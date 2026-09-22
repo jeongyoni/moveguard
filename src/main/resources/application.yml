@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: moveguard
+  profiles:
+    active: local
+  sql:
+    init:
+      mode: never
+
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
