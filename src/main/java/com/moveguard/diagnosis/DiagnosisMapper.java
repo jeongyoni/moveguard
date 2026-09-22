@@ -5,6 +5,7 @@ import com.moveguard.asset.AssetIp;
 import com.moveguard.asset.Dependency;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface DiagnosisMapper {
@@ -14,4 +15,10 @@ public interface DiagnosisMapper {
     List<AssetIp> findAssetIps(Long projectId);
 
     List<Dependency> findDependencies(Long projectId);
+
+    List<RuleDefinition> findEnabledRules();
+
+    void insertRun(DiagnosisRun run);
+
+    void insertFindings(@Param("findings") List<FindingRecord> findings);
 }

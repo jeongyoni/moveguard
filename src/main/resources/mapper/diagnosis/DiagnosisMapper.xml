@@ -26,4 +26,31 @@
         ORDER BY dependency_id
     </select>
 
+    <select id="findEnabledRules" resultType="com.moveguard.diagnosis.RuleDefinition">
+        SELECT r.rule_id, r.rule_code,
+               f.code   AS factor_code,
+               f.weight AS factor_weight,
+               r.title, r.severity, r.occurrence, r.detection,
+               r.is_blocking AS blocking,
+               r.message_template, r.mitigation
+        FROM risk_rule r
+        JOIN risk_factor f ON f.factor_id = r.factor_id
+        WHERE r.enabled = 1
+    </select>
+
+    <insert id="insertRun" useGeneratedKeys="true" keyProperty="runId">
+        INSERT INTO diagnosis_run (project_id, total_score, risk_level, blocked, finding_count)
+        VALUES (#{projectId}, #{totalScore}, #{riskLevel}, #{blocked}, #{findingCount})
+    </insert>
+
+    <insert id="insertFindings">
+        INSERT INTO diagnosis_finding (run_id, rule_id, asset_id, dependency_id, rpn, detail)
+        VALUES
+        <foreach collection="findings" item="f" separator=",">
+            (#{f.runId}, #{f.ruleId},
+             #{f.assetId, jdbcType=BIGINT}, #{f.dependencyId, jdbcType=BIGINT},
+             #{f.rpn}, #{f.detail})
+        </foreach>
+    </insert>
+
 </mapper>
