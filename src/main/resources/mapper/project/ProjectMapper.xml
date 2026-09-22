@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moveguard.project.ProjectMapper">
+
+    <sql id="projectColumns">
+        project_id, name, customer_name, source_env, target_env,
+        status, planned_date, created_at, updated_at
+    </sql>
+
+    <select id="findById" resultType="com.moveguard.project.Project">
+        SELECT <include refid="projectColumns"/>
+        FROM migration_project
+        WHERE project_id = #{projectId}
+    </select>
+
+    <select id="findAll" resultType="com.moveguard.project.Project">
+        SELECT <include refid="projectColumns"/>
+        FROM migration_project
+        ORDER BY project_id DESC
+    </select>
+
+</mapper>

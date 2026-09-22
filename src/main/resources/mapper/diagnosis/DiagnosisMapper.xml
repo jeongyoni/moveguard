@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moveguard.diagnosis.DiagnosisMapper">
+
+    <select id="findAssets" resultType="com.moveguard.asset.Asset">
+        SELECT asset_id, project_id, name, asset_type, role
+        FROM asset
+        WHERE project_id = #{projectId}
+        ORDER BY asset_id
+    </select>
+
+    <select id="findAssetIps" resultType="com.moveguard.asset.AssetIp">
+        SELECT i.ip_id, i.asset_id, i.address, i.ip_type, i.phase, i.ext_whitelisted
+        FROM asset_ip i
+        JOIN asset a ON a.asset_id = i.asset_id
+        WHERE a.project_id = #{projectId}
+        ORDER BY i.ip_id
+    </select>
+
+    <select id="findDependencies" resultType="com.moveguard.asset.Dependency">
+        SELECT dependency_id, project_id, from_asset_id, to_asset_id,
+               target_address, target_port, protocol, config_location
+        FROM dependency
+        WHERE project_id = #{projectId}
+        ORDER BY dependency_id
+    </select>
+
+</mapper>
