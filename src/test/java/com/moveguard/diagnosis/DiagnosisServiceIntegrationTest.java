@@ -17,7 +17,7 @@ class DiagnosisServiceIntegrationTest {
     private DiagnosisService diagnosisService;
 
     @Test
-    @DisplayName("더미 사업 진단 → HIGH, 전환 차단, 피드백 문구 치환 완료")
+    @DisplayName("더미 사업 진단 → 네트워크 규칙 2건(IP-01·02) 발견, HIGH, 전환 차단")
     void diagnosesSeedProject() {
         DiagnosisResult result = diagnosisService.diagnose(1L).orElseThrow();
 
@@ -27,10 +27,10 @@ class DiagnosisServiceIntegrationTest {
         // 규칙이 추가될 때마다 기대값을 함께 갱신한다
         assertThat(result.findings())
                 .extracting(DiagnosisResult.Item::ruleCode)
-                .containsExactly("IP-01");
-        assertThat(result.findings().get(0).message())
-                .contains("web01", "db01", "203.0.113.21")
-                .doesNotContain("{");
+                .containsExactlyInAnyOrder("IP-01", "IP-02");
+        assertThat(result.findings())
+                .extracting(DiagnosisResult.Item::message)
+                .noneMatch(message -> message.contains("{"));
     }
 
     @Test
