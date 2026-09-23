@@ -17,17 +17,19 @@ class DiagnosisServiceIntegrationTest {
     private DiagnosisService diagnosisService;
 
     @Test
-    @DisplayName("더미 사업 진단 → 네트워크 규칙 3건(IP-01·02·03) 발견, HIGH, 전환 차단")
+    @DisplayName("더미 사업 진단 → 네트워크 규칙 4건이 RPN 내림차순으로 발견, HIGH, 전환 차단")
     void diagnosesSeedProject() {
         DiagnosisResult result = diagnosisService.diagnose(1L).orElseThrow();
 
         assertThat(result.runId()).isNotNull();
         assertThat(result.riskLevel()).isEqualTo(RiskLevel.HIGH);
         assertThat(result.blocked()).isTrue();
+        assertThat(result.maxRpn()).isEqualTo(504);
+        assertThat(result.totalScore()).isEqualByComparingTo("17.64");
         // 규칙이 추가될 때마다 기대값을 함께 갱신한다
         assertThat(result.findings())
                 .extracting(DiagnosisResult.Item::ruleCode)
-                .containsExactlyInAnyOrder("IP-01", "IP-02", "IP-03");
+                .containsExactly("IP-04", "IP-01", "IP-03", "IP-02");
         assertThat(result.findings())
                 .extracting(DiagnosisResult.Item::message)
                 .noneMatch(message -> message.contains("{"));
