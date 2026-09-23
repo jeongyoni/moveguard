@@ -17,7 +17,7 @@ class DiagnosisServiceIntegrationTest {
     private DiagnosisService diagnosisService;
 
     @Test
-    @DisplayName("더미 사업 진단 → 네트워크 규칙 2건(IP-01·02) 발견, HIGH, 전환 차단")
+    @DisplayName("더미 사업 진단 → 네트워크 규칙 3건(IP-01·02·03) 발견, HIGH, 전환 차단")
     void diagnosesSeedProject() {
         DiagnosisResult result = diagnosisService.diagnose(1L).orElseThrow();
 
@@ -27,7 +27,7 @@ class DiagnosisServiceIntegrationTest {
         // 규칙이 추가될 때마다 기대값을 함께 갱신한다
         assertThat(result.findings())
                 .extracting(DiagnosisResult.Item::ruleCode)
-                .containsExactlyInAnyOrder("IP-01", "IP-02");
+                .containsExactlyInAnyOrder("IP-01", "IP-02", "IP-03");
         assertThat(result.findings())
                 .extracting(DiagnosisResult.Item::message)
                 .noneMatch(message -> message.contains("{"));
