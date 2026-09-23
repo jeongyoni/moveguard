@@ -54,6 +54,16 @@ refactor: 규칙 공통 로직을 DiagnosisContext로 이동
 - 커밋 메시지와 PR 제목·본문에는 사람이 읽을 내용만 적는다
 - AI 어시스턴트가 작성했다는 표시(`Co-Authored-By`, `Generated with ...` 등 서명·꼬리말)를 남기지 않는다
 
+### commit-msg 훅 활성화
+
+`.githooks/commit-msg`가 위 규칙을 커밋 단계에서 강제한다. 클론 후 한 번만 아래 명령으로 켠다.
+
+~~~
+git config core.hooksPath .githooks
+~~~
+
+AI 서명이 포함된 커밋 메시지는 훅이 거부한다.
+
 ## 브랜치
 
 | 브랜치 | 용도 |

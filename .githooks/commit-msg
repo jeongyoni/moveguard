@@ -1,0 +1,18 @@
+#!/bin/sh
+# 커밋 메시지에 AI 어시스턴트 서명이 들어가지 못하게 막는다.
+# 활성화: git config core.hooksPath .githooks
+# (docs/GIT_CONVENTION.md의 'AI 도구 사용 규칙' 참고)
+
+msg_file="$1"
+
+# 대소문자 무시. 하나라도 걸리면 커밋을 거부한다.
+forbidden='co-authored-by:[[:space:]]*claude|co-authored-by:.*anthropic|generated with .*claude|noreply@anthropic\.com|🤖 generated with'
+
+if grep -iEn "$forbidden" "$msg_file" >/dev/null 2>&1; then
+    echo "✗ 커밋 거부: 메시지에 AI 어시스턴트 서명이 포함되어 있습니다." >&2
+    echo "  해당 줄을 지우고 다시 커밋하세요:" >&2
+    grep -iEn "$forbidden" "$msg_file" >&2
+    exit 1
+fi
+
+exit 0
