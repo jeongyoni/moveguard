@@ -4,6 +4,7 @@ import com.moveguard.asset.Asset;
 import com.moveguard.asset.AssetIp;
 import com.moveguard.asset.AssetIp.IpType;
 import com.moveguard.asset.Dependency;
+import com.moveguard.asset.DnsRecord;
 import com.moveguard.asset.Phase;
 import java.util.List;
 import java.util.Map;
@@ -22,14 +23,16 @@ public class DiagnosisContext {
     private final Map<Long, Asset> assets;
     private final List<AssetIp> ips;
     private final List<Dependency> dependencies;
+    private final List<DnsRecord> dnsRecords;
 
-    public DiagnosisContext(Long projectId, List<Asset> assets,
-                            List<AssetIp> ips, List<Dependency> dependencies) {
+    public DiagnosisContext(Long projectId, List<Asset> assets, List<AssetIp> ips,
+                            List<Dependency> dependencies, List<DnsRecord> dnsRecords) {
         this.projectId = projectId;
         this.assets = assets.stream()
                 .collect(Collectors.toMap(Asset::getAssetId, Function.identity()));
         this.ips = List.copyOf(ips);
         this.dependencies = List.copyOf(dependencies);
+        this.dnsRecords = List.copyOf(dnsRecords);
     }
 
     public Long projectId() {
@@ -46,6 +49,10 @@ public class DiagnosisContext {
 
     public List<Dependency> dependencies() {
         return dependencies;
+    }
+
+    public List<DnsRecord> dnsRecords() {
+        return dnsRecords;
     }
 
     /** 자산이 해당 단계에서 주어진 주소를 갖고 있는지 */
@@ -69,5 +76,20 @@ public class DiagnosisContext {
     public boolean isChangingPublicIp(Long assetId, String address) {
         return hasIp(assetId, address, Phase.BEFORE, IpType.PUBLIC)
                 && !hasIp(assetId, address, Phase.AFTER);
+    }
+
+    /** 자산을 특정하지 않고, 주어진 주소가 이전 전 어느 자산의 공인IP였고 이전 후 그 자산에 남아 있지 않으면 true */
+    public boolean isChangingPublicIpAddress(String address) {
+        return ips.stream()
+                .filter(ip -> ip.getPhase() == Phase.BEFORE
+                        && ip.getIpType() == IpType.PUBLIC
+                        && Objects.equals(ip.getAddress(), address))
+                .anyMatch(ip -> !hasIp(ip.getAssetId(), address, Phase.AFTER));
+    }
+
+    /** 해당 도메인의 특정 단계 DNS 레코드가 하나라도 있으면 true */
+    public boolean hasDnsRecord(String domain, Phase phase) {
+        return dnsRecords.stream().anyMatch(record ->
+                Objects.equals(record.getDomain(), domain) && record.getPhase() == phase);
     }
 }
