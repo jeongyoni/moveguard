@@ -3,10 +3,12 @@ package com.moveguard.diagnosis.rule;
 import com.moveguard.asset.Asset;
 import com.moveguard.asset.AssetIp;
 import com.moveguard.asset.AssetIp.IpType;
+import com.moveguard.asset.Certificate;
 import com.moveguard.asset.Dependency;
 import com.moveguard.asset.DnsRecord;
 import com.moveguard.asset.Phase;
 import com.moveguard.diagnosis.DiagnosisContext;
+import java.time.LocalDate;
 import java.util.List;
 
 /** 규칙 단위 테스트용 공통 데이터 */
@@ -15,6 +17,8 @@ final class Fixtures {
     static final Asset WEB = new Asset(1L, 1L, "web01", "SERVER", "WEB");
     static final Asset DB = new Asset(2L, 1L, "db01", "SERVER", "DB");
     static final Asset PG = new Asset(3L, 1L, "pg-api", "EXTERNAL", null);
+
+    static final LocalDate PLANNED_DATE = LocalDate.of(2026, 10, 24);
 
     private Fixtures() {
     }
@@ -36,12 +40,22 @@ final class Fixtures {
         return new DnsRecord(null, 1L, domain, "A", value, ttl, phase);
     }
 
+    static Certificate cert(String domain, LocalDate notAfter, Phase phase) {
+        return new Certificate(null, 1L, domain, "Test CA", notAfter, phase);
+    }
+
     static DiagnosisContext context(List<AssetIp> ips, List<Dependency> dependencies) {
         return context(ips, dependencies, List.of());
     }
 
     static DiagnosisContext context(List<AssetIp> ips, List<Dependency> dependencies,
                                     List<DnsRecord> dnsRecords) {
-        return new DiagnosisContext(1L, List.of(WEB, DB, PG), ips, dependencies, dnsRecords);
+        return new DiagnosisContext(1L, List.of(WEB, DB, PG), ips, dependencies, dnsRecords,
+                List.of(), PLANNED_DATE);
+    }
+
+    static DiagnosisContext certContext(List<Certificate> certificates, LocalDate plannedDate) {
+        return new DiagnosisContext(1L, List.of(WEB, DB, PG), List.of(), List.of(), List.of(),
+                certificates, plannedDate);
     }
 }

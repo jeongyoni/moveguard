@@ -3,9 +3,11 @@ package com.moveguard.diagnosis;
 import com.moveguard.asset.Asset;
 import com.moveguard.asset.AssetIp;
 import com.moveguard.asset.AssetIp.IpType;
+import com.moveguard.asset.Certificate;
 import com.moveguard.asset.Dependency;
 import com.moveguard.asset.DnsRecord;
 import com.moveguard.asset.Phase;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,15 +26,20 @@ public class DiagnosisContext {
     private final List<AssetIp> ips;
     private final List<Dependency> dependencies;
     private final List<DnsRecord> dnsRecords;
+    private final List<Certificate> certificates;
+    private final LocalDate plannedDate;
 
     public DiagnosisContext(Long projectId, List<Asset> assets, List<AssetIp> ips,
-                            List<Dependency> dependencies, List<DnsRecord> dnsRecords) {
+                            List<Dependency> dependencies, List<DnsRecord> dnsRecords,
+                            List<Certificate> certificates, LocalDate plannedDate) {
         this.projectId = projectId;
         this.assets = assets.stream()
                 .collect(Collectors.toMap(Asset::getAssetId, Function.identity()));
         this.ips = List.copyOf(ips);
         this.dependencies = List.copyOf(dependencies);
         this.dnsRecords = List.copyOf(dnsRecords);
+        this.certificates = List.copyOf(certificates);
+        this.plannedDate = plannedDate;
     }
 
     public Long projectId() {
@@ -53,6 +60,15 @@ public class DiagnosisContext {
 
     public List<DnsRecord> dnsRecords() {
         return dnsRecords;
+    }
+
+    public List<Certificate> certificates() {
+        return certificates;
+    }
+
+    /** 이전 예정일 (미정이면 empty) */
+    public Optional<LocalDate> plannedDate() {
+        return Optional.ofNullable(plannedDate);
     }
 
     /** 자산이 해당 단계에서 주어진 주소를 갖고 있는지 */
@@ -78,6 +94,12 @@ public class DiagnosisContext {
                 && !hasIp(assetId, address, Phase.AFTER);
     }
 
+    /** 주어진 주소가 어느 단계에서든 공인IP로 등록되어 있으면 true */
+    public boolean isPublicIp(String address) {
+        return ips.stream().anyMatch(ip ->
+                ip.getIpType() == IpType.PUBLIC && Objects.equals(ip.getAddress(), address));
+    }
+
     /** 자산을 특정하지 않고, 주어진 주소가 이전 전 어느 자산의 공인IP였고 이전 후 그 자산에 남아 있지 않으면 true */
     public boolean isChangingPublicIpAddress(String address) {
         return ips.stream()
@@ -91,5 +113,11 @@ public class DiagnosisContext {
     public boolean hasDnsRecord(String domain, Phase phase) {
         return dnsRecords.stream().anyMatch(record ->
                 Objects.equals(record.getDomain(), domain) && record.getPhase() == phase);
+    }
+
+    /** 해당 도메인의 특정 단계 인증서가 하나라도 있으면 true */
+    public boolean hasCertificate(String domain, Phase phase) {
+        return certificates.stream().anyMatch(cert ->
+                Objects.equals(cert.getDomain(), domain) && cert.getPhase() == phase);
     }
 }

@@ -17,6 +17,9 @@ public class DiagnosisContextLoader {
                 diagnosisMapper.findAssets(projectId),
                 diagnosisMapper.findAssetIps(projectId),
                 diagnosisMapper.findDependencies(projectId),
-                diagnosisMapper.findDnsRecords(projectId));
+                diagnosisMapper.findDnsRecords(projectId),
+                diagnosisMapper.findCertificates(projectId),
+                diagnosisMapper.findPlannedDate(projectId));
     }
 }
+

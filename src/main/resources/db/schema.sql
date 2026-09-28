@@ -11,6 +11,7 @@ DROP TABLE IF EXISTS diagnosis_finding;
 DROP TABLE IF EXISTS diagnosis_run;
 DROP TABLE IF EXISTS risk_rule;
 DROP TABLE IF EXISTS risk_factor;
+DROP TABLE IF EXISTS certificate;
 DROP TABLE IF EXISTS dns_record;
 DROP TABLE IF EXISTS dependency;
 DROP TABLE IF EXISTS asset_attribute;
@@ -137,6 +138,22 @@ CREATE TABLE dns_record
     CONSTRAINT chk_dns_phase CHECK (phase IN ('BEFORE', 'AFTER')),
     CONSTRAINT chk_dns_ttl CHECK (ttl >= 0)
 ) ENGINE = InnoDB COMMENT = 'DNS 레코드 (이전 전/후)';
+
+CREATE TABLE certificate
+(
+    cert_id    BIGINT       NOT NULL AUTO_INCREMENT,
+    project_id BIGINT       NOT NULL,
+    domain     VARCHAR(255) NOT NULL,
+    issuer     VARCHAR(255),
+    not_after  DATE         NOT NULL COMMENT '만료일',
+    phase      VARCHAR(10)  NOT NULL COMMENT 'BEFORE / AFTER',
+    created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (cert_id),
+    KEY        idx_cert_domain (domain, phase),
+    CONSTRAINT fk_cert_project FOREIGN KEY (project_id)
+        REFERENCES migration_project (project_id) ON DELETE CASCADE,
+    CONSTRAINT chk_cert_phase CHECK (phase IN ('BEFORE', 'AFTER'))
+) ENGINE = InnoDB COMMENT = 'TLS 인증서 (이전 전/후)';
 
 CREATE TABLE risk_factor
 (
