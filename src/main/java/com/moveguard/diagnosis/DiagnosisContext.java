@@ -7,6 +7,7 @@ import com.moveguard.asset.Dependency;
 import com.moveguard.asset.Phase;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -47,19 +48,26 @@ public class DiagnosisContext {
         return dependencies;
     }
 
+    /** 자산이 해당 단계에서 주어진 주소를 갖고 있는지 */
+    public boolean hasIp(Long assetId, String address, Phase phase) {
+        return ips.stream().anyMatch(ip ->
+                Objects.equals(ip.getAssetId(), assetId)
+                        && ip.getPhase() == phase
+                        && Objects.equals(ip.getAddress(), address));
+    }
+
+    /** 자산이 해당 단계에서 주어진 주소를 특정 종류(공인/사설)로 갖고 있는지 */
+    public boolean hasIp(Long assetId, String address, Phase phase, IpType type) {
+        return ips.stream().anyMatch(ip ->
+                Objects.equals(ip.getAssetId(), assetId)
+                        && ip.getPhase() == phase
+                        && ip.getIpType() == type
+                        && Objects.equals(ip.getAddress(), address));
+    }
+
     /** 이전 전 공인IP였던 주소가 이전 후 같은 자산에 남아 있지 않으면 true */
     public boolean isChangingPublicIp(Long assetId, String address) {
-        boolean wasPublic = ips.stream().anyMatch(ip ->
-                ip.getAssetId().equals(assetId)
-                        && ip.getPhase() == Phase.BEFORE
-                        && ip.getIpType() == IpType.PUBLIC
-                        && ip.getAddress().equals(address));
-
-        boolean keptAfter = ips.stream().anyMatch(ip ->
-                ip.getAssetId().equals(assetId)
-                        && ip.getPhase() == Phase.AFTER
-                        && ip.getAddress().equals(address));
-
-        return wasPublic && !keptAfter;
+        return hasIp(assetId, address, Phase.BEFORE, IpType.PUBLIC)
+                && !hasIp(assetId, address, Phase.AFTER);
     }
 }
