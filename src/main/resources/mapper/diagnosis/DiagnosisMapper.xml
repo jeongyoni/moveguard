@@ -26,6 +26,13 @@
         ORDER BY dependency_id
     </select>
 
+    <select id="findDnsRecords" resultType="com.moveguard.asset.DnsRecord">
+        SELECT dns_id, project_id, domain, record_type, value, ttl, phase
+        FROM dns_record
+        WHERE project_id = #{projectId}
+        ORDER BY dns_id
+    </select>
+
     <select id="findEnabledRules" resultType="com.moveguard.diagnosis.RuleDefinition">
         SELECT r.rule_id, r.rule_code,
                f.code   AS factor_code,

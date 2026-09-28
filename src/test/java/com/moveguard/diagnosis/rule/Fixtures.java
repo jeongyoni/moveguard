@@ -4,6 +4,7 @@ import com.moveguard.asset.Asset;
 import com.moveguard.asset.AssetIp;
 import com.moveguard.asset.AssetIp.IpType;
 import com.moveguard.asset.Dependency;
+import com.moveguard.asset.DnsRecord;
 import com.moveguard.asset.Phase;
 import com.moveguard.diagnosis.DiagnosisContext;
 import java.util.List;
@@ -31,7 +32,16 @@ final class Fixtures {
                 targetAddress, 3306, "JDBC", "application.yml spring.datasource.url");
     }
 
+    static DnsRecord aRecord(String domain, String value, int ttl, Phase phase) {
+        return new DnsRecord(null, 1L, domain, "A", value, ttl, phase);
+    }
+
     static DiagnosisContext context(List<AssetIp> ips, List<Dependency> dependencies) {
-        return new DiagnosisContext(1L, List.of(WEB, DB, PG), ips, dependencies);
+        return context(ips, dependencies, List.of());
+    }
+
+    static DiagnosisContext context(List<AssetIp> ips, List<Dependency> dependencies,
+                                    List<DnsRecord> dnsRecords) {
+        return new DiagnosisContext(1L, List.of(WEB, DB, PG), ips, dependencies, dnsRecords);
     }
 }
