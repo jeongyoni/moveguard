@@ -82,6 +82,7 @@ class PublicIpChangeRuleTest {
     }
 
     private static DiagnosisContext context(List<AssetIp> ips, Dependency dependency) {
-        return new DiagnosisContext(1L, List.of(WEB, DB), ips, List.of(dependency), List.of());
+        return new DiagnosisContext(1L, List.of(WEB, DB), ips, List.of(dependency),
+                List.of(), List.of(), null);
     }
 }

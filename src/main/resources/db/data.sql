@@ -76,6 +76,15 @@ VALUES ('PORT-02',
         '{asset}에서 {target}(으)로의 통신이 평문 프로토콜({protocol})을 사용합니다.',
         'TLS 기반 프로토콜로 전환해 전송 구간을 암호화하고, 자격 증명·데이터 노출을 방지하십시오.');
 
+INSERT INTO risk_rule
+(rule_code, factor_id, title, severity, occurrence, detection, is_blocking, message_template, mitigation)
+VALUES ('CERT-01',
+        (SELECT factor_id FROM risk_factor WHERE code = 'SECURITY'),
+        '인증서 만료가 전환 시점과 근접',
+        8, 6, 4, 1,
+        '{domain} 인증서가 {expiry}에 만료되어 전환 예정일({planned}) 기준 임박했습니다.',
+        '전환 전에 인증서를 갱신하고, 신규 환경에도 유효한 인증서를 배포한 뒤 만료일을 재확인하십시오.');
+
 INSERT INTO attribute_def (attr_key, data_type, description)
 VALUES ('maintenance_window', 'STRING', '작업 가능 시간대'),
        ('service_criticality', 'NUMBER', '서비스 중요도 1~5'),
@@ -118,6 +127,11 @@ VALUES (@p, @web, @db, '203.0.113.21', 3306, 'JDBC', 'application.yml spring.dat
 INSERT INTO dns_record (project_id, domain, record_type, value, ttl, phase)
 VALUES (@p, 'shop.example.com', 'A', '203.0.113.11', 3600, 'BEFORE'),
        (@p, 'shop.example.com', 'A', '198.51.100.21', 300, 'AFTER');
+
+-- 이전 전 인증서는 전환 예정일(2026-10-24) 직후 만료 → CERT-01, 이전 후 갱신 인증서 존재 → CERT-02 미발생
+INSERT INTO certificate (project_id, domain, issuer, not_after, phase)
+VALUES (@p, 'shop.example.com', 'Lets Encrypt R3', '2026-11-10', 'BEFORE'),
+       (@p, 'shop.example.com', 'Lets Encrypt R3', '2027-11-10', 'AFTER');
 
 INSERT INTO asset_attribute (asset_id, attr_key, attr_value)
 VALUES (@web, 'service_criticality', '5'),

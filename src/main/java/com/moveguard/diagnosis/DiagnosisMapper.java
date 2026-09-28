@@ -2,8 +2,10 @@ package com.moveguard.diagnosis;
 
 import com.moveguard.asset.Asset;
 import com.moveguard.asset.AssetIp;
+import com.moveguard.asset.Certificate;
 import com.moveguard.asset.Dependency;
 import com.moveguard.asset.DnsRecord;
+import java.time.LocalDate;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -18,6 +20,10 @@ public interface DiagnosisMapper {
     List<Dependency> findDependencies(Long projectId);
 
     List<DnsRecord> findDnsRecords(Long projectId);
+
+    List<Certificate> findCertificates(Long projectId);
+
+    LocalDate findPlannedDate(Long projectId);
 
     List<RuleDefinition> findEnabledRules();
 

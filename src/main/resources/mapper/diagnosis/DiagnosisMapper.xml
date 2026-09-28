@@ -33,6 +33,19 @@
         ORDER BY dns_id
     </select>
 
+    <select id="findCertificates" resultType="com.moveguard.asset.Certificate">
+        SELECT cert_id, project_id, domain, issuer, not_after, phase
+        FROM certificate
+        WHERE project_id = #{projectId}
+        ORDER BY cert_id
+    </select>
+
+    <select id="findPlannedDate" resultType="java.time.LocalDate">
+        SELECT planned_date
+        FROM migration_project
+        WHERE project_id = #{projectId}
+    </select>
+
     <select id="findEnabledRules" resultType="com.moveguard.diagnosis.RuleDefinition">
         SELECT r.rule_id, r.rule_code,
                f.code   AS factor_code,
