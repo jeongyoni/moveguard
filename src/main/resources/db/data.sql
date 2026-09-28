@@ -67,6 +67,15 @@ VALUES ('PORT-01',
         '{asset}이(가) {target}의 민감 포트 {port}에 공인IP {address}로 접속합니다.',
         '내부 통신은 사설 대역과 보안그룹으로 제한하고, 외부 노출이 불가피하면 접근 허용 IP를 최소화하십시오.');
 
+INSERT INTO risk_rule
+(rule_code, factor_id, title, severity, occurrence, detection, is_blocking, message_template, mitigation)
+VALUES ('PORT-02',
+        (SELECT factor_id FROM risk_factor WHERE code = 'SECURITY'),
+        '평문 프로토콜로 통신',
+        6, 5, 6, 0,
+        '{asset}에서 {target}(으)로의 통신이 평문 프로토콜({protocol})을 사용합니다.',
+        'TLS 기반 프로토콜로 전환해 전송 구간을 암호화하고, 자격 증명·데이터 노출을 방지하십시오.');
+
 INSERT INTO attribute_def (attr_key, data_type, description)
 VALUES ('maintenance_window', 'STRING', '작업 가능 시간대'),
        ('service_criticality', 'NUMBER', '서비스 중요도 1~5'),
