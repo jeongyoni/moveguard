@@ -85,6 +85,15 @@ VALUES ('CERT-01',
         '{domain} 인증서가 {expiry}에 만료되어 전환 예정일({planned}) 기준 임박했습니다.',
         '전환 전에 인증서를 갱신하고, 신규 환경에도 유효한 인증서를 배포한 뒤 만료일을 재확인하십시오.');
 
+INSERT INTO risk_rule
+(rule_code, factor_id, title, severity, occurrence, detection, is_blocking, message_template, mitigation)
+VALUES ('CERT-02',
+        (SELECT factor_id FROM risk_factor WHERE code = 'SECURITY'),
+        '인증서의 이전 후 갱신·이관 계획 누락',
+        7, 5, 6, 1,
+        '{domain} 인증서의 이전 후 갱신·이관 계획이 등록되지 않았습니다.',
+        '신규 환경에 배포할 인증서를 준비하고 만료 전 교체 일정을 전환 계획에 포함하십시오.');
+
 INSERT INTO attribute_def (attr_key, data_type, description)
 VALUES ('maintenance_window', 'STRING', '작업 가능 시간대'),
        ('service_criticality', 'NUMBER', '서비스 중요도 1~5'),
