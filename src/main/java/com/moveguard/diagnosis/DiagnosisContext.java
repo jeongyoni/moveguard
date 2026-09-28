@@ -78,6 +78,12 @@ public class DiagnosisContext {
                 && !hasIp(assetId, address, Phase.AFTER);
     }
 
+    /** 주어진 주소가 어느 단계에서든 공인IP로 등록되어 있으면 true */
+    public boolean isPublicIp(String address) {
+        return ips.stream().anyMatch(ip ->
+                ip.getIpType() == IpType.PUBLIC && Objects.equals(ip.getAddress(), address));
+    }
+
     /** 자산을 특정하지 않고, 주어진 주소가 이전 전 어느 자산의 공인IP였고 이전 후 그 자산에 남아 있지 않으면 true */
     public boolean isChangingPublicIpAddress(String address) {
         return ips.stream()

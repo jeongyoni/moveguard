@@ -58,6 +58,15 @@ VALUES ('IP-01',
         '{domain} A 레코드가 변경 예정 IP {address}를 가리키지만 이전 후 레코드가 등록되지 않았습니다.',
         '이전 후 레코드 값을 확정하고 변경 담당자와 시점을 전환 계획에 포함하십시오.');
 
+INSERT INTO risk_rule
+(rule_code, factor_id, title, severity, occurrence, detection, is_blocking, message_template, mitigation)
+VALUES ('PORT-01',
+        (SELECT factor_id FROM risk_factor WHERE code = 'SECURITY'),
+        '민감 포트가 공인IP로 노출됨',
+        8, 6, 5, 1,
+        '{asset}이(가) {target}의 민감 포트 {port}에 공인IP {address}로 접속합니다.',
+        '내부 통신은 사설 대역과 보안그룹으로 제한하고, 외부 노출이 불가피하면 접근 허용 IP를 최소화하십시오.');
+
 INSERT INTO attribute_def (attr_key, data_type, description)
 VALUES ('maintenance_window', 'STRING', '작업 가능 시간대'),
        ('service_criticality', 'NUMBER', '서비스 중요도 1~5'),
