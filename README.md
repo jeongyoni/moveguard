@@ -83,7 +83,11 @@ docker compose up -d
 ```bash
 docker exec -i moveguard-mysql mysql -uroot -proot1234 moveguard < src/main/resources/db/schema.sql
 docker exec -i moveguard-mysql mysql -uroot -proot1234 moveguard < src/main/resources/db/data.sql
+docker exec -i moveguard-mysql mysql -uroot -proot1234 moveguard < src/main/resources/db/compat_schema.sql
+docker exec -i moveguard-mysql mysql -uroot -proot1234 moveguard < src/main/resources/db/compat_data.sql
 ```
+
+> 외래키 때문에 적용 순서를 지켜야 합니다: `schema.sql` → `data.sql` → `compat_schema.sql` → `compat_data.sql`
 
 ### 3. 애플리케이션 실행
 
