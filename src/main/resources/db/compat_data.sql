@@ -46,7 +46,8 @@ VALUES
 -- 2. 동기화 대상 제품
 INSERT INTO compat_product (product, label, category, version_command, source_url, fetch_status) VALUES
 ('tomcat',          'Apache Tomcat',   'server-app', './bin/version.sh',                    'https://endoflife.date/tomcat',          'PENDING'),
-('java',            'Java (JDK)',      'lang',       'java -version',                       'https://endoflife.date/java',            'PENDING'),
+-- java는 endoflife.date에 통합 제품이 없고 배포판(oracle-jdk 등)으로 나뉘므로 동기화 대상에서 제외(MANUAL)
+('java',            'Java (JDK)',      'lang',       'java -version',                       'https://endoflife.date/',                'MANUAL'),
 ('mysql',           'MySQL',           'database',   'mysqld --version',                    'https://endoflife.date/mysql',           'PENDING'),
 ('oracle-database', 'Oracle Database', 'database',   'SELECT BANNER_FULL FROM V$VERSION;',  'https://endoflife.date/oracle-database', 'PENDING'),
 ('postgresql',      'PostgreSQL',      'database',   'postgres --version',                  'https://endoflife.date/postgresql',      'PENDING'),

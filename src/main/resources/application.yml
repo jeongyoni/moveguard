@@ -11,3 +11,7 @@ mybatis:
   mapper-locations: classpath:mapper/**/*.xml
   configuration:
     map-underscore-to-camel-case: true
+
+compat:
+  endoflife:
+    base-url: https://endoflife.date/api
