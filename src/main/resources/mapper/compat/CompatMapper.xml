@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moveguard.compat.CompatMapper">
+
+    <select id="findProducts" resultType="com.moveguard.compat.CompatProduct">
+        SELECT product, label, category, version_command, source_url, fetched_at, fetch_status
+        FROM compat_product
+        ORDER BY product
+    </select>
+
+    <select id="findAllReleases" resultType="com.moveguard.compat.CompatRelease">
+        SELECT release_id, product, version, label, release_date,
+               is_lts        AS lts,
+               is_eol        AS eol,
+               eol_date,
+               ext_support_date,
+               is_maintained AS maintained,
+               latest_version, min_java_version,
+               is_manual     AS manual
+        FROM compat_release
+    </select>
+
+    <select id="findManualVersions" resultType="string">
+        SELECT version
+        FROM compat_release
+        WHERE product = #{product} AND is_manual = 1
+    </select>
+
+    <insert id="upsertRelease">
+        INSERT INTO compat_release
+            (product, version, label, release_date, is_lts, is_eol, eol_date,
+             ext_support_date, is_maintained, latest_version, min_java_version, is_manual)
+        VALUES
+            (#{product}, #{version}, #{label}, #{releaseDate}, #{lts}, #{eol}, #{eolDate},
+             #{extSupportDate}, #{maintained}, #{latestVersion}, #{minJavaVersion}, #{manual})
+        ON DUPLICATE KEY UPDATE
+            label = VALUES(label),
+            release_date = VALUES(release_date),
+            is_lts = VALUES(is_lts),
+            is_eol = VALUES(is_eol),
+            eol_date = VALUES(eol_date),
+            ext_support_date = VALUES(ext_support_date),
+            is_maintained = VALUES(is_maintained),
+            latest_version = VALUES(latest_version),
+            min_java_version = VALUES(min_java_version)
+    </insert>
+
+    <update id="updateProductStatus">
+        UPDATE compat_product
+        SET fetch_status = #{status}, fetched_at = #{fetchedAt}
+        WHERE product = #{product}
+    </update>
+
+</mapper>

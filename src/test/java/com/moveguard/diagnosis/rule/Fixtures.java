@@ -3,10 +3,12 @@ package com.moveguard.diagnosis.rule;
 import com.moveguard.asset.Asset;
 import com.moveguard.asset.AssetIp;
 import com.moveguard.asset.AssetIp.IpType;
+import com.moveguard.asset.AssetSoftware;
 import com.moveguard.asset.Certificate;
 import com.moveguard.asset.Dependency;
 import com.moveguard.asset.DnsRecord;
 import com.moveguard.asset.Phase;
+import com.moveguard.compat.CompatRelease;
 import com.moveguard.diagnosis.DiagnosisContext;
 import java.time.LocalDate;
 import java.util.List;
@@ -57,5 +59,22 @@ final class Fixtures {
     static DiagnosisContext certContext(List<Certificate> certificates, LocalDate plannedDate) {
         return new DiagnosisContext(1L, List.of(WEB, DB, PG), List.of(), List.of(), List.of(),
                 certificates, plannedDate);
+    }
+
+    static AssetSoftware sw(Asset asset, String product, String version, String releaseLine, Phase phase) {
+        return new AssetSoftware(null, asset.getAssetId(), product, null, version, releaseLine, phase);
+    }
+
+    /** eol 여부·만료일·최소 Java만 지정하는 간이 릴리스 */
+    static CompatRelease release(String product, String version, boolean eol, LocalDate eolDate,
+                                 String minJavaVersion) {
+        return new CompatRelease(null, product, version, version, null, false, eol, eolDate,
+                null, !eol, null, minJavaVersion, false);
+    }
+
+    static DiagnosisContext compatContext(List<AssetSoftware> software, List<CompatRelease> releases,
+                                          LocalDate plannedDate) {
+        return new DiagnosisContext(1L, List.of(WEB, DB, PG), List.of(), List.of(), List.of(),
+                List.of(), plannedDate, software, releases);
     }
 }
