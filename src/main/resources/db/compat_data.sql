@@ -51,7 +51,16 @@ INSERT INTO compat_product (product, label, category, version_command, source_ur
 ('mysql',           'MySQL',           'database',   'mysqld --version',                    'https://endoflife.date/mysql',           'PENDING'),
 ('oracle-database', 'Oracle Database', 'database',   'SELECT BANNER_FULL FROM V$VERSION;',  'https://endoflife.date/oracle-database', 'PENDING'),
 ('postgresql',      'PostgreSQL',      'database',   'postgres --version',                  'https://endoflife.date/postgresql',      'PENDING'),
-('nginx',           'nginx',           'server-app', 'nginx -v',                            'https://endoflife.date/nginx',           'PENDING');
+('nginx',           'nginx',           'server-app', 'nginx -v',                            'https://endoflife.date/nginx',           'PENDING'),
+-- OS (IDC → 클라우드 이전에서 지원 종료·업그레이드 경로 진단용)
+('rocky-linux',     'Rocky Linux',     'os',         'cat /etc/os-release',                 'https://endoflife.date/rocky-linux',     'PENDING'),
+('rhel',            'RHEL',            'os',         'cat /etc/redhat-release',             'https://endoflife.date/rhel',            'PENDING'),
+('centos',          'CentOS',          'os',         'cat /etc/centos-release',             'https://endoflife.date/centos',          'PENDING'),
+('ubuntu',          'Ubuntu',          'os',         'lsb_release -a',                      'https://endoflife.date/ubuntu',          'PENDING'),
+('debian',          'Debian',          'os',         'cat /etc/debian_version',             'https://endoflife.date/debian',          'PENDING'),
+('amazon-linux',    'Amazon Linux',    'os',         'cat /etc/os-release',                 'https://endoflife.date/amazon-linux',    'PENDING'),
+('almalinux',       'AlmaLinux',       'os',         'cat /etc/os-release',                 'https://endoflife.date/almalinux',       'PENDING'),
+('windows-server',  'Windows Server',  'os',         'systeminfo',                          'https://endoflife.date/windows-server',  'PENDING');
 
 -- 3. 기준 데이터 초기값 (동기화 전에도 진단이 동작하도록)
 INSERT INTO compat_release
@@ -74,11 +83,15 @@ SET @web := (SELECT asset_id FROM asset WHERE project_id = @p AND name = 'web01'
 SET @db  := (SELECT asset_id FROM asset WHERE project_id = @p AND name = 'db01');
 
 INSERT INTO asset_software (asset_id, product, role, version, release_line, phase) VALUES
-(@web, 'tomcat', 'WAS',     '9.0.80',    '9.0',  'BEFORE'),
-(@web, 'java',   'RUNTIME', '1.8.0_382', '8',    'BEFORE'),
-(@db,  'mysql',  'DB',      '5.7.44',    '5.7',  'BEFORE');
+(@web, 'tomcat',      'WAS',     '9.0.80',    '9.0',  'BEFORE'),
+(@web, 'java',        'RUNTIME', '1.8.0_382', '8',    'BEFORE'),
+(@web, 'rocky-linux', 'OS',      '8.9',       '8',    'BEFORE'),
+(@db,  'mysql',       'DB',      '5.7.44',    '5.7',  'BEFORE'),
+(@db,  'rocky-linux', 'OS',      '8.9',       '8',    'BEFORE');
 
 INSERT INTO asset_software (asset_id, product, role, version, release_line, phase) VALUES
-(@web, 'tomcat', 'WAS',     '11.0.22',   '11.0', 'AFTER'),
-(@web, 'java',   'RUNTIME', '11.0.24',   '11',   'AFTER'),
-(@db,  'mysql',  'DB',      '9.6.1',     '9.6',  'AFTER');
+(@web, 'tomcat',      'WAS',     '11.0.22',   '11.0', 'AFTER'),
+(@web, 'java',        'RUNTIME', '11.0.24',   '11',   'AFTER'),
+(@web, 'rocky-linux', 'OS',      '9.4',       '9',    'AFTER'),
+(@db,  'mysql',       'DB',      '9.6.1',     '9.6',  'AFTER'),
+(@db,  'rocky-linux', 'OS',      '9.4',       '9',    'AFTER');
