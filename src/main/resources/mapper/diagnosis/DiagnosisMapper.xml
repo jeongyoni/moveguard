@@ -40,6 +40,14 @@
         ORDER BY cert_id
     </select>
 
+    <select id="findAssetSoftware" resultType="com.moveguard.asset.AssetSoftware">
+        SELECT s.software_id, s.asset_id, s.product, s.role, s.version, s.release_line, s.phase
+        FROM asset_software s
+        JOIN asset a ON a.asset_id = s.asset_id
+        WHERE a.project_id = #{projectId}
+        ORDER BY s.software_id
+    </select>
+
     <select id="findPlannedDate" resultType="java.time.LocalDate">
         SELECT planned_date
         FROM migration_project

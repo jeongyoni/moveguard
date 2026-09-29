@@ -3,10 +3,12 @@ package com.moveguard.diagnosis;
 import com.moveguard.asset.Asset;
 import com.moveguard.asset.AssetIp;
 import com.moveguard.asset.AssetIp.IpType;
+import com.moveguard.asset.AssetSoftware;
 import com.moveguard.asset.Certificate;
 import com.moveguard.asset.Dependency;
 import com.moveguard.asset.DnsRecord;
 import com.moveguard.asset.Phase;
+import com.moveguard.compat.CompatRelease;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -28,10 +30,20 @@ public class DiagnosisContext {
     private final List<DnsRecord> dnsRecords;
     private final List<Certificate> certificates;
     private final LocalDate plannedDate;
+    private final List<AssetSoftware> software;
+    private final Map<String, CompatRelease> releaseIndex;
 
     public DiagnosisContext(Long projectId, List<Asset> assets, List<AssetIp> ips,
                             List<Dependency> dependencies, List<DnsRecord> dnsRecords,
                             List<Certificate> certificates, LocalDate plannedDate) {
+        this(projectId, assets, ips, dependencies, dnsRecords, certificates, plannedDate,
+                List.of(), List.of());
+    }
+
+    public DiagnosisContext(Long projectId, List<Asset> assets, List<AssetIp> ips,
+                            List<Dependency> dependencies, List<DnsRecord> dnsRecords,
+                            List<Certificate> certificates, LocalDate plannedDate,
+                            List<AssetSoftware> software, List<CompatRelease> releases) {
         this.projectId = projectId;
         this.assets = assets.stream()
                 .collect(Collectors.toMap(Asset::getAssetId, Function.identity()));
@@ -40,6 +52,14 @@ public class DiagnosisContext {
         this.dnsRecords = List.copyOf(dnsRecords);
         this.certificates = List.copyOf(certificates);
         this.plannedDate = plannedDate;
+        this.software = List.copyOf(software);
+        this.releaseIndex = releases.stream().collect(Collectors.toMap(
+                r -> releaseKey(r.getProduct(), r.getVersion()), Function.identity(),
+                (a, b) -> a));
+    }
+
+    private static String releaseKey(String product, String releaseLine) {
+        return product + "|" + releaseLine;
     }
 
     public Long projectId() {
@@ -119,5 +139,28 @@ public class DiagnosisContext {
     public boolean hasCertificate(String domain, Phase phase) {
         return certificates.stream().anyMatch(cert ->
                 Objects.equals(cert.getDomain(), domain) && cert.getPhase() == phase);
+    }
+
+    public List<AssetSoftware> software() {
+        return software;
+    }
+
+    /** 특정 단계의 설치 소프트웨어 */
+    public List<AssetSoftware> software(Phase phase) {
+        return software.stream().filter(s -> s.getPhase() == phase).toList();
+    }
+
+    /** 한 자산의 특정 제품·단계 소프트웨어 */
+    public Optional<AssetSoftware> software(Long assetId, String product, Phase phase) {
+        return software.stream()
+                .filter(s -> Objects.equals(s.getAssetId(), assetId)
+                        && Objects.equals(s.getProduct(), product)
+                        && s.getPhase() == phase)
+                .findFirst();
+    }
+
+    /** 제품·릴리스 라인에 해당하는 호환성 기준 릴리스 */
+    public Optional<CompatRelease> release(String product, String releaseLine) {
+        return Optional.ofNullable(releaseIndex.get(releaseKey(product, releaseLine)));
     }
 }

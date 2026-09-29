@@ -9,6 +9,18 @@
         ORDER BY product
     </select>
 
+    <select id="findAllReleases" resultType="com.moveguard.compat.CompatRelease">
+        SELECT release_id, product, version, label, release_date,
+               is_lts        AS lts,
+               is_eol        AS eol,
+               eol_date,
+               ext_support_date,
+               is_maintained AS maintained,
+               latest_version, min_java_version,
+               is_manual     AS manual
+        FROM compat_release
+    </select>
+
     <select id="findManualVersions" resultType="string">
         SELECT version
         FROM compat_release

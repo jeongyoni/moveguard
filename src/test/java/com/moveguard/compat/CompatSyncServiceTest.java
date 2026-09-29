@@ -65,6 +65,11 @@ class CompatSyncServiceTest {
         }
 
         @Override
+        public List<CompatRelease> findAllReleases() {
+            return List.of();
+        }
+
+        @Override
         public List<String> findManualVersions(String product) {
             return manualVersions.getOrDefault(product, List.of());
         }
