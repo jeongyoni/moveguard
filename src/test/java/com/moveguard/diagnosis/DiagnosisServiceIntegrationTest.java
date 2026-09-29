@@ -29,7 +29,8 @@ class DiagnosisServiceIntegrationTest {
         // 규칙이 추가될 때마다 기대값을 함께 갱신한다
         assertThat(result.findings())
                 .extracting(DiagnosisResult.Item::ruleCode)
-                .containsExactly("IP-04", "IP-01", "CMP-03", "CMP-02", "PORT-01", "IP-03", "DNS-01", "CERT-01", "IP-02", "CMP-01");
+                .containsExactly("IP-04", "IP-01", "CMP-03", "CMP-02", "PORT-01", "IP-03", "DNS-01",
+                        "CERT-01", "IP-02", "CMP-05", "CMP-05", "CMP-05", "CMP-01");
         assertThat(result.findings())
                 .extracting(DiagnosisResult.Item::message)
                 .noneMatch(message -> message.contains("{"));
