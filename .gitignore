@@ -40,3 +40,8 @@ out/
 .DS_Store
 *.log
 application-local.yml
+
+# Python (ml)
+ml/.venv/
+ml/dataset*.csv
+__pycache__/
