@@ -1,14 +1,16 @@
 # MoveGuard
 
 IDC → 클라우드(AWS) **이전(마이그레이션) 사업의 전환 위험을 사전 진단**하는 도구입니다.
-이전 대상 자산의 네트워크·DNS·인증서 정보를 입력받아 규칙으로 위험을 판정하고, 위험도를 산정해 **전환 가능/차단** 여부를 알려줍니다.
+이전 대상 자산의 네트워크·DNS·인증서·소프트웨어 버전 정보를 입력받아 규칙으로 위험을 판정하고, 위험도를 산정해 **전환 가능/차단** 여부를 알려줍니다.
 
 ## 주요 기능
 
-- 이전사업 단위로 자산·IP·의존관계·DNS·인증서 데이터를 진단 입력으로 수집
-- 규칙 기반 위험 진단 (FMEA RPN 점수화)
+- 이전사업 단위로 자산·IP·의존관계·DNS·인증서·설치 소프트웨어 데이터를 진단 입력으로 수집
+- 규칙 기반 위험 진단 (FMEA RPN 점수화) — 네트워크·DNS·보안·호환성
 - 위험도 등급 산정 및 **전환 차단(blocking)** 판정
 - 규칙별 조치 가이드 문구 제공
+- OS·WAS·DB 버전의 지원 종료(EOL)를 **endoflife.date와 동기화**해 진단
+- 가상 이전사업 **시뮬레이션 → 성패 라벨링 → 규칙 성능 분석 → 학습**(규칙 baseline 비교)
 - 진단 이력(run·finding) 저장
 
 ## 기술 스택
@@ -38,7 +40,7 @@ RPN(위험우선순위수) = 심각도(severity) × 발생가능성(occurrence) 
 | 요인 | 가중치 | 규칙 |
 | --- | --- | --- |
 | NETWORK_IP (공인IP·네트워크) | 0.350 | IP-01 공인IP 변경 · IP-02 내부 공인IP 사용 · IP-03 IP 하드코딩 · IP-04 허용목록 IP 변경 |
-| COMPAT (OS·DBMS 호환성) | 0.200 | _(예정)_ |
+| COMPAT (OS·DBMS 호환성) | 0.200 | CMP-01 EOL 버전 · CMP-02 최소 Java 미달 · CMP-03 javax→jakarta · CMP-04 지원종료 임박 · CMP-05 메이저 건너뛰기 |
 | DNS (DNS 전환) | 0.150 | DNS-01 긴 TTL · DNS-02 이전 후 레코드 누락 |
 | BACKUP (백업·복구) | 0.150 | _(예정)_ |
 | SECURITY (보안·접근통제) | 0.150 | PORT-01 민감 포트 노출 · PORT-02 평문 프로토콜 · CERT-01 인증서 만료 임박 · CERT-02 갱신 계획 누락 |
@@ -47,11 +49,11 @@ RPN(위험우선순위수) = 심각도(severity) × 발생가능성(occurrence) 
 
 ```
 입력 DB
-  → DiagnosisContextLoader   자산·IP·의존·DNS·인증서·전환예정일 로딩
+  → DiagnosisContextLoader   자산·IP·의존·DNS·인증서·소프트웨어·호환성기준·전환예정일 로딩
   → DiagnosisContext         규칙이 참조하는 진단 입력 객체
-  → RiskRuleEvaluator[]      @Component로 자동 수집되는 규칙별 판정기
-  → Finding                  판정 결과 + 문구 치환 파라미터
-  → RiskScorer               RPN 정렬, 요인 가중 총점, 등급/차단/최대 RPN
+  → DiagnosisEngine          규칙 적용 + RPN 정렬 + 점수 산정 (진단·시뮬레이션 공유)
+     → RiskRuleEvaluator[]   @Component로 자동 수집되는 규칙별 판정기 → Finding
+     → RiskScorer            요인 가중 총점, 등급/차단/최대 RPN
   → diagnosis_run / diagnosis_finding 저장
   → DiagnosisResult          API 응답
 ```
@@ -62,10 +64,14 @@ RPN(위험우선순위수) = 심각도(severity) × 발생가능성(occurrence) 
 
 ```
 com.moveguard
-├─ asset        # 진단 입력 도메인 (Asset, AssetIp, Dependency, DnsRecord, Certificate, Phase)
+├─ asset        # 진단 입력 도메인 (Asset, AssetIp, Dependency, DnsRecord, Certificate, AssetSoftware, Phase)
 ├─ project      # 이전사업 조회 API
-└─ diagnosis    # 진단 파이프라인
-   └─ rule      # 규칙 구현체 (RiskRuleEvaluator)
+├─ compat       # 호환성 기준 데이터 + endoflife.date 동기화 (CompatSyncService)
+├─ diagnosis    # 진단 파이프라인 (DiagnosisEngine)
+│  └─ rule      # 규칙 구현체 (RiskRuleEvaluator)
+└─ sim          # 시뮬레이션·학습 (ScenarioGenerator, OutcomeModel, RuleAnalysis)
+
+ml/            # 성패 예측 학습 스크립트 (Python, scikit-learn)
 ```
 
 ## 실행 방법
@@ -112,6 +118,9 @@ docker exec -i moveguard-mysql mysql -uroot -proot1234 moveguard < src/main/reso
 | GET | `/api/projects` | 이전사업 목록 |
 | GET | `/api/projects/{projectId}` | 이전사업 단건 |
 | POST | `/api/projects/{projectId}/diagnoses` | 진단 실행 (결과 반환·저장) |
+| POST | `/api/compat/sync` | 호환성 기준 데이터를 endoflife.date와 동기화 (실패 시 스냅샷 fallback) |
+| GET | `/api/sim/dataset?count=&seed=` | 가상 이전사업 데이터셋(특징+진단결과+성패) CSV |
+| GET | `/api/sim/analysis?count=&seed=` | 규칙(차단)의 성패 예측 성능 분석 (혼동행렬·정밀도·재현율·F1) |
 
 진단 실행 예시:
 
@@ -120,6 +129,14 @@ curl -X POST http://localhost:8080/api/projects/1/diagnoses
 ```
 
 응답(`DiagnosisResult`)에는 위험도 등급, 전환 차단 여부, 최대 RPN, 발견된 위험 항목(규칙 코드·문구·조치 가이드)이 포함됩니다.
+
+## 시뮬레이션 · 학습
+
+규칙 진단 엔진을 재사용해 가상 이전사업을 대량 생성하고, 학습 데이터를 만든다. 상세 계획은 [`docs/SIMULATION_ROADMAP.md`](docs/SIMULATION_ROADMAP.md).
+
+- **생성·라벨링·분석**: `/api/sim/dataset`(데이터셋), `/api/sim/analysis`(규칙 성능). 모두 인메모리 평가로 DB에 저장하지 않음
+- **학습**: `ml/`의 Python 스크립트로 성패를 예측하고 규칙 baseline과 F1 비교 (`ml/README.md` 참고)
+- 표(tabular) 데이터라 **CPU로 충분** — GPU는 이후 딥러닝·대규모 단계에서만 필요
 
 ## 개발 규칙
 
@@ -133,5 +150,7 @@ git config core.hooksPath .githooks
 
 ## 범위
 
-- **1차**: 이전사업 입력 → 공인IP·DNS 진단 → 위험도 산정 _(진행 중)_
+- **1차**: 이전사업 입력 → 네트워크·DNS·보안·호환성 진단 → 위험도 산정 _(진행 중)_
+  - 위험요인 5개 중 4개 구현(NETWORK_IP·DNS·SECURITY·COMPAT), BACKUP 예정
+- **시뮬레이션·학습**: 가상 데이터 생성 → 성패 라벨 → 규칙 분석 → 학습 _(파이프라인 완료)_
 - **2차**: 전환 실행 · 검증 · 롤백 _(예정)_
