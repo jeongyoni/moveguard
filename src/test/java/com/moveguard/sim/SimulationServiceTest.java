@@ -26,7 +26,8 @@ class SimulationServiceTest {
 
         // 규칙 없는 빈 엔진 → findings 0건, 파이프라인·CSV 구조만 검증
         DiagnosisEngine engine = new DiagnosisEngine(List.of(), new RiskScorer());
-        service = new SimulationService(new ScenarioGenerator(), engine, diagnosisMapper, compatMapper);
+        service = new SimulationService(new ScenarioGenerator(), engine, new OutcomeModel(),
+                diagnosisMapper, compatMapper);
     }
 
     @Test
@@ -37,9 +38,12 @@ class SimulationServiceTest {
 
         assertThat(lines).hasSize(6); // 헤더 1 + 5행
         assertThat(lines[0]).startsWith("ipChanges,")
-                .contains("riskLevel", "blocked", "maxRpn", "totalScore", "findingCount", "findingCodes");
+                .contains("riskLevel", "blocked", "maxRpn", "totalScore", "findingCount",
+                        "findingCodes", "outcome");
         // 규칙이 없으므로 모든 행은 위험 없음
         assertThat(lines[1]).contains("LOW");
+        // 마지막 컬럼은 성패 라벨
+        assertThat(lines[1]).matches(".*(SUCCESS|FAIL)$");
     }
 
     @Test

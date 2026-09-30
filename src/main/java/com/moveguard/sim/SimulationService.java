@@ -26,11 +26,12 @@ public class SimulationService {
 
     private final ScenarioGenerator generator;
     private final DiagnosisEngine engine;
+    private final OutcomeModel outcomeModel;
     private final DiagnosisMapper diagnosisMapper;
     private final CompatMapper compatMapper;
 
     private static final List<String> OUTPUT_COLUMNS =
-            List.of("riskLevel", "blocked", "maxRpn", "totalScore", "findingCount", "findingCodes");
+            List.of("riskLevel", "blocked", "maxRpn", "totalScore", "findingCount", "findingCodes", "outcome");
 
     @Transactional(readOnly = true)
     public String generateCsv(int count, long seed) {
@@ -66,6 +67,7 @@ public class SimulationService {
             row.add(assessment.score().totalScore().toPlainString());
             row.add(String.valueOf(assessment.findings().size()));
             row.add(codes);
+            row.add(outcomeModel.sample(scenario.features(), rnd).name());
             lines.add(String.join(",", row));
         }
 
