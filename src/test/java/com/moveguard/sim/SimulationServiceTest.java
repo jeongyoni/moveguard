@@ -37,7 +37,7 @@ class SimulationServiceTest {
         String[] lines = csv.strip().split("\n");
 
         assertThat(lines).hasSize(6); // 헤더 1 + 5행
-        assertThat(lines[0]).startsWith("ipChanges,")
+        assertThat(lines[0]).startsWith("numAppServers,")
                 .contains("riskLevel", "blocked", "maxRpn", "totalScore", "findingCount",
                         "findingCodes", "outcome");
         // 규칙이 없으므로 모든 행은 위험 없음

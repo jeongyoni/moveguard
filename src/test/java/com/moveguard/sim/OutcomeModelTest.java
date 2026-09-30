@@ -12,33 +12,33 @@ class OutcomeModelTest {
 
     private final OutcomeModel model = new OutcomeModel();
 
-    private Map<String, String> features(String ipChanges, String whitelisted, String hardcoded,
-            String dnsAfter, String certExpiring, String certAfter, String tomcatFrom,
-            String tomcatTo, String javaAfter, String dbFrom, String dbTo, String protocol) {
+    private Map<String, String> features(String numApps, String ipChanges, String whitelisted,
+            String dnsAfter, String certExpiring, String certAfter, String dbFrom, String dbTo,
+            String anyHardcoded, String anyPlaintext, String anyJavaxJump, String anyJavaBelowMin) {
         Map<String, String> f = new java.util.HashMap<>();
+        f.put("numAppServers", numApps);
         f.put("ipChanges", ipChanges);
         f.put("whitelisted", whitelisted);
-        f.put("hardcoded", hardcoded);
         f.put("dnsAfter", dnsAfter);
         f.put("certExpiring", certExpiring);
         f.put("certAfter", certAfter);
-        f.put("tomcatFrom", tomcatFrom);
-        f.put("tomcatTo", tomcatTo);
-        f.put("javaAfter", javaAfter);
         f.put("dbFrom", dbFrom);
         f.put("dbTo", dbTo);
-        f.put("protocol", protocol);
+        f.put("anyHardcoded", anyHardcoded);
+        f.put("anyPlaintext", anyPlaintext);
+        f.put("anyJavaxJump", anyJavaxJump);
+        f.put("anyJavaBelowMin", anyJavaBelowMin);
         return f;
     }
 
     private Map<String, String> lowRisk() {
-        return features("false", "false", "false", "true", "false", "true",
-                "11.0", "11.0", "17", "8.4", "8.4", "JDBC");
+        return features("1", "false", "false", "true", "false", "true",
+                "8.4", "8.4", "false", "false", "false", "false");
     }
 
     private Map<String, String> highRisk() {
-        return features("true", "true", "true", "false", "true", "false",
-                "9.0", "11.0", "8", "5.7", "9.6", "HTTP");
+        return features("3", "true", "true", "false", "true", "false",
+                "5.7", "9.6", "true", "true", "true", "true");
     }
 
     private long failCount(Map<String, String> features, long seed, int n) {
@@ -76,12 +76,12 @@ class OutcomeModelTest {
     @Test
     @DisplayName("평문 프로토콜은 성패에 영향을 주지 않는다 (규칙과 라벨의 의도적 불일치)")
     void plaintextProtocolDoesNotAffectOutcome() {
-        Map<String, String> https = new java.util.HashMap<>(lowRisk());
-        https.put("protocol", "HTTPS");
-        Map<String, String> http = new java.util.HashMap<>(lowRisk());
-        http.put("protocol", "HTTP");
+        Map<String, String> withoutPlaintext = new java.util.HashMap<>(lowRisk());
+        withoutPlaintext.put("anyPlaintext", "false");
+        Map<String, String> withPlaintext = new java.util.HashMap<>(lowRisk());
+        withPlaintext.put("anyPlaintext", "true");
 
-        assertThat(model.failureLogit(http)).isEqualTo(model.failureLogit(https));
+        assertThat(model.failureLogit(withPlaintext)).isEqualTo(model.failureLogit(withoutPlaintext));
     }
 
     @Test

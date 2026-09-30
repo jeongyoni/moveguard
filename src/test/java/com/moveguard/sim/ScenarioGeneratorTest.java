@@ -34,12 +34,15 @@ class ScenarioGeneratorTest {
     }
 
     @Test
-    @DisplayName("생성된 컨텍스트는 web·db 자산과 의존관계를 포함한다")
+    @DisplayName("앱 서버 1~3대 + DB로 구성되고 집계 특징을 포함한다")
     void producesValidContext() {
         Scenario s = generator.generate(new Random(1L), List.of());
 
-        assertThat(s.context().dependencies()).hasSize(1);
+        int numApps = Integer.parseInt(s.features().get("numAppServers"));
+        assertThat(numApps).isBetween(1, 3);
+        // 앱 서버 수만큼 의존관계(각 앱 → DB), 자산은 앱 + DB
+        assertThat(s.context().dependencies()).hasSize(numApps);
         assertThat(s.context().software()).isNotEmpty();
-        assertThat(s.features()).containsKeys("ipChanges", "whitelisted", "tomcatFrom", "dbTo");
+        assertThat(s.features()).containsKeys("numAppServers", "ipChanges", "anyJavaxJump", "dbTo");
     }
 }
