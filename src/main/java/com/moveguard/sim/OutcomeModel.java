@@ -29,13 +29,13 @@ public class OutcomeModel {
         return rnd.nextDouble() < failureProb ? Outcome.FAIL : Outcome.SUCCESS;
     }
 
-    /** 생성 파라미터로 실패 로짓을 계산 (가중치는 규칙 RPN과 독립적으로 설계) */
+    /** 집계 특징으로 실패 로짓을 계산 (가중치는 규칙 RPN과 독립적으로 설계) */
     double failureLogit(Map<String, String> f) {
         double x = BASE_LOGIT;
 
         boolean ipChanges = bool(f, "ipChanges");
         // 하드코딩 IP + 공인IP 변경 → 접속 주소가 깨져 기동 실패 가능성 큼
-        if (ipChanges && bool(f, "hardcoded")) {
+        if (ipChanges && bool(f, "anyHardcoded")) {
             x += 2.0;
         }
         // 공인IP는 바뀌는데 이전 후 DNS 계획이 없음 → 접속 불가
@@ -47,11 +47,11 @@ public class OutcomeModel {
             x += 0.9;
         }
         // Tomcat 9↓ → 10↑ : javax→jakarta로 애플리케이션이 기동 안 됨 (강한 실패 요인)
-        if (major(f.get("tomcatFrom")) <= 9 && major(f.get("tomcatTo")) >= 10) {
+        if (bool(f, "anyJavaxJump")) {
             x += 1.8;
         }
         // 목표 WAS 최소 Java 미달 → 기동 실패
-        if (javaBelowMinimum(f)) {
+        if (bool(f, "anyJavaBelowMin")) {
             x += 1.6;
         }
         // 인증서가 임박 만료인데 갱신 계획 없음 → HTTPS 접속 실패
@@ -62,27 +62,20 @@ public class OutcomeModel {
         if ("9.6".equals(f.get("dbTo"))) {
             x += 0.4;
         }
+        // 앱 서버가 많을수록 전환 실패 지점이 늘어 약간 위험 ↑
+        x += 0.25 * (parseInt(f.get("numAppServers")) - 1);
         // 평문 프로토콜(PORT-02)은 보안 이슈일 뿐 기동 실패와 무관 → 기여 0 (의도적)
         return x;
-    }
-
-    /** tomcatTo가 요구하는 최소 Java를 javaAfter가 못 맞추는지 (11.0→17, 10.1→11 필요) */
-    private boolean javaBelowMinimum(Map<String, String> f) {
-        int required = "11.0".equals(f.get("tomcatTo")) ? 17 : 11;
-        return major(f.get("javaAfter")) < required;
     }
 
     private static boolean bool(Map<String, String> f, String key) {
         return Boolean.parseBoolean(f.get(key));
     }
 
-    private static int major(String releaseLine) {
-        if (releaseLine == null || releaseLine.isBlank()) {
-            return 0;
-        }
+    private static int parseInt(String value) {
         try {
-            return Integer.parseInt(releaseLine.trim().split("\\.")[0]);
-        } catch (NumberFormatException e) {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException | NullPointerException e) {
             return 0;
         }
     }
