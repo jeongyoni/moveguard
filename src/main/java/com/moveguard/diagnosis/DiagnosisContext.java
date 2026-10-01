@@ -4,6 +4,7 @@ import com.moveguard.asset.Asset;
 import com.moveguard.asset.AssetIp;
 import com.moveguard.asset.AssetIp.IpType;
 import com.moveguard.asset.AssetSoftware;
+import com.moveguard.asset.BackupPlan;
 import com.moveguard.asset.Certificate;
 import com.moveguard.asset.Dependency;
 import com.moveguard.asset.DnsRecord;
@@ -32,6 +33,7 @@ public class DiagnosisContext {
     private final LocalDate plannedDate;
     private final List<AssetSoftware> software;
     private final Map<String, CompatRelease> releaseIndex;
+    private final List<BackupPlan> backups;
 
     public DiagnosisContext(Long projectId, List<Asset> assets, List<AssetIp> ips,
                             List<Dependency> dependencies, List<DnsRecord> dnsRecords,
@@ -44,6 +46,15 @@ public class DiagnosisContext {
                             List<Dependency> dependencies, List<DnsRecord> dnsRecords,
                             List<Certificate> certificates, LocalDate plannedDate,
                             List<AssetSoftware> software, List<CompatRelease> releases) {
+        this(projectId, assets, ips, dependencies, dnsRecords, certificates, plannedDate,
+                software, releases, List.of());
+    }
+
+    public DiagnosisContext(Long projectId, List<Asset> assets, List<AssetIp> ips,
+                            List<Dependency> dependencies, List<DnsRecord> dnsRecords,
+                            List<Certificate> certificates, LocalDate plannedDate,
+                            List<AssetSoftware> software, List<CompatRelease> releases,
+                            List<BackupPlan> backups) {
         this.projectId = projectId;
         this.assets = assets.stream()
                 .collect(Collectors.toMap(Asset::getAssetId, Function.identity()));
@@ -56,6 +67,7 @@ public class DiagnosisContext {
         this.releaseIndex = releases.stream().collect(Collectors.toMap(
                 r -> releaseKey(r.getProduct(), r.getVersion()), Function.identity(),
                 (a, b) -> a));
+        this.backups = List.copyOf(backups);
     }
 
     private static String releaseKey(String product, String releaseLine) {
@@ -162,5 +174,16 @@ public class DiagnosisContext {
     /** 제품·릴리스 라인에 해당하는 호환성 기준 릴리스 */
     public Optional<CompatRelease> release(String product, String releaseLine) {
         return Optional.ofNullable(releaseIndex.get(releaseKey(product, releaseLine)));
+    }
+
+    /** 특정 단계의 백업 계획 */
+    public List<BackupPlan> backups(Phase phase) {
+        return backups.stream().filter(b -> b.getPhase() == phase).toList();
+    }
+
+    /** 자산이 해당 단계의 백업 계획을 갖고 있는지 */
+    public boolean hasBackup(Long assetId, Phase phase) {
+        return backups.stream().anyMatch(b ->
+                Objects.equals(b.getAssetId(), assetId) && b.getPhase() == phase);
     }
 }

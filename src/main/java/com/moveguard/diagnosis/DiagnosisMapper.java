@@ -3,6 +3,7 @@ package com.moveguard.diagnosis;
 import com.moveguard.asset.Asset;
 import com.moveguard.asset.AssetIp;
 import com.moveguard.asset.AssetSoftware;
+import com.moveguard.asset.BackupPlan;
 import com.moveguard.asset.Certificate;
 import com.moveguard.asset.Dependency;
 import com.moveguard.asset.DnsRecord;
@@ -25,6 +26,8 @@ public interface DiagnosisMapper {
     List<Certificate> findCertificates(Long projectId);
 
     List<AssetSoftware> findAssetSoftware(Long projectId);
+
+    List<BackupPlan> findBackupPlans(Long projectId);
 
     LocalDate findPlannedDate(Long projectId);
 

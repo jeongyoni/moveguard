@@ -11,6 +11,7 @@ DROP TABLE IF EXISTS diagnosis_finding;
 DROP TABLE IF EXISTS diagnosis_run;
 DROP TABLE IF EXISTS risk_rule;
 DROP TABLE IF EXISTS risk_factor;
+DROP TABLE IF EXISTS backup_plan;
 DROP TABLE IF EXISTS certificate;
 DROP TABLE IF EXISTS dns_record;
 DROP TABLE IF EXISTS dependency;
@@ -154,6 +155,22 @@ CREATE TABLE certificate
         REFERENCES migration_project (project_id) ON DELETE CASCADE,
     CONSTRAINT chk_cert_phase CHECK (phase IN ('BEFORE', 'AFTER'))
 ) ENGINE = InnoDB COMMENT = 'TLS 인증서 (이전 전/후)';
+
+CREATE TABLE backup_plan
+(
+    backup_id      BIGINT      NOT NULL AUTO_INCREMENT,
+    asset_id       BIGINT      NOT NULL,
+    last_backup_at DATE                 COMMENT '마지막 백업일 (NULL이면 백업 없음)',
+    restore_tested TINYINT(1)  NOT NULL DEFAULT 0 COMMENT '복구 테스트 수행 여부',
+    offsite        TINYINT(1)  NOT NULL DEFAULT 0 COMMENT '원본과 다른 환경에 보관',
+    phase          VARCHAR(10) NOT NULL COMMENT 'BEFORE / AFTER',
+    created_at     DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (backup_id),
+    KEY            idx_backup_asset (asset_id, phase),
+    CONSTRAINT fk_backup_asset FOREIGN KEY (asset_id)
+        REFERENCES asset (asset_id) ON DELETE CASCADE,
+    CONSTRAINT chk_backup_phase CHECK (phase IN ('BEFORE', 'AFTER'))
+) ENGINE = InnoDB COMMENT = '자산별 백업 계획 (이전 전/후)';
 
 CREATE TABLE risk_factor
 (
