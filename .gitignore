@@ -45,3 +45,4 @@ application-local.yml
 ml/.venv/
 ml/dataset*.csv
 __pycache__/
+des/.venv/
