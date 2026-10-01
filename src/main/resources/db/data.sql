@@ -94,6 +94,33 @@ VALUES ('CERT-02',
         '{domain} 인증서의 이전 후 갱신·이관 계획이 등록되지 않았습니다.',
         '신규 환경에 배포할 인증서를 준비하고 만료 전 교체 일정을 전환 계획에 포함하십시오.');
 
+INSERT INTO risk_rule
+(rule_code, factor_id, title, severity, occurrence, detection, is_blocking, message_template, mitigation)
+VALUES ('BAK-01',
+        (SELECT factor_id FROM risk_factor WHERE code = 'BACKUP'),
+        '이전 전 최근 백업 없음',
+        9, 4, 3, 1,
+        '{asset}의 이전 전 최근 백업이 없습니다(마지막 백업: {lastBackup}). 전환 실패 시 복구가 불가능합니다.',
+        '전환 직전 전체 백업을 수행하고 복구 가능성을 확인한 뒤 진행하십시오.'),
+       ('BAK-02',
+        (SELECT factor_id FROM risk_factor WHERE code = 'BACKUP'),
+        '복구 테스트 미수행',
+        7, 6, 5, 0,
+        '{asset}의 백업이 복구 테스트를 거치지 않아 실제 복구 가능 여부를 보장할 수 없습니다.',
+        '전환 전에 백업으로 실제 복구 테스트를 1회 이상 수행하십시오.'),
+       ('BAK-03',
+        (SELECT factor_id FROM risk_factor WHERE code = 'BACKUP'),
+        '이전 후 백업 체계 미비',
+        6, 5, 4, 0,
+        '{asset}의 이전 후 백업 체계가 구성되지 않았습니다.',
+        '신규 환경의 백업 주기·보관 정책을 전환 계획에 포함하십시오.'),
+       ('BAK-04',
+        (SELECT factor_id FROM risk_factor WHERE code = 'BACKUP'),
+        '백업 오프사이트 미보관',
+        5, 5, 4, 0,
+        '{asset}의 백업이 원본과 같은 환경에 보관되어(오프사이트 아님) 동시 장애에 취약합니다.',
+        '백업을 원본과 분리된 환경(다른 리전·계정)에 보관하십시오.');
+
 INSERT INTO attribute_def (attr_key, data_type, description)
 VALUES ('maintenance_window', 'STRING', '작업 가능 시간대'),
        ('service_criticality', 'NUMBER', '서비스 중요도 1~5'),
@@ -141,6 +168,13 @@ VALUES (@p, 'shop.example.com', 'A', '203.0.113.11', 3600, 'BEFORE'),
 INSERT INTO certificate (project_id, domain, issuer, not_after, phase)
 VALUES (@p, 'shop.example.com', 'Lets Encrypt R3', '2026-11-10', 'BEFORE'),
        (@p, 'shop.example.com', 'Lets Encrypt R3', '2027-11-10', 'AFTER');
+
+-- web01: 최근·복구테스트·오프사이트 백업 + 이전 후 계획 → BAK 미발생
+-- db01: 복구 테스트 미수행(BAK-02), 이전 후 백업 없음(BAK-03). 최근 백업·오프사이트라 BAK-01·04 미발생
+INSERT INTO backup_plan (asset_id, last_backup_at, restore_tested, offsite, phase)
+VALUES (@web, '2026-10-22', 1, 1, 'BEFORE'),
+       (@web, '2026-10-26', 1, 1, 'AFTER'),
+       (@db, '2026-10-22', 0, 1, 'BEFORE');
 
 INSERT INTO asset_attribute (asset_id, attr_key, attr_value)
 VALUES (@web, 'service_criticality', '5'),

@@ -48,6 +48,14 @@
         ORDER BY s.software_id
     </select>
 
+    <select id="findBackupPlans" resultType="com.moveguard.asset.BackupPlan">
+        SELECT b.backup_id, b.asset_id, b.last_backup_at, b.restore_tested, b.offsite, b.phase
+        FROM backup_plan b
+        JOIN asset a ON a.asset_id = b.asset_id
+        WHERE a.project_id = #{projectId}
+        ORDER BY b.backup_id
+    </select>
+
     <select id="findPlannedDate" resultType="java.time.LocalDate">
         SELECT planned_date
         FROM migration_project

@@ -23,6 +23,7 @@ public class DiagnosisContextLoader {
                 diagnosisMapper.findCertificates(projectId),
                 diagnosisMapper.findPlannedDate(projectId),
                 diagnosisMapper.findAssetSoftware(projectId),
-                compatMapper.findAllReleases());
+                compatMapper.findAllReleases(),
+                diagnosisMapper.findBackupPlans(projectId));
     }
 }

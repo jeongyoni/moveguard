@@ -4,6 +4,7 @@ import com.moveguard.asset.Asset;
 import com.moveguard.asset.AssetIp;
 import com.moveguard.asset.AssetIp.IpType;
 import com.moveguard.asset.AssetSoftware;
+import com.moveguard.asset.BackupPlan;
 import com.moveguard.asset.Certificate;
 import com.moveguard.asset.Dependency;
 import com.moveguard.asset.DnsRecord;
@@ -76,5 +77,15 @@ final class Fixtures {
                                           LocalDate plannedDate) {
         return new DiagnosisContext(1L, List.of(WEB, DB, PG), List.of(), List.of(), List.of(),
                 List.of(), plannedDate, software, releases);
+    }
+
+    static BackupPlan backup(Asset asset, LocalDate lastBackupAt, boolean restoreTested,
+                             boolean offsite, Phase phase) {
+        return new BackupPlan(null, asset.getAssetId(), lastBackupAt, restoreTested, offsite, phase);
+    }
+
+    static DiagnosisContext backupContext(List<BackupPlan> backups, LocalDate plannedDate) {
+        return new DiagnosisContext(1L, List.of(WEB, DB, PG), List.of(), List.of(), List.of(),
+                List.of(), plannedDate, List.of(), List.of(), backups);
     }
 }
