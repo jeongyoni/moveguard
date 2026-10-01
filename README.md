@@ -1,12 +1,12 @@
 # MoveGuard
 
 IDC → 클라우드(AWS) **이전(마이그레이션) 사업의 전환 위험을 사전 진단**하는 도구입니다.
-이전 대상 자산의 네트워크·DNS·인증서·소프트웨어 버전 정보를 입력받아 규칙으로 위험을 판정하고, 위험도를 산정해 **전환 가능/차단** 여부를 알려줍니다.
+이전 대상 자산의 네트워크·DNS·인증서·소프트웨어 버전·백업 정보를 입력받아 규칙으로 위험을 판정하고, 위험도를 산정해 **전환 가능/차단** 여부를 알려줍니다.
 
 ## 주요 기능
 
-- 이전사업 단위로 자산·IP·의존관계·DNS·인증서·설치 소프트웨어 데이터를 진단 입력으로 수집
-- 규칙 기반 위험 진단 (FMEA RPN 점수화) — 네트워크·DNS·보안·호환성
+- 이전사업 단위로 자산·IP·의존관계·DNS·인증서·설치 소프트웨어·백업 데이터를 진단 입력으로 수집
+- 규칙 기반 위험 진단 (FMEA RPN 점수화) — 네트워크·DNS·보안·호환성·백업
 - 위험도 등급 산정 및 **전환 차단(blocking)** 판정
 - 규칙별 조치 가이드 문구 제공
 - OS·WAS·DB 버전의 지원 종료(EOL)를 **endoflife.date와 동기화**해 진단
@@ -39,10 +39,10 @@ RPN(위험우선순위수) = 심각도(severity) × 발생가능성(occurrence) 
 
 | 요인 | 가중치 | 규칙 |
 | --- | --- | --- |
-| NETWORK_IP (공인IP·네트워크) | 0.350 | IP-01 공인IP 변경 · IP-02 내부 공인IP 사용 · IP-03 IP 하드코딩 · IP-04 허용목록 IP 변경 |
+| NETWORK_IP (공인IP·네트워크) | 0.350 | IP-01 공인IP 변경 · IP-02 내부 공인IP 사용 · IP-03 IP 하드코딩 · IP-04 허용목록 IP 변경 · IP-05 이전 후 IP 미확정 |
 | COMPAT (OS·DBMS 호환성) | 0.200 | CMP-01 EOL 버전 · CMP-02 최소 Java 미달 · CMP-03 javax→jakarta · CMP-04 지원종료 임박 · CMP-05 메이저 건너뛰기 |
 | DNS (DNS 전환) | 0.150 | DNS-01 긴 TTL · DNS-02 이전 후 레코드 누락 |
-| BACKUP (백업·복구) | 0.150 | _(예정)_ |
+| BACKUP (백업·복구) | 0.150 | BAK-01 최근 백업 없음 · BAK-02 복구 테스트 미수행 · BAK-03 이전 후 백업 미비 · BAK-04 오프사이트 미보관 |
 | SECURITY (보안·접근통제) | 0.150 | PORT-01 민감 포트 노출 · PORT-02 평문 프로토콜 · CERT-01 인증서 만료 임박 · CERT-02 갱신 계획 누락 |
 
 ## 아키텍처
@@ -64,7 +64,7 @@ RPN(위험우선순위수) = 심각도(severity) × 발생가능성(occurrence) 
 
 ```
 com.moveguard
-├─ asset        # 진단 입력 도메인 (Asset, AssetIp, Dependency, DnsRecord, Certificate, AssetSoftware, Phase)
+├─ asset        # 진단 입력 도메인 (Asset, AssetIp, Dependency, DnsRecord, Certificate, AssetSoftware, BackupPlan, Phase)
 ├─ project      # 이전사업 조회 API
 ├─ compat       # 호환성 기준 데이터 + endoflife.date 동기화 (CompatSyncService)
 ├─ diagnosis    # 진단 파이프라인 (DiagnosisEngine)
@@ -150,7 +150,7 @@ git config core.hooksPath .githooks
 
 ## 범위
 
-- **1차**: 이전사업 입력 → 네트워크·DNS·보안·호환성 진단 → 위험도 산정 _(진행 중)_
-  - 위험요인 5개 중 4개 구현(NETWORK_IP·DNS·SECURITY·COMPAT), BACKUP 예정
+- **1차**: 이전사업 입력 → 네트워크·DNS·보안·호환성·백업 진단 → 위험도 산정 _(완료)_
+  - 위험요인 5개 전부 구현(NETWORK_IP·DNS·SECURITY·COMPAT·BACKUP), 규칙 20개
 - **시뮬레이션·학습**: 가상 데이터 생성 → 성패 라벨 → 규칙 분석 → 학습 _(파이프라인 완료)_
 - **2차**: 전환 실행 · 검증 · 롤백 _(예정)_
