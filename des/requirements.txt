@@ -1,1 +1,3 @@
 simpy>=4.1
+salabim>=25.0
+pillow>=10.0
