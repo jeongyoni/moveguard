@@ -39,6 +39,25 @@ python cutover_sim.py --fetch --project 1 --assets 6 --engineers 2
 
 주요 옵션: `--assets`(자산 수) `--engineers`(엔지니어 수) `--window-hours`(정비창) `--risk`(LOW/MEDIUM/HIGH) `--reps`(반복 횟수) `--fetch`(진단 연동).
 
+## 애니메이션 (발표 영상용) — `cutover_anim.py`
+
+엔지니어 자원에 자산이 **줄 서는 모습**이 창으로 보이는 애니메이션 버전. 맥에서 그대로 실행·녹화한다.
+
+**준비 — tkinter 필요 (한 번만)**
+```bash
+brew install python-tk@3.14     # (python 버전에 맞게)
+```
+
+**실행**
+```bash
+python cutover_anim.py --assets 6 --engineers 2 --risk HIGH   # 위험·인력 부족 → 대기열 길어짐
+python cutover_anim.py --assets 6 --engineers 4 --risk LOW    # 비교: 빠르게 끝남
+python cutover_anim.py --headless                              # 애니메이션 없이 숫자만(검증용)
+```
+
+**녹화**: 실행하면 애니메이션 창이 열린다 → macOS 화면 녹화 `⌘ + ⇧ + 5` 로 창을 녹화.
+두 시나리오(2명·HIGH / 4명·LOW)를 비교해 보여주면 발표 영상이 된다. 상세 대본은 [`../docs/ARENA_MODEL.md`](../docs/ARENA_MODEL.md)의 "7분 영상 스토리보드" 참고(도구만 Salabim으로 바뀜).
+
 ## 활용 예
 
 - **정비창 안에 끝나는가?** 위험 수준·엔지니어 수를 바꿔가며 완료율 비교
