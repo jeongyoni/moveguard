@@ -157,6 +157,17 @@ curl -X POST http://localhost:8080/api/projects/1/diagnoses
 - **학습**: `ml/`의 Python 스크립트로 성패를 예측하고 규칙 baseline과 F1 비교 (`ml/README.md` 참고)
 - 표(tabular) 데이터라 **CPU로 충분** — GPU는 이후 딥러닝·대규모 단계에서만 필요
 
+## 진단 리포트 LLM 생성
+
+진단 결과(JSON)를 **로컬 LLM**(DGX Spark의 Ollama)이 고객사 보고용 한국어 리포트로 작성한다.
+외부 API 없이 표준 라이브러리로 Ollama HTTP API만 호출한다. 설치·실행은 [`report/README.md`](report/README.md).
+
+```bash
+cd report
+python generate_report.py --dry-run                                   # 프롬프트만 확인(LLM 불필요)
+python generate_report.py --model qwen2.5:14b --out report.md         # DGX에서 실제 생성
+```
+
 ## 개발 규칙
 
 - 브랜치·커밋·PR 규칙은 [`docs/GIT_CONVENTION.md`](docs/GIT_CONVENTION.md) 참고
