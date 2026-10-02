@@ -20,10 +20,19 @@ Rockwell Arena와 같은 종류의 이산사건 시뮬레이션이지만, **맥�
 
 ## 준비
 
+**맥·리눅스**
 ```bash
 cd des
 python3 -m venv .venv
 source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+**윈도우** (PowerShell) — tkinter가 기본 포함이라 추가 설치가 없다
+```powershell
+cd des
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
@@ -41,12 +50,14 @@ python cutover_sim.py --fetch --project 1 --assets 6 --engineers 2
 
 ## 애니메이션 (발표 영상용) — `cutover_anim.py`
 
-엔지니어 자원에 자산이 **줄 서는 모습**이 창으로 보이는 애니메이션 버전. 맥에서 그대로 실행·녹화한다.
+엔지니어 자원에 자산이 **줄 서는 모습**이 창으로 보이는 애니메이션 버전. 맥·윈도우 모두 실행·녹화된다.
 
-**준비 — tkinter 필요 (한 번만)**
-```bash
-brew install python-tk@3.14     # (python 버전에 맞게)
-```
+**준비 — tkinter 필요**
+- **윈도우**: python.org 설치본에 tkinter가 **기본 포함** — 따로 할 것 없음
+- **맥**: 별도 설치 (한 번만)
+  ```bash
+  brew install python-tk@3.14     # (python 버전에 맞게)
+  ```
 
 **실행**
 ```bash
@@ -55,7 +66,10 @@ python cutover_anim.py --assets 6 --engineers 4 --risk LOW    # 비교: 빠르�
 python cutover_anim.py --headless                              # 애니메이션 없이 숫자만(검증용)
 ```
 
-**녹화**: 실행하면 애니메이션 창이 열린다 → macOS 화면 녹화 `⌘ + ⇧ + 5` 로 창을 녹화.
+**녹화**: 실행하면 애니메이션 창이 열린다.
+- **윈도우**: `Win + G`(Xbox Game Bar) 또는 OBS로 창 녹화
+- **맥**: 화면 녹화 `⌘ + ⇧ + 5` 로 창 녹화
+
 두 시나리오(2명·HIGH / 4명·LOW)를 비교해 보여주면 발표 영상이 된다. 상세 대본은 [`../docs/ARENA_MODEL.md`](../docs/ARENA_MODEL.md)의 "7분 영상 스토리보드" 참고(도구만 Salabim으로 바뀜).
 
 ## 활용 예
