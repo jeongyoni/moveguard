@@ -13,6 +13,7 @@ DGX Spark에서 Ollama 로컬 LLM을 띄워 GPU로 추론한다(설치는 report
 """
 import argparse
 import json
+import sys
 import urllib.request
 
 
@@ -30,7 +31,8 @@ def build_prompt(d):
     ]
     for i, f in enumerate(d.get("findings", []), 1):
         block = " [전환 차단]" if f.get("blocking") else ""
-        lines.append(f"{i}. ({f.get('ruleCode')}, RPN {f.get('rpn')}){block} {f.get('title')}")
+        factor = f" / {f.get('factorName')}" if f.get("factorName") else ""
+        lines.append(f"{i}. ({f.get('ruleCode')}, RPN {f.get('rpn')}{factor}){block} {f.get('title')}")
         lines.append(f"   - 내용: {f.get('message')}")
         lines.append(f"   - 조치: {f.get('mitigation')}")
 
@@ -69,6 +71,9 @@ def main():
     prompt = build_prompt(diagnosis)
 
     if args.dry_run:
+        # 윈도우 콘솔은 기본이 cp949라 한글 프롬프트를 그대로 출력하면 깨진다
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8")
         print(prompt)
         return
 
