@@ -95,6 +95,9 @@ docker exec -i moveguard-mysql mysql -uroot -proot1234 moveguard < src/main/reso
 
 > 외래키 때문에 적용 순서를 지켜야 합니다: `schema.sql` → `data.sql` → `compat_schema.sql` → `compat_data.sql`
 
+> **윈도우에서는 PowerShell이 아니라 Git Bash(또는 cmd)에서 실행하세요.** PowerShell의 파이프는 파일을
+> 콘솔 코드페이지로 다시 인코딩해서 한글이 전부 `?`로 저장됩니다. 이미 깨졌다면 위 4개를 다시 적용하면 됩니다.
+
 ### 3. 애플리케이션 실행
 
 ```bash
@@ -110,6 +113,22 @@ docker exec -i moveguard-mysql mysql -uroot -proot1234 moveguard < src/main/reso
 ```
 
 > 통합 테스트(`DiagnosisServiceIntegrationTest`)는 로컬 MySQL에 더미 사업(`project_id = 1`) 시드가 필요합니다.
+
+## 화면
+
+앱을 띄우고 <http://localhost:8080/> 으로 접속하면 진단 결과를 사람이 보는 화면으로 확인할 수 있습니다.
+
+| 경로 | 설명 |
+| --- | --- |
+| `GET /` | 이전사업 목록 — 사업별 **진단 실행** 버튼 |
+| `POST /projects/{projectId}/diagnose` | 진단을 실행하고 결과 화면을 보여줌 |
+
+결과 화면에 나오는 것
+
+- **판정**: 위험 등급(HIGH/MEDIUM/LOW), 전환 차단 여부, 최고 RPN, 종합 점수, 발견 건수
+- **진단 입력**(접이식): 무엇을 보고 판단했는지 — 자산별 IP·소프트웨어 버전의 **이전 전/후 비교**(바뀐 값 강조), 의존관계·DNS·인증서·백업
+- **위험요인별**: 5개 요인(공인IP·네트워크 / OS·DBMS 호환성 / 보안·접근통제 / DNS / 백업·복구)의 건수와 최고 RPN
+- **발견 목록**: RPN 내림차순으로 규칙 코드·제목·차단 배지와 함께 **무엇이 왜 위험한지(message)** 와 **조치 가이드(mitigation)**
 
 ## API
 

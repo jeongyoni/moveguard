@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'진단 결과 — ' + ${project.name}">진단 결과</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header class="top">
+    <div class="brand">MoveGuard</div>
+    <div class="tagline" th:text="${project.name}">사업명</div>
+</header>
+
+<main>
+    <h1>진단 결과</h1>
+    <p class="hint">
+        <span th:text="${project.customerName}">고객사</span> ·
+        <span th:text="${project.sourceEnv} + ' → ' + ${project.targetEnv}">IDC-A → AWS</span> ·
+        <span th:text="'전환 예정 ' + ${project.plannedDate}">전환 예정</span>
+    </p>
+
+    <!-- 판정 -->
+    <section class="verdict" th:classappend="${result.riskLevel}">
+        <div>
+            <div class="level" th:text="${result.riskLevel}">HIGH</div>
+            <div class="level-caption">위험 등급 (최고 RPN 기준)</div>
+        </div>
+        <div>
+            <span class="badge blocked" th:if="${result.blocked}">전환 차단</span>
+            <span class="badge allowed" th:unless="${result.blocked}">전환 가능</span>
+            <div class="level-caption" th:if="${result.blocked}">차단 규칙에 걸려 지금 상태로는 이전할 수 없습니다</div>
+            <div class="level-caption" th:unless="${result.blocked}">전환을 막는 규칙은 없습니다</div>
+        </div>
+        <div class="metrics">
+            <div>
+                <div class="metric-value" th:text="${result.maxRpn}">504</div>
+                <div class="metric-label">최고 RPN</div>
+            </div>
+            <div>
+                <div class="metric-value" th:text="${result.totalScore}">35.10</div>
+                <div class="metric-label">종합 점수</div>
+            </div>
+            <div>
+                <div class="metric-value" th:text="${#lists.size(result.findings)}">15</div>
+                <div class="metric-label">발견 건수</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 진단 입력 — 무엇을 보고 판단했나 -->
+    <details class="input-box">
+        <summary>진단 입력 — 무엇을 보고 판단했나</summary>
+
+        <p class="input-hint">
+            진단은 자산을 스캔하는 것이 아니라, 이전 계획에 적힌 <strong>이전 전 / 이전 후 구성을 비교</strong>해
+            깨질 지점을 찾습니다. 아래가 그 입력입니다.
+        </p>
+
+        <div class="input-asset" th:each="a : ${input.assets}">
+            <div class="input-asset-head">
+                <span class="input-asset-name" th:text="${a.name}">web01</span>
+                <span class="input-asset-meta" th:text="${a.assetType} + (${a.role} != null ? ' · ' + ${a.role} : '')">SERVER · WEB</span>
+            </div>
+
+            <p class="input-none"
+               th:if="${#lists.isEmpty(a.beforeIps) and #lists.isEmpty(a.afterIps) and #lists.isEmpty(a.software)}">
+                외부 시스템 — 우리가 이전하지 않으므로 구성 정보가 없습니다. 의존관계로만 참조됩니다.
+            </p>
+
+            <table class="input-table"
+                   th:unless="${#lists.isEmpty(a.beforeIps) and #lists.isEmpty(a.afterIps) and #lists.isEmpty(a.software)}">
+                <thead>
+                <tr>
+                    <th>항목</th>
+                    <th>이전 전</th>
+                    <th>이전 후</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${!#lists.isEmpty(a.beforeIps) or !#lists.isEmpty(a.afterIps)}">
+                    <th scope="row">IP</th>
+                    <td>
+                        <div th:each="ip : ${a.beforeIps}" th:text="${ip}">203.0.113.11 공인</div>
+                        <span th:if="${#lists.isEmpty(a.beforeIps)}" class="none">-</span>
+                    </td>
+                    <td>
+                        <div th:each="ip : ${a.afterIps}" th:text="${ip}">198.51.100.21 공인</div>
+                        <span th:if="${#lists.isEmpty(a.afterIps)}" class="none">-</span>
+                    </td>
+                </tr>
+                <tr th:each="s : ${a.software}" th:classappend="${s.changed} ? 'changed' : ''">
+                    <th scope="row" th:text="${s.product}">tomcat</th>
+                    <td th:text="${s.before}">9.0.80</td>
+                    <td th:text="${s.after}">11.0.22</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h3 th:if="${!#lists.isEmpty(input.dependencies)}">의존관계</h3>
+        <table class="input-table wide" th:if="${!#lists.isEmpty(input.dependencies)}">
+            <thead>
+            <tr><th>출발</th><th>대상</th><th>접속 주소</th><th>프로토콜</th><th>설정 위치</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="d : ${input.dependencies}">
+                <td th:text="${d.from}">web01</td>
+                <td th:text="${d.to}">db01</td>
+                <td th:text="${d.address} + (${d.port} != null ? ':' + ${d.port} : '')">203.0.113.21:3306</td>
+                <td th:text="${d.protocol}">JDBC</td>
+                <td th:text="${d.configLocation}">application.yml</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <h3 th:if="${!#lists.isEmpty(input.dnsRecords)}">DNS</h3>
+        <table class="input-table wide" th:if="${!#lists.isEmpty(input.dnsRecords)}">
+            <thead>
+            <tr><th>도메인</th><th>타입</th><th>시점</th><th>값</th><th>TTL</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${input.dnsRecords}">
+                <td th:text="${r.domain}">shop.example.com</td>
+                <td th:text="${r.recordType}">A</td>
+                <td th:text="${r.phase}">이전 전</td>
+                <td th:text="${r.value}">203.0.113.11</td>
+                <td th:text="${r.ttl} + '초'">3600초</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <h3 th:if="${!#lists.isEmpty(input.certificates)}">인증서</h3>
+        <table class="input-table wide" th:if="${!#lists.isEmpty(input.certificates)}">
+            <thead>
+            <tr><th>도메인</th><th>발급자</th><th>시점</th><th>만료일</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${input.certificates}">
+                <td th:text="${c.domain}">shop.example.com</td>
+                <td th:text="${c.issuer}">Lets Encrypt R3</td>
+                <td th:text="${c.phase}">이전 전</td>
+                <td th:text="${c.notAfter}">2026-11-10</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <h3 th:if="${!#lists.isEmpty(input.backups)}">백업</h3>
+        <table class="input-table wide" th:if="${!#lists.isEmpty(input.backups)}">
+            <thead>
+            <tr><th>자산</th><th>시점</th><th>마지막 백업</th><th>복구 테스트</th><th>오프사이트</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="b : ${input.backups}">
+                <td th:text="${b.assetName}">db01</td>
+                <td th:text="${b.phase}">이전 전</td>
+                <td th:text="${b.lastBackupAt} ?: '-'">2026-10-22</td>
+                <td th:text="${b.restoreTested} ? '수행' : '미수행'">미수행</td>
+                <td th:text="${b.offsite} ? '보관' : '미보관'">보관</td>
+            </tr>
+            </tbody>
+        </table>
+    </details>
+
+    <!-- 위험요인별 -->
+    <h2>위험요인별</h2>
+    <div class="factors">
+        <div class="factor" th:each="f : ${factors}">
+            <div class="factor-name" th:text="${f.name}">공인IP·네트워크 변경</div>
+            <div class="factor-meta">
+                <span th:text="${f.count} + '건'">5건</span> ·
+                <span th:text="'최고 RPN ' + ${f.maxRpn}">최고 RPN 504</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 발견 목록 -->
+    <h2 th:text="'발견된 위험 ' + ${#lists.size(result.findings)} + '건 (위험 순)'">발견된 위험</h2>
+    <div class="findings">
+        <article class="finding" th:each="item : ${result.findings}"
+                 th:classappend="${item.blocking} ? 'is-blocking' : ''">
+            <div class="rpn">
+                <div class="rpn-value" th:text="${item.rpn}">504</div>
+                <div class="rpn-label">RPN</div>
+            </div>
+            <div>
+                <div class="finding-head">
+                    <span class="code" th:text="${item.ruleCode}">IP-04</span>
+                    <span th:text="${item.factorName}">공인IP·네트워크 변경</span>
+                    <span class="tag-blocking" th:if="${item.blocking}">전환 차단</span>
+                </div>
+                <div class="finding-title" th:text="${item.title}">규칙 제목</div>
+                <p class="finding-message" th:text="${item.message}">무엇이 왜 위험한지</p>
+                <div class="mitigation">
+                    <span class="mitigation-label">조치</span>
+                    <span th:text="${item.mitigation}">조치 가이드</span>
+                </div>
+            </div>
+        </article>
+    </div>
+
+    <div class="empty" th:if="${#lists.isEmpty(result.findings)}">
+        발견된 위험이 없습니다.
+    </div>
+
+    <div class="actions">
+        <form th:action="@{'/projects/' + ${project.projectId} + '/diagnose'}" method="post">
+            <button class="btn" type="submit">다시 진단</button>
+        </form>
+        <form th:action="@{/}" method="get">
+            <button class="btn ghost" type="submit">사업 목록</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

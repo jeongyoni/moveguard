@@ -20,10 +20,19 @@ Rockwell Arena와 같은 종류의 이산사건 시뮬레이션이지만, **맥�
 
 ## 준비
 
+**맥·리눅스**
 ```bash
 cd des
 python3 -m venv .venv
 source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+**윈도우** (PowerShell) — tkinter가 기본 포함이라 추가 설치가 없다
+```powershell
+cd des
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
@@ -41,22 +50,51 @@ python cutover_sim.py --fetch --project 1 --assets 6 --engineers 2
 
 ## 애니메이션 (발표 영상용) — `cutover_anim.py`
 
-엔지니어 자원에 자산이 **줄 서는 모습**이 창으로 보이는 애니메이션 버전. 맥에서 그대로 실행·녹화한다.
+자산이 엔지니어를 기다리며 **줄 서고**, 각 전환 단계를 거쳐 성공/롤백으로 쌓이는 과정을 보여준다.
 
-**준비 — tkinter 필요 (한 번만)**
+화면 구성
+- **대기 / 작업 중 / 완료** 세 칸. 자산 블록에 **현재 단계**(백업·서비스중단·데이터이전·재설정·검증·롤백)가 색과 함께 표시된다
+- **정비창 진행 바** — 넘어가면 빨강으로 바뀌고 `정비창 초과 +N.Nh` 가 뜬다
+- 경과 시간, 성공·롤백 수, 엔지니어 가동 현황, 그리고 지금 무슨 일이 벌어지는지 한 줄 설명(병목 여부)
+
+**준비 — tkinter 필요**
+- **윈도우**: python.org 설치본에 tkinter가 **기본 포함** — 따로 할 것 없음
+- **맥**: 별도 설치 (한 번만)
+  ```bash
+  brew install python-tk@3.14     # (python 버전에 맞게)
+  ```
+
+### 1) mp4로 바로 뽑기 (권장 — 화면 녹화 불필요)
+
 ```bash
-brew install python-tk@3.14     # (python 버전에 맞게)
+python cutover_anim.py --engineers 2 --risk HIGH --speed 6 --video cutover_2eng_HIGH.mp4
+python cutover_anim.py --engineers 4 --risk LOW  --speed 6 --video cutover_4eng_LOW.mp4
 ```
 
-**실행**
-```bash
-python cutover_anim.py --assets 6 --engineers 2 --risk HIGH   # 위험·인력 부족 → 대기열 길어짐
-python cutover_anim.py --assets 6 --engineers 4 --risk LOW    # 비교: 빠르게 끝남
-python cutover_anim.py --headless                              # 애니메이션 없이 숫자만(검증용)
-```
+- `--video`를 주면 **창을 띄우지 않고**(salabim blind animation) 1280×720 / 30fps mp4를 쓴다. 창이 중간에 닫혀 녹화가 끊기는 일이 없다
+- **두 시나리오는 같은 `--speed`로 뽑는다.** 영상 길이 차이(약 84초 vs 31초) 자체가 "인력을 늘리면 빨리 끝난다"는 메시지다
+- `--seed`가 고정(기본 42)이라 같은 영상이 그대로 다시 나온다
 
-**녹화**: 실행하면 애니메이션 창이 열린다 → macOS 화면 녹화 `⌘ + ⇧ + 5` 로 창을 녹화.
-두 시나리오(2명·HIGH / 4명·LOW)를 비교해 보여주면 발표 영상이 된다. 상세 대본은 [`../docs/ARENA_MODEL.md`](../docs/ARENA_MODEL.md)의 "7분 영상 스토리보드" 참고(도구만 Salabim으로 바뀜).
+### 2) 창으로 보며 직접 녹화
+
+```bash
+python cutover_anim.py --engineers 2 --risk HIGH   # 위험·인력 부족 → 대기열 길어짐
+python cutover_anim.py --engineers 4 --risk LOW    # 비교: 빠르게 끝남
+```
+- **윈도우**: `Win + G`(Xbox Game Bar) 또는 OBS로 창 녹화
+- **맥**: 화면 녹화 `⌘ + ⇧ + 5` 로 창 녹화
+
+### 기타 옵션
+
+| 옵션 | 설명 |
+| --- | --- |
+| `--speed` | 실시간 1초당 시뮬레이션 분 (기본 8). 영상 길이 = 총 소요분 ÷ speed |
+| `--snapshots 60,180,360` | 해당 시각(분)의 화면을 png로 저장 — 발표 자료용 정지 이미지 |
+| `--seed` | 난수 고정 (기본 42) |
+| `--font` | 한글 글꼴. 기본값 윈도우 `malgun`, 맥 `AppleGothic` |
+| `--headless` | 애니메이션 없이 숫자만 (검증용) |
+
+영상 대본은 [`../docs/ARENA_MODEL.md`](../docs/ARENA_MODEL.md)의 "7분 영상 스토리보드" 참고(도구만 Salabim으로 바뀜).
 
 ## 활용 예
 

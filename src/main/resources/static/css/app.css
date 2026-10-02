@@ -1,0 +1,424 @@
+/* MoveGuard 진단 화면 — 발표·시연용 (전환 DES 애니메이션과 같은 색 계열) */
+
+:root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-2: #172033;
+    --line: #334155;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --green: #22c55e;
+    --blue: #38bdf8;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    line-height: 1.6;
+}
+
+.top {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 20px 48px;
+    border-bottom: 1px solid var(--line);
+}
+
+.brand {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.tagline {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 36px 48px 80px;
+}
+
+h1 {
+    font-size: 26px;
+    margin: 0 0 8px;
+}
+
+.hint {
+    color: var(--muted);
+    margin: 0 0 28px;
+}
+
+.btn {
+    background: var(--blue);
+    color: #06243a;
+    border: 0;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.btn.ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--line);
+}
+
+/* 사업 목록 */
+.projects {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+}
+
+.project {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px 24px;
+}
+
+.project-name {
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.project-meta {
+    color: var(--muted);
+    font-size: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 4px;
+}
+
+/* 판정 */
+.verdict {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-left: 6px solid var(--line);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+}
+
+.verdict.HIGH {
+    border-left-color: var(--red);
+}
+
+.verdict.MEDIUM {
+    border-left-color: var(--amber);
+}
+
+.verdict.LOW {
+    border-left-color: var(--green);
+}
+
+.level {
+    font-size: 44px;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.verdict.HIGH .level {
+    color: var(--red);
+}
+
+.verdict.MEDIUM .level {
+    color: var(--amber);
+}
+
+.verdict.LOW .level {
+    color: var(--green);
+}
+
+.level-caption {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.badge {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.badge.blocked {
+    background: var(--red);
+    color: #fff;
+}
+
+.badge.allowed {
+    background: var(--green);
+    color: #06290f;
+}
+
+.metrics {
+    display: flex;
+    gap: 36px;
+    margin-left: auto;
+}
+
+.metric-value {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.metric-label {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* 진단 입력 (접이식) */
+.input-box {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 0 22px;
+    margin-bottom: 28px;
+}
+
+.input-box > summary {
+    cursor: pointer;
+    padding: 16px 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--blue);
+    list-style-position: inside;
+}
+
+.input-box[open] > summary {
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 18px;
+}
+
+.input-hint {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 18px;
+}
+
+.input-asset {
+    margin-bottom: 20px;
+}
+
+.input-asset-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.input-asset-name {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.input-asset-meta {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.input-box h3 {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 22px 0 8px;
+}
+
+.input-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.input-table.wide {
+    margin-bottom: 18px;
+}
+
+.input-table th,
+.input-table td {
+    text-align: left;
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+}
+
+.input-table thead th {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--line);
+}
+
+.input-table tbody th {
+    color: var(--muted);
+    font-weight: 400;
+    width: 120px;
+}
+
+/* 이전 전/후가 달라진 줄 — 진단이 보는 지점 */
+.input-table tr.changed td:last-child {
+    color: var(--amber);
+    font-weight: 700;
+}
+
+.input-table .none {
+    color: var(--muted);
+}
+
+.input-none {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0 0 4px;
+}
+
+/* 요인별 집계 */
+h2 {
+    font-size: 18px;
+    margin: 32px 0 14px;
+}
+
+.factors {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.factor {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+}
+
+.factor-name {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.factor-meta {
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+/* 발견 목록 */
+.findings {
+    display: grid;
+    gap: 12px;
+}
+
+.finding {
+    display: flex;
+    gap: 22px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 22px;
+}
+
+.finding.is-blocking {
+    border-color: #7f1d1d;
+}
+
+.rpn {
+    min-width: 92px;
+    text-align: center;
+}
+
+.rpn-value {
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.rpn-label {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.finding-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.code {
+    font-weight: 700;
+    color: var(--blue);
+}
+
+.tag-blocking {
+    background: var(--red);
+    color: #fff;
+    border-radius: 4px;
+    padding: 1px 8px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.finding-title {
+    font-size: 17px;
+    font-weight: 700;
+    margin: 4px 0 6px;
+}
+
+.finding-message {
+    margin: 0 0 10px;
+}
+
+.mitigation {
+    background: var(--panel-2);
+    border-left: 3px solid var(--green);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px;
+    font-size: 14px;
+}
+
+.mitigation-label {
+    color: var(--green);
+    font-weight: 700;
+    margin-right: 8px;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 32px;
+}
+
+.empty {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 28px;
+    color: var(--muted);
+}
