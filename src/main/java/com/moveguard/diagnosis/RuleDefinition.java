@@ -15,6 +15,7 @@ public class RuleDefinition {
     private Long ruleId;
     private String ruleCode;
     private String factorCode;
+    private String factorName;
     private BigDecimal factorWeight;
     private String title;
     private int severity;
@@ -31,10 +32,19 @@ public class RuleDefinition {
 
     /** message_template의 {키}를 params 값으로 치환 */
     public String renderMessage(Map<String, String> params) {
-        String message = messageTemplate;
+        return render(messageTemplate, params);
+    }
+
+    /** 조치 가이드의 {키}를 params 값으로 치환 (예: CMP-02의 {required}) */
+    public String renderMitigation(Map<String, String> params) {
+        return render(mitigation, params);
+    }
+
+    private static String render(String template, Map<String, String> params) {
+        String rendered = template;
         for (Map.Entry<String, String> entry : params.entrySet()) {
-            message = message.replace("{" + entry.getKey() + "}", entry.getValue());
+            rendered = rendered.replace("{" + entry.getKey() + "}", entry.getValue());
         }
-        return message;
+        return rendered;
     }
 }

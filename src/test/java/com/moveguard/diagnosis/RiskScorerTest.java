@@ -59,7 +59,7 @@ class RiskScorerTest {
 
     private static EvaluatedFinding finding(String code, String factor, String weight,
                                             int s, int o, int d, boolean blocking) {
-        RuleDefinition rule = new RuleDefinition(1L, code, factor, new BigDecimal(weight),
+        RuleDefinition rule = new RuleDefinition(1L, code, factor, factor, new BigDecimal(weight),
                 code, s, o, d, blocking, "", "");
         return new EvaluatedFinding(new Finding(code, null, null, Map.of()), rule, "");
     }

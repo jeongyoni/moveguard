@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>MoveGuard — 이전 위험 진단</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header class="top">
+    <div class="brand">MoveGuard</div>
+    <div class="tagline">IDC → 클라우드 이전, 전환 위험 사전 진단</div>
+</header>
+
+<main>
+    <h1>이전사업</h1>
+    <p class="hint">
+        사업을 선택해 진단을 실행하면 네트워크·DNS·보안·호환성·백업 <strong>규칙 20개</strong>로
+        전환을 막는 위험을 찾아내고, 조치 가이드까지 함께 보여줍니다.
+    </p>
+
+    <ul class="projects">
+        <li class="project" th:each="p : ${projects}">
+            <div>
+                <div class="project-name" th:text="${p.name}">사업명</div>
+                <div class="project-meta">
+                    <span th:text="${p.customerName}">고객사</span>
+                    <span th:text="${p.sourceEnv} + ' → ' + ${p.targetEnv}">IDC-A → AWS</span>
+                    <span th:text="'전환 예정 ' + ${p.plannedDate}">전환 예정</span>
+                    <span th:text="${p.status}">PLAN</span>
+                </div>
+            </div>
+            <form th:action="@{'/projects/' + ${p.projectId} + '/diagnose'}" method="post">
+                <button class="btn" type="submit">진단 실행</button>
+            </form>
+        </li>
+    </ul>
+
+    <div class="empty" th:if="${#lists.isEmpty(projects)}">
+        등록된 이전사업이 없습니다. 시드 데이터를 적용했는지 확인하세요.
+    </div>
+</main>
+</body>
+</html>
