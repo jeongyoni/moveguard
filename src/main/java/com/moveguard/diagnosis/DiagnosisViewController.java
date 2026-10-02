@@ -23,6 +23,7 @@ public class DiagnosisViewController {
 
     private final ProjectService projectService;
     private final DiagnosisService diagnosisService;
+    private final DiagnosisContextLoader contextLoader;
 
     @GetMapping("/")
     public String projects(Model model) {
@@ -44,6 +45,8 @@ public class DiagnosisViewController {
         model.addAttribute("project", project);
         model.addAttribute("result", result);
         model.addAttribute("factors", summarize(result.findings()));
+        // "무엇을 보고 판단했는지"를 같이 보여준다 — 결과만으로는 근거가 안 보인다
+        model.addAttribute("input", DiagnosisInput.of(contextLoader.load(projectId)));
         return "diagnosis";
     }
 
