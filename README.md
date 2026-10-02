@@ -126,6 +126,7 @@ docker exec -i moveguard-mysql mysql -uroot -proot1234 moveguard < src/main/reso
 결과 화면에 나오는 것
 
 - **판정**: 위험 등급(HIGH/MEDIUM/LOW), 전환 차단 여부, 최고 RPN, 종합 점수, 발견 건수
+- **진단 입력**(접이식): 무엇을 보고 판단했는지 — 자산별 IP·소프트웨어 버전의 **이전 전/후 비교**(바뀐 값 강조), 의존관계·DNS·인증서·백업
 - **위험요인별**: 5개 요인(공인IP·네트워크 / OS·DBMS 호환성 / 보안·접근통제 / DNS / 백업·복구)의 건수와 최고 RPN
 - **발견 목록**: RPN 내림차순으로 규칙 코드·제목·차단 배지와 함께 **무엇이 왜 위험한지(message)** 와 **조치 가이드(mitigation)**
 

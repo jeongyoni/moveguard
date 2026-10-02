@@ -11,6 +11,7 @@ import com.moveguard.asset.DnsRecord;
 import com.moveguard.asset.Phase;
 import com.moveguard.compat.CompatRelease;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -80,6 +81,13 @@ public class DiagnosisContext {
 
     public Optional<Asset> asset(Long assetId) {
         return assetId == null ? Optional.empty() : Optional.ofNullable(assets.get(assetId));
+    }
+
+    /** 자산 목록 (등록 순). 진단 입력을 화면에 보여줄 때 쓴다. */
+    public List<Asset> assets() {
+        return assets.values().stream()
+                .sorted(Comparator.comparing(Asset::getAssetId))
+                .toList();
     }
 
     public List<AssetIp> ips() {
