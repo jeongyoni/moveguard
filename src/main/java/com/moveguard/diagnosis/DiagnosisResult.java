@@ -14,7 +14,8 @@ public record DiagnosisResult(
         int maxRpn,
         List<Item> findings) {
 
-    public record Item(String ruleCode, String title, int rpn, boolean blocking,
+    public record Item(String ruleCode, String factorCode, String factorName,
+                       String title, int rpn, boolean blocking,
                        String message, String mitigation) {
     }
 
@@ -23,11 +24,13 @@ public record DiagnosisResult(
         List<Item> items = findings.stream()
                 .map(f -> new Item(
                         f.rule().getRuleCode(),
+                        f.rule().getFactorCode(),
+                        f.rule().getFactorName(),
                         f.rule().getTitle(),
                         f.rpn(),
                         f.rule().isBlocking(),
                         f.message(),
-                        f.rule().getMitigation()))
+                        f.rule().renderMitigation(f.finding().params())))
                 .toList();
         return new DiagnosisResult(runId, projectId, score.totalScore(), score.level(),
                 score.blocked(), score.maxRpn(), items);

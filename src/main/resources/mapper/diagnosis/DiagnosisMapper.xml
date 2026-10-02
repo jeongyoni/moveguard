@@ -65,6 +65,7 @@
     <select id="findEnabledRules" resultType="com.moveguard.diagnosis.RuleDefinition">
         SELECT r.rule_id, r.rule_code,
                f.code   AS factor_code,
+               f.name   AS factor_name,
                f.weight AS factor_weight,
                r.title, r.severity, r.occurrence, r.detection,
                r.is_blocking AS blocking,

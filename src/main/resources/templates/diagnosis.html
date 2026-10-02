@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'진단 결과 — ' + ${project.name}">진단 결과</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header class="top">
+    <div class="brand">MoveGuard</div>
+    <div class="tagline" th:text="${project.name}">사업명</div>
+</header>
+
+<main>
+    <h1>진단 결과</h1>
+    <p class="hint">
+        <span th:text="${project.customerName}">고객사</span> ·
+        <span th:text="${project.sourceEnv} + ' → ' + ${project.targetEnv}">IDC-A → AWS</span> ·
+        <span th:text="'전환 예정 ' + ${project.plannedDate}">전환 예정</span>
+    </p>
+
+    <!-- 판정 -->
+    <section class="verdict" th:classappend="${result.riskLevel}">
+        <div>
+            <div class="level" th:text="${result.riskLevel}">HIGH</div>
+            <div class="level-caption">위험 등급 (최고 RPN 기준)</div>
+        </div>
+        <div>
+            <span class="badge blocked" th:if="${result.blocked}">전환 차단</span>
+            <span class="badge allowed" th:unless="${result.blocked}">전환 가능</span>
+            <div class="level-caption" th:if="${result.blocked}">차단 규칙에 걸려 지금 상태로는 이전할 수 없습니다</div>
+            <div class="level-caption" th:unless="${result.blocked}">전환을 막는 규칙은 없습니다</div>
+        </div>
+        <div class="metrics">
+            <div>
+                <div class="metric-value" th:text="${result.maxRpn}">504</div>
+                <div class="metric-label">최고 RPN</div>
+            </div>
+            <div>
+                <div class="metric-value" th:text="${result.totalScore}">35.10</div>
+                <div class="metric-label">종합 점수</div>
+            </div>
+            <div>
+                <div class="metric-value" th:text="${#lists.size(result.findings)}">15</div>
+                <div class="metric-label">발견 건수</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 위험요인별 -->
+    <h2>위험요인별</h2>
+    <div class="factors">
+        <div class="factor" th:each="f : ${factors}">
+            <div class="factor-name" th:text="${f.name}">공인IP·네트워크 변경</div>
+            <div class="factor-meta">
+                <span th:text="${f.count} + '건'">5건</span> ·
+                <span th:text="'최고 RPN ' + ${f.maxRpn}">최고 RPN 504</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 발견 목록 -->
+    <h2 th:text="'발견된 위험 ' + ${#lists.size(result.findings)} + '건 (위험 순)'">발견된 위험</h2>
+    <div class="findings">
+        <article class="finding" th:each="item : ${result.findings}"
+                 th:classappend="${item.blocking} ? 'is-blocking' : ''">
+            <div class="rpn">
+                <div class="rpn-value" th:text="${item.rpn}">504</div>
+                <div class="rpn-label">RPN</div>
+            </div>
+            <div>
+                <div class="finding-head">
+                    <span class="code" th:text="${item.ruleCode}">IP-04</span>
+                    <span th:text="${item.factorName}">공인IP·네트워크 변경</span>
+                    <span class="tag-blocking" th:if="${item.blocking}">전환 차단</span>
+                </div>
+                <div class="finding-title" th:text="${item.title}">규칙 제목</div>
+                <p class="finding-message" th:text="${item.message}">무엇이 왜 위험한지</p>
+                <div class="mitigation">
+                    <span class="mitigation-label">조치</span>
+                    <span th:text="${item.mitigation}">조치 가이드</span>
+                </div>
+            </div>
+        </article>
+    </div>
+
+    <div class="empty" th:if="${#lists.isEmpty(result.findings)}">
+        발견된 위험이 없습니다.
+    </div>
+
+    <div class="actions">
+        <form th:action="@{'/projects/' + ${project.projectId} + '/diagnose'}" method="post">
+            <button class="btn" type="submit">다시 진단</button>
+        </form>
+        <form th:action="@{/}" method="get">
+            <button class="btn ghost" type="submit">사업 목록</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>
