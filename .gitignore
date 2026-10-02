@@ -46,3 +46,14 @@ ml/.venv/
 ml/dataset*.csv
 __pycache__/
 des/.venv/
+
+# Arena (전환 DES 모델) 실행 산출물
+arena/*.p
+arena/*.out
+arena/*.err
+arena/*.mdb
+arena/*.ldb
+arena/*.doe.bak
+des/video/
+des/*.mp4
+des/snapshot_*.png

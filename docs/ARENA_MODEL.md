@@ -22,6 +22,8 @@ Create(자산 N개 생성) → Seize(엔지니어 1명)
 
 ## 2. 모듈별 설정 (Basic Process 패널)
 
+> **Arena를 처음 켰다면** → [`ARENA_BUILD_STEPS.md`](ARENA_BUILD_STEPS.md) 에 이 표를 그대로 따라 만드는 클릭 단위 순서가 있다.
+
 | 모듈 | 종류 | 핵심 설정 |
 | --- | --- | --- |
 | **자산 생성** | Create | Entities per Arrival = `6`(자산 수), Max Arrivals = `1`, First Creation = `0.0` → t=0에 6개 생성 |
@@ -53,6 +55,7 @@ Create(자산 N개 생성) → Seize(엔지니어 1명)
 - Replication Length = `24` Hours (충분히 길게), Base Time Units = `Minutes`
 - Number of Replications = `500`
 - 정비창(Maintenance Window) = `6시간 = 360분` (판정 기준)
+- 완료율 측정 방법(종료조건 + Output 통계)은 [`ARENA_BUILD_STEPS.md`](ARENA_BUILD_STEPS.md) 5~6절
 
 > 이 숫자들은 `des/cutover_sim.py`와 동일 — Arena 결과가 SimPy 결과(아래)와 비슷하게 나와야 정상.
 
@@ -93,8 +96,8 @@ Create(자산 N개 생성) → Seize(엔지니어 1명)
 
 ## 6. 체크리스트
 
-- [ ] 윈도우 + Arena 설치 (Student/Eval)
-- [ ] 위 모듈대로 모델 작성, Variable/Resource/Run 설정
+- [ ] 윈도우 + Arena 설치 (Student/Eval) — **학교 등록 승인에 약 2일** 걸리니 먼저 신청: [`ARENA_BUILD_STEPS.md`](ARENA_BUILD_STEPS.md) 0절
+- [ ] 위 모듈대로 모델 작성, Variable/Resource/Run 설정 → 클릭 순서는 [`ARENA_BUILD_STEPS.md`](ARENA_BUILD_STEPS.md)
 - [ ] 엔지니어 2명·HIGH로 1차 Run → 애니메이션·리포트 확인
 - [ ] 엔지니어 4명(또는 LOW)로 2차 Run → 비교
 - [ ] 스토리보드대로 7분 녹화 → 발표 자료에 삽입

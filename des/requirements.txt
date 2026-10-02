@@ -1,3 +1,4 @@
 simpy>=4.1
 salabim>=25.0
 pillow>=10.0
+opencv-python>=4.9  # --video (mp4 저장)에만 필요
