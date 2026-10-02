@@ -54,3 +54,6 @@ arena/*.err
 arena/*.mdb
 arena/*.ldb
 arena/*.doe.bak
+des/video/
+des/*.mp4
+des/snapshot_*.png
