@@ -46,3 +46,5 @@ ml/.venv/
 ml/dataset*.csv
 __pycache__/
 des/.venv/
+report/report.md
+report/diagnosis.json
