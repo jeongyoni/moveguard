@@ -20,7 +20,7 @@ VALUES
  '목표 WAS가 요구하는 최소 Java 버전 미달',
  9, 6, 5, 1,
  '{asset}의 이전 후 {product} {version}은(는) Java {required} 이상이 필요하지만, 이전 후 Java 버전은 {current}입니다.',
- 'Java 런타임을 {required} 이상으로 올리거나, 현재 Java 버전을 지원하는 WAS 버전으로 목표를 조정하십시오.'),
+ 'Java 런타임을 필요한 버전 이상으로 올리거나, 현재 Java 버전을 지원하는 WAS 버전으로 목표를 조정하십시오.'),
 
 ('CMP-03',
  (SELECT factor_id FROM risk_factor WHERE code = 'COMPAT'),
