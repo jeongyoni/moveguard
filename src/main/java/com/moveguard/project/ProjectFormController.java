@@ -31,6 +31,8 @@ public class ProjectFormController {
     private final IpEditService ipEditService;
     private final DnsEditService dnsEditService;
     private final CertEditService certEditService;
+    private final SoftwareEditService softwareEditService;
+    private final BackupEditService backupEditService;
     private final DiagnosisContextLoader contextLoader;
 
     @GetMapping("/projects/new")
@@ -288,6 +290,127 @@ public class ProjectFormController {
         return "redirect:/projects/" + projectId;
     }
 
+    // ----- 소프트웨어 CRUD (2d-2) -----
+
+    @PostMapping("/projects/{projectId}/software")
+    public String addSoftware(@PathVariable Long projectId,
+                              @RequestParam(required = false) Long assetId,
+                              @RequestParam String product,
+                              @RequestParam(required = false) String role,
+                              @RequestParam String version,
+                              @RequestParam(required = false) String releaseLine,
+                              @RequestParam(required = false) String phase,
+                              Model model) {
+        List<String> errors = softwareEditService.add(projectId, assetId, product, role, version,
+                releaseLine, phase);
+        if (errors.isEmpty()) {
+            return "redirect:/projects/" + projectId;
+        }
+        model.addAttribute("errors", errors);
+        return populateDetail(projectId, model);
+    }
+
+    @GetMapping("/projects/{projectId}/software/{softwareId}/edit")
+    public String editSoftwareForm(@PathVariable Long projectId, @PathVariable Long softwareId,
+                                   Model model) {
+        SoftwareView sw = editMapper.findSoftwareOne(softwareId);
+        if (sw == null) {
+            return "redirect:/projects/" + projectId;
+        }
+        model.addAttribute("projectId", projectId);
+        model.addAttribute("software", sw);
+        model.addAttribute("assets", editMapper.findAssets(projectId));
+        return "software-form";
+    }
+
+    @PostMapping("/projects/{projectId}/software/{softwareId}/edit")
+    public String editSoftware(@PathVariable Long projectId, @PathVariable Long softwareId,
+                               @RequestParam(required = false) Long assetId,
+                               @RequestParam String product,
+                               @RequestParam(required = false) String role,
+                               @RequestParam String version,
+                               @RequestParam(required = false) String releaseLine,
+                               @RequestParam(required = false) String phase,
+                               Model model) {
+        List<String> errors = softwareEditService.update(softwareId, assetId, product, role,
+                version, releaseLine, phase);
+        if (errors.isEmpty()) {
+            return "redirect:/projects/" + projectId;
+        }
+        model.addAttribute("errors", errors);
+        model.addAttribute("projectId", projectId);
+        model.addAttribute("software", new SoftwareView(softwareId, assetId, null, product, role,
+                version, releaseLine, phase));
+        model.addAttribute("assets", editMapper.findAssets(projectId));
+        return "software-form";
+    }
+
+    @PostMapping("/projects/{projectId}/software/{softwareId}/delete")
+    public String deleteSoftware(@PathVariable Long projectId, @PathVariable Long softwareId) {
+        softwareEditService.delete(softwareId);
+        return "redirect:/projects/" + projectId;
+    }
+
+    // ----- 백업 CRUD (2d-2) -----
+
+    @PostMapping("/projects/{projectId}/backups")
+    public String addBackup(@PathVariable Long projectId,
+                            @RequestParam(required = false) Long assetId,
+                            @RequestParam(required = false) String lastBackupAt,
+                            @RequestParam(required = false) String restoreTested,
+                            @RequestParam(required = false) String offsite,
+                            @RequestParam(required = false) String phase,
+                            Model model) {
+        List<String> errors = backupEditService.add(projectId, assetId, lastBackupAt, restoreTested,
+                offsite, phase);
+        if (errors.isEmpty()) {
+            return "redirect:/projects/" + projectId;
+        }
+        model.addAttribute("errors", errors);
+        return populateDetail(projectId, model);
+    }
+
+    @GetMapping("/projects/{projectId}/backups/{backupId}/edit")
+    public String editBackupForm(@PathVariable Long projectId, @PathVariable Long backupId,
+                                 Model model) {
+        BackupView backup = editMapper.findBackup(backupId);
+        if (backup == null) {
+            return "redirect:/projects/" + projectId;
+        }
+        model.addAttribute("projectId", projectId);
+        model.addAttribute("backup", backup);
+        model.addAttribute("assets", editMapper.findAssets(projectId));
+        return "backup-form";
+    }
+
+    @PostMapping("/projects/{projectId}/backups/{backupId}/edit")
+    public String editBackup(@PathVariable Long projectId, @PathVariable Long backupId,
+                             @RequestParam(required = false) Long assetId,
+                             @RequestParam(required = false) String lastBackupAt,
+                             @RequestParam(required = false) String restoreTested,
+                             @RequestParam(required = false) String offsite,
+                             @RequestParam(required = false) String phase,
+                             Model model) {
+        List<String> errors = backupEditService.update(backupId, assetId, lastBackupAt,
+                restoreTested, offsite, phase);
+        if (errors.isEmpty()) {
+            return "redirect:/projects/" + projectId;
+        }
+        model.addAttribute("errors", errors);
+        model.addAttribute("projectId", projectId);
+        model.addAttribute("backup", new BackupView(backupId, assetId, null,
+                ImportValues.toDateOrNull(lastBackupAt), ImportValues.toBool(restoreTested),
+                ImportValues.toBool(offsite), phase));
+        model.addAttribute("assets", editMapper.findAssets(projectId));
+        return "backup-form";
+    }
+
+    @PostMapping("/projects/{projectId}/backups/{backupId}/delete")
+    public String deleteBackup(@PathVariable Long projectId, @PathVariable Long backupId) {
+        backupEditService.delete(backupId);
+        return "redirect:/projects/" + projectId;
+    }
+
     private String populateDetail(Long projectId, Model model) {
         Project project = projectService.findProject(projectId).orElse(null);
         if (project == null) {
@@ -298,6 +421,8 @@ public class ProjectFormController {
         model.addAttribute("ips", editMapper.findIps(projectId));
         model.addAttribute("dnsRecords", editMapper.findDnsRecords(projectId));
         model.addAttribute("certs", editMapper.findCerts(projectId));
+        model.addAttribute("software", editMapper.findSoftware(projectId));
+        model.addAttribute("backups", editMapper.findBackups(projectId));
         model.addAttribute("input", DiagnosisInput.of(contextLoader.load(projectId)));
         return "project-detail";
     }

@@ -49,4 +49,26 @@ public interface ProjectEditMapper {
     void updateCert(Map<String, Object> params);
 
     void deleteCert(Long certId);
+
+    // 소프트웨어
+    List<SoftwareView> findSoftware(Long projectId);
+
+    SoftwareView findSoftwareOne(Long softwareId);
+
+    /** (자산·제품·단계) 중복 확인 — 있으면 software_id, 없으면 null */
+    Long findSoftwareId(@Param("assetId") Long assetId, @Param("product") String product,
+                        @Param("phase") String phase);
+
+    void updateSoftware(Map<String, Object> params);
+
+    void deleteSoftware(Long softwareId);
+
+    // 백업
+    List<BackupView> findBackups(Long projectId);
+
+    BackupView findBackup(Long backupId);
+
+    void updateBackup(Map<String, Object> params);
+
+    void deleteBackup(Long backupId);
 }

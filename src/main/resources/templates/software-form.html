@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>소프트웨어 수정 — MoveGuard</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header class="top">
+    <div class="brand">MoveGuard</div>
+    <div class="tagline">소프트웨어 수정</div>
+</header>
+
+<main>
+    <p><a th:href="@{'/projects/' + ${projectId}}">← 사업 상세</a></p>
+    <h1>소프트웨어 수정</h1>
+
+    <div class="errors" th:if="${errors}">
+        <h2>저장되지 않았습니다</h2>
+        <ul><li th:each="e : ${errors}" th:text="${e}">오류</li></ul>
+    </div>
+
+    <form th:action="@{'/projects/' + ${projectId} + '/software/' + ${software.softwareId} + '/edit'}"
+          method="post" class="form">
+        <p><label>자산<br>
+            <select name="assetId">
+                <option th:each="a : ${assets}" th:value="${a.assetId}" th:text="${a.name}"
+                        th:selected="${a.assetId == software.assetId}">web01</option>
+            </select></label></p>
+        <p><label>제품 *<br><input type="text" name="product" th:value="${software.product}" required></label></p>
+        <p><label>역할<br><input type="text" name="role" th:value="${software.role}"></label></p>
+        <p><label>버전 *<br><input type="text" name="version" th:value="${software.version}" required></label></p>
+        <p><label>릴리스라인 *<br><input type="text" name="releaseLine" th:value="${software.releaseLine}" required></label></p>
+        <p><label>단계<br>
+            <select name="phase">
+                <option value="BEFORE" th:selected="${software.phase == 'BEFORE'}">BEFORE</option>
+                <option value="AFTER" th:selected="${software.phase == 'AFTER'}">AFTER</option>
+            </select></label></p>
+        <p><button class="btn" type="submit">저장</button></p>
+    </form>
+</main>
+</body>
+</html>
