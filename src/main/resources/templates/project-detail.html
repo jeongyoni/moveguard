@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${project.name} + ' — MoveGuard'">사업 상세</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header class="top">
+    <div class="brand">MoveGuard</div>
+    <div class="tagline" th:text="${project.name}">사업명</div>
+</header>
+
+<main>
+    <p><a th:href="@{/}">← 사업 목록</a></p>
+    <h1 th:text="${project.name}">사업명</h1>
+    <p class="hint">
+        <span th:text="${project.customerName}">고객사</span> ·
+        <span th:text="${project.sourceEnv} + ' → ' + ${project.targetEnv}">IDC-A → AWS</span> ·
+        <span th:text="'전환 예정 ' + ${project.plannedDate}">전환 예정</span> ·
+        <span th:text="${project.status}">PLAN</span>
+    </p>
+
+    <div class="actions">
+        <form th:action="@{'/projects/' + ${project.projectId} + '/diagnose'}" method="post">
+            <button class="btn" type="submit">다시 진단</button>
+        </form>
+    </div>
+
+    <h2>입력 항목</h2>
+    <p class="empty" th:if="${#lists.isEmpty(input.assets)
+            and #lists.isEmpty(input.dependencies) and #lists.isEmpty(input.dnsRecords)
+            and #lists.isEmpty(input.certificates) and #lists.isEmpty(input.backups)}">
+        아직 등록된 항목이 없습니다. (항목 추가 기능은 후속 단계에서 제공됩니다)
+    </p>
+
+    <div class="input-asset" th:each="a : ${input.assets}">
+        <div class="input-asset-head">
+            <span class="input-asset-name" th:text="${a.name}">web01</span>
+            <span class="input-asset-meta" th:text="${a.assetType} + (${a.role} != null ? ' · ' + ${a.role} : '')">SERVER · WEB</span>
+        </div>
+        <table class="input-table"
+               th:unless="${#lists.isEmpty(a.beforeIps) and #lists.isEmpty(a.afterIps) and #lists.isEmpty(a.software)}">
+            <thead>
+            <tr><th>항목</th><th>이전 전</th><th>이전 후</th></tr>
+            </thead>
+            <tbody>
+            <tr th:if="${!#lists.isEmpty(a.beforeIps) or !#lists.isEmpty(a.afterIps)}">
+                <th scope="row">IP</th>
+                <td>
+                    <div th:each="ip : ${a.beforeIps}" th:text="${ip}">203.0.113.11 공인</div>
+                    <span th:if="${#lists.isEmpty(a.beforeIps)}" class="none">-</span>
+                </td>
+                <td>
+                    <div th:each="ip : ${a.afterIps}" th:text="${ip}">198.51.100.21 공인</div>
+                    <span th:if="${#lists.isEmpty(a.afterIps)}" class="none">-</span>
+                </td>
+            </tr>
+            <tr th:each="s : ${a.software}" th:classappend="${s.changed} ? 'changed' : ''">
+                <th scope="row" th:text="${s.product}">tomcat</th>
+                <td th:text="${s.before}">9.0.80</td>
+                <td th:text="${s.after}">11.0.22</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h3 th:if="${!#lists.isEmpty(input.dependencies)}">의존관계</h3>
+    <table class="input-table wide" th:if="${!#lists.isEmpty(input.dependencies)}">
+        <thead>
+        <tr><th>출발</th><th>대상</th><th>접속 주소</th><th>프로토콜</th><th>설정 위치</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="d : ${input.dependencies}">
+            <td th:text="${d.from}">web01</td>
+            <td th:text="${d.to}">db01</td>
+            <td th:text="${d.address} + (${d.port} != null ? ':' + ${d.port} : '')">203.0.113.21:3306</td>
+            <td th:text="${d.protocol}">JDBC</td>
+            <td th:text="${d.configLocation}">application.yml</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3 th:if="${!#lists.isEmpty(input.dnsRecords)}">DNS</h3>
+    <table class="input-table wide" th:if="${!#lists.isEmpty(input.dnsRecords)}">
+        <thead>
+        <tr><th>도메인</th><th>타입</th><th>시점</th><th>값</th><th>TTL</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="r : ${input.dnsRecords}">
+            <td th:text="${r.domain}">shop.example.com</td>
+            <td th:text="${r.recordType}">A</td>
+            <td th:text="${r.phase}">이전 전</td>
+            <td th:text="${r.value}">203.0.113.11</td>
+            <td th:text="${r.ttl} + '초'">3600초</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3 th:if="${!#lists.isEmpty(input.certificates)}">인증서</h3>
+    <table class="input-table wide" th:if="${!#lists.isEmpty(input.certificates)}">
+        <thead>
+        <tr><th>도메인</th><th>발급자</th><th>시점</th><th>만료일</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="c : ${input.certificates}">
+            <td th:text="${c.domain}">shop.example.com</td>
+            <td th:text="${c.issuer}">Lets Encrypt R3</td>
+            <td th:text="${c.phase}">이전 전</td>
+            <td th:text="${c.notAfter}">2026-11-10</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3 th:if="${!#lists.isEmpty(input.backups)}">백업</h3>
+    <table class="input-table wide" th:if="${!#lists.isEmpty(input.backups)}">
+        <thead>
+        <tr><th>자산</th><th>시점</th><th>마지막 백업</th><th>복구 테스트</th><th>오프사이트</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="b : ${input.backups}">
+            <td th:text="${b.assetName}">db01</td>
+            <td th:text="${b.phase}">이전 전</td>
+            <td th:text="${b.lastBackupAt} ?: '-'">2026-10-22</td>
+            <td th:text="${b.restoreTested} ? '수행' : '미수행'">미수행</td>
+            <td th:text="${b.offsite} ? '보관' : '미보관'">보관</td>
+        </tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>

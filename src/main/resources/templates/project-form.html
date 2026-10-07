@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>새 사업 만들기 — MoveGuard</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header class="top">
+    <div class="brand">MoveGuard</div>
+    <div class="tagline">새 이전사업 만들기</div>
+</header>
+
+<main>
+    <p><a th:href="@{/}">← 사업 목록</a></p>
+    <h1>새 사업 만들기</h1>
+    <p class="hint">사업 기본 정보를 입력해 만든 뒤, 상세 화면에서 자산·IP 등 항목을 추가합니다.</p>
+
+    <div class="errors" th:if="${errors}">
+        <h2>저장되지 않았습니다</h2>
+        <ul>
+            <li th:each="e : ${errors}" th:text="${e}">오류</li>
+        </ul>
+    </div>
+
+    <form th:action="@{/projects}" method="post" class="form">
+        <p><label>사업명 *<br><input type="text" name="name" th:value="${name}" required></label></p>
+        <p><label>고객사 *<br><input type="text" name="customerName" th:value="${customerName}"></label></p>
+        <p><label>기존 환경<br><input type="text" name="sourceEnv" th:value="${sourceEnv}" placeholder="IDC-A"></label></p>
+        <p><label>신규 환경<br><input type="text" name="targetEnv" th:value="${targetEnv}" placeholder="AWS ap-northeast-2"></label></p>
+        <p><label>상태<br>
+            <select name="status">
+                <option value="PLAN" th:selected="${status == null or status == 'PLAN'}">PLAN</option>
+                <option value="READY" th:selected="${status == 'READY'}">READY</option>
+                <option value="BLOCKED" th:selected="${status == 'BLOCKED'}">BLOCKED</option>
+                <option value="DONE" th:selected="${status == 'DONE'}">DONE</option>
+            </select></label></p>
+        <p><label>전환 예정일<br><input type="date" name="plannedDate" th:value="${plannedDate}"></label></p>
+        <p><button class="btn" type="submit">만들기</button></p>
+    </form>
+</main>
+</body>
+</html>
