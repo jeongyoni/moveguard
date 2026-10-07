@@ -107,4 +107,66 @@
         DELETE FROM certificate WHERE cert_id = #{certId}
     </delete>
 
+    <select id="findSoftware" resultType="com.moveguard.project.SoftwareView">
+        SELECT s.software_id, s.asset_id, a.name AS asset_name, s.product, s.role,
+               s.version, s.release_line, s.phase
+        FROM asset_software s
+        JOIN asset a ON a.asset_id = s.asset_id
+        WHERE a.project_id = #{projectId}
+        ORDER BY s.software_id
+    </select>
+
+    <select id="findSoftwareOne" resultType="com.moveguard.project.SoftwareView">
+        SELECT s.software_id, s.asset_id, a.name AS asset_name, s.product, s.role,
+               s.version, s.release_line, s.phase
+        FROM asset_software s
+        JOIN asset a ON a.asset_id = s.asset_id
+        WHERE s.software_id = #{softwareId}
+    </select>
+
+    <select id="findSoftwareId" resultType="long">
+        SELECT software_id FROM asset_software
+        WHERE asset_id = #{assetId} AND product = #{product} AND phase = #{phase}
+        LIMIT 1
+    </select>
+
+    <update id="updateSoftware">
+        UPDATE asset_software
+        SET asset_id = #{assetId}, product = #{product}, role = #{role, jdbcType=VARCHAR},
+            version = #{version}, release_line = #{releaseLine}, phase = #{phase}
+        WHERE software_id = #{softwareId}
+    </update>
+
+    <delete id="deleteSoftware">
+        DELETE FROM asset_software WHERE software_id = #{softwareId}
+    </delete>
+
+    <select id="findBackups" resultType="com.moveguard.project.BackupView">
+        SELECT b.backup_id, b.asset_id, a.name AS asset_name, b.last_backup_at,
+               b.restore_tested, b.offsite, b.phase
+        FROM backup_plan b
+        JOIN asset a ON a.asset_id = b.asset_id
+        WHERE a.project_id = #{projectId}
+        ORDER BY b.backup_id
+    </select>
+
+    <select id="findBackup" resultType="com.moveguard.project.BackupView">
+        SELECT b.backup_id, b.asset_id, a.name AS asset_name, b.last_backup_at,
+               b.restore_tested, b.offsite, b.phase
+        FROM backup_plan b
+        JOIN asset a ON a.asset_id = b.asset_id
+        WHERE b.backup_id = #{backupId}
+    </select>
+
+    <update id="updateBackup">
+        UPDATE backup_plan
+        SET asset_id = #{assetId}, last_backup_at = #{lastBackupAt, jdbcType=DATE},
+            restore_tested = #{restoreTested}, offsite = #{offsite}, phase = #{phase}
+        WHERE backup_id = #{backupId}
+    </update>
+
+    <delete id="deleteBackup">
+        DELETE FROM backup_plan WHERE backup_id = #{backupId}
+    </delete>
+
 </mapper>

@@ -191,6 +191,84 @@
         <button class="btn" type="submit">추가</button>
     </form>
 
+    <!-- 소프트웨어 편집 -->
+    <h2>소프트웨어</h2>
+    <table class="input-table wide" th:if="${!#lists.isEmpty(software)}">
+        <thead>
+        <tr><th>자산</th><th>제품</th><th>역할</th><th>버전</th><th>릴리스라인</th><th>단계</th><th></th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="s : ${software}">
+            <td th:text="${s.assetName}">web01</td>
+            <td th:text="${s.product}">tomcat</td>
+            <td th:text="${s.role} ?: '-'">WAS</td>
+            <td th:text="${s.version}">9.0.80</td>
+            <td th:text="${s.releaseLine}">9.0</td>
+            <td th:text="${s.phase}">BEFORE</td>
+            <td class="row-actions">
+                <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/software/' + ${s.softwareId} + '/edit'}">수정</a>
+                <form th:action="@{'/projects/' + ${project.projectId} + '/software/' + ${s.softwareId} + '/delete'}" method="post">
+                    <button class="btn ghost danger" type="submit">삭제</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p class="empty" th:if="${#lists.isEmpty(software)}">등록된 소프트웨어가 없습니다.</p>
+
+    <h3>소프트웨어 추가</h3>
+    <form th:action="@{'/projects/' + ${project.projectId} + '/software'}" method="post" class="inline-form"
+          th:if="${!#lists.isEmpty(assets)}">
+        <select name="assetId">
+            <option th:each="a : ${assets}" th:value="${a.assetId}" th:text="${a.name}">web01</option>
+        </select>
+        <input type="text" name="product" placeholder="제품 (tomcat)" required>
+        <input type="text" name="role" placeholder="역할 (WAS)">
+        <input type="text" name="version" placeholder="버전 (9.0.80)" required>
+        <input type="text" name="releaseLine" placeholder="릴리스라인 (9.0)" required>
+        <select name="phase"><option value="BEFORE">BEFORE</option><option value="AFTER">AFTER</option></select>
+        <button class="btn" type="submit">추가</button>
+    </form>
+    <p class="empty" th:if="${#lists.isEmpty(assets)}">소프트웨어를 추가하려면 먼저 자산을 등록하세요.</p>
+
+    <!-- 백업 편집 -->
+    <h2>백업</h2>
+    <table class="input-table wide" th:if="${!#lists.isEmpty(backups)}">
+        <thead>
+        <tr><th>자산</th><th>마지막 백업</th><th>복구 테스트</th><th>오프사이트</th><th>단계</th><th></th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="b : ${backups}">
+            <td th:text="${b.assetName}">db01</td>
+            <td th:text="${b.lastBackupAt} ?: '-'">2026-10-22</td>
+            <td th:text="${b.restoreTested} ? '수행' : '미수행'">미수행</td>
+            <td th:text="${b.offsite} ? '보관' : '미보관'">보관</td>
+            <td th:text="${b.phase}">BEFORE</td>
+            <td class="row-actions">
+                <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/backups/' + ${b.backupId} + '/edit'}">수정</a>
+                <form th:action="@{'/projects/' + ${project.projectId} + '/backups/' + ${b.backupId} + '/delete'}" method="post">
+                    <button class="btn ghost danger" type="submit">삭제</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p class="empty" th:if="${#lists.isEmpty(backups)}">등록된 백업이 없습니다.</p>
+
+    <h3>백업 추가</h3>
+    <form th:action="@{'/projects/' + ${project.projectId} + '/backups'}" method="post" class="inline-form"
+          th:if="${!#lists.isEmpty(assets)}">
+        <select name="assetId">
+            <option th:each="a : ${assets}" th:value="${a.assetId}" th:text="${a.name}">db01</option>
+        </select>
+        <input type="date" name="lastBackupAt">
+        <label class="chk"><input type="checkbox" name="restoreTested" value="true"> 복구 테스트</label>
+        <label class="chk"><input type="checkbox" name="offsite" value="true"> 오프사이트</label>
+        <select name="phase"><option value="BEFORE">BEFORE</option><option value="AFTER">AFTER</option></select>
+        <button class="btn" type="submit">추가</button>
+    </form>
+    <p class="empty" th:if="${#lists.isEmpty(assets)}">백업을 추가하려면 먼저 자산을 등록하세요.</p>
+
     <!-- 진단 입력 미리보기 (읽기 전용) -->
     <details class="input-box">
         <summary>진단 입력 미리보기 (이전 전/후 구성)</summary>
