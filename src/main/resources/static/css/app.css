@@ -441,3 +441,5 @@ h2 {
 .btn.danger { color: #8a1f1f; border-color: #e3b7b7; }
 .form label { display: block; margin-bottom: 4px; }
 .form input, .form select { padding: 6px 8px; min-width: 260px; }
+
+.chk { display: inline-flex; align-items: center; gap: 4px; min-width: auto; }

@@ -3,6 +3,7 @@ package com.moveguard.project;
 import com.moveguard.diagnosis.DiagnosisContextLoader;
 import com.moveguard.diagnosis.DiagnosisInput;
 import com.moveguard.imports.ImportError;
+import com.moveguard.imports.ImportValues;
 import com.moveguard.imports.ImportValidationException;
 import com.moveguard.imports.ProjectImport;
 import com.moveguard.imports.ProjectImport.ProjectRow;
@@ -27,6 +28,7 @@ public class ProjectFormController {
     private final ProjectImportService importService;
     private final ProjectEditMapper editMapper;
     private final AssetEditService assetEditService;
+    private final IpEditService ipEditService;
     private final DiagnosisContextLoader contextLoader;
 
     @GetMapping("/projects/new")
@@ -118,6 +120,66 @@ public class ProjectFormController {
         return "redirect:/projects/" + projectId;
     }
 
+    // ----- IP CRUD (2c) -----
+
+    @PostMapping("/projects/{projectId}/ips")
+    public String addIp(@PathVariable Long projectId,
+                        @RequestParam(required = false) Long assetId,
+                        @RequestParam String address,
+                        @RequestParam(required = false) String ipType,
+                        @RequestParam(required = false) String phase,
+                        @RequestParam(required = false) String extWhitelisted,
+                        @RequestParam(required = false) String note,
+                        Model model) {
+        List<String> errors = ipEditService.add(projectId, assetId, address, ipType, phase,
+                extWhitelisted, note);
+        if (errors.isEmpty()) {
+            return "redirect:/projects/" + projectId;
+        }
+        model.addAttribute("errors", errors);
+        return populateDetail(projectId, model);
+    }
+
+    @GetMapping("/projects/{projectId}/ips/{ipId}/edit")
+    public String editIpForm(@PathVariable Long projectId, @PathVariable Long ipId, Model model) {
+        IpView ip = editMapper.findIp(ipId);
+        if (ip == null) {
+            return "redirect:/projects/" + projectId;
+        }
+        model.addAttribute("projectId", projectId);
+        model.addAttribute("ip", ip);
+        model.addAttribute("assets", editMapper.findAssets(projectId));
+        return "ip-form";
+    }
+
+    @PostMapping("/projects/{projectId}/ips/{ipId}/edit")
+    public String editIp(@PathVariable Long projectId, @PathVariable Long ipId,
+                         @RequestParam(required = false) Long assetId,
+                         @RequestParam String address,
+                         @RequestParam(required = false) String ipType,
+                         @RequestParam(required = false) String phase,
+                         @RequestParam(required = false) String extWhitelisted,
+                         @RequestParam(required = false) String note,
+                         Model model) {
+        List<String> errors = ipEditService.update(ipId, assetId, address, ipType, phase,
+                extWhitelisted, note);
+        if (errors.isEmpty()) {
+            return "redirect:/projects/" + projectId;
+        }
+        model.addAttribute("errors", errors);
+        model.addAttribute("projectId", projectId);
+        model.addAttribute("ip", new IpView(ipId, assetId, null, address, ipType, phase,
+                ImportValues.toBool(extWhitelisted), note));
+        model.addAttribute("assets", editMapper.findAssets(projectId));
+        return "ip-form";
+    }
+
+    @PostMapping("/projects/{projectId}/ips/{ipId}/delete")
+    public String deleteIp(@PathVariable Long projectId, @PathVariable Long ipId) {
+        ipEditService.delete(ipId);
+        return "redirect:/projects/" + projectId;
+    }
+
     private String populateDetail(Long projectId, Model model) {
         Project project = projectService.findProject(projectId).orElse(null);
         if (project == null) {
@@ -125,6 +187,7 @@ public class ProjectFormController {
         }
         model.addAttribute("project", project);
         model.addAttribute("assets", editMapper.findAssets(projectId));
+        model.addAttribute("ips", editMapper.findIps(projectId));
         model.addAttribute("input", DiagnosisInput.of(contextLoader.load(projectId)));
         return "project-detail";
     }

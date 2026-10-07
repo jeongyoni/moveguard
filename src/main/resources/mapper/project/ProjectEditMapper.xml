@@ -31,4 +31,38 @@
         DELETE FROM asset WHERE asset_id = #{assetId}
     </delete>
 
+    <select id="findIps" resultType="com.moveguard.project.IpView">
+        SELECT i.ip_id, i.asset_id, a.name AS asset_name, i.address, i.ip_type, i.phase,
+               i.ext_whitelisted, i.note
+        FROM asset_ip i
+        JOIN asset a ON a.asset_id = i.asset_id
+        WHERE a.project_id = #{projectId}
+        ORDER BY i.ip_id
+    </select>
+
+    <select id="findIp" resultType="com.moveguard.project.IpView">
+        SELECT i.ip_id, i.asset_id, a.name AS asset_name, i.address, i.ip_type, i.phase,
+               i.ext_whitelisted, i.note
+        FROM asset_ip i
+        JOIN asset a ON a.asset_id = i.asset_id
+        WHERE i.ip_id = #{ipId}
+    </select>
+
+    <select id="findIpId" resultType="long">
+        SELECT ip_id FROM asset_ip
+        WHERE asset_id = #{assetId} AND address = #{address} AND phase = #{phase}
+        LIMIT 1
+    </select>
+
+    <update id="updateIp">
+        UPDATE asset_ip
+        SET asset_id = #{assetId}, address = #{address}, ip_type = #{ipType}, phase = #{phase},
+            ext_whitelisted = #{extWhitelisted}, note = #{note, jdbcType=VARCHAR}
+        WHERE ip_id = #{ipId}
+    </update>
+
+    <delete id="deleteIp">
+        DELETE FROM asset_ip WHERE ip_id = #{ipId}
+    </delete>
+
 </mapper>
