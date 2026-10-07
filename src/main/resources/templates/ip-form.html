@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>IP 수정 — MoveGuard</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header class="top">
+    <div class="brand">MoveGuard</div>
+    <div class="tagline">IP 수정</div>
+</header>
+
+<main>
+    <p><a th:href="@{'/projects/' + ${projectId}}">← 사업 상세</a></p>
+    <h1>IP 수정</h1>
+
+    <div class="errors" th:if="${errors}">
+        <h2>저장되지 않았습니다</h2>
+        <ul>
+            <li th:each="e : ${errors}" th:text="${e}">오류</li>
+        </ul>
+    </div>
+
+    <form th:action="@{'/projects/' + ${projectId} + '/ips/' + ${ip.ipId} + '/edit'}"
+          method="post" class="form">
+        <p><label>자산<br>
+            <select name="assetId">
+                <option th:each="a : ${assets}" th:value="${a.assetId}" th:text="${a.name}"
+                        th:selected="${a.assetId == ip.assetId}">web01</option>
+            </select></label></p>
+        <p><label>주소 *<br><input type="text" name="address" th:value="${ip.address}" required></label></p>
+        <p><label>종류<br>
+            <select name="ipType">
+                <option value="PUBLIC" th:selected="${ip.ipType == 'PUBLIC'}">PUBLIC</option>
+                <option value="PRIVATE" th:selected="${ip.ipType == 'PRIVATE'}">PRIVATE</option>
+            </select></label></p>
+        <p><label>단계<br>
+            <select name="phase">
+                <option value="BEFORE" th:selected="${ip.phase == 'BEFORE'}">BEFORE</option>
+                <option value="AFTER" th:selected="${ip.phase == 'AFTER'}">AFTER</option>
+            </select></label></p>
+        <p><label class="chk"><input type="checkbox" name="extWhitelisted" value="true"
+                                     th:checked="${ip.extWhitelisted}"> 외부 허용목록</label></p>
+        <p><label>비고<br><input type="text" name="note" th:value="${ip.note}"></label></p>
+        <p><button class="btn" type="submit">저장</button></p>
+    </form>
+</main>
+</body>
+</html>

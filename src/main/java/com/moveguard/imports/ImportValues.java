@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /** 입력 문자열 파싱·판정 공통 로직. 검증기와 저장 서비스가 같은 규칙을 쓰도록 한곳에 둔다. */
-final class ImportValues {
+public final class ImportValues {
 
     private static final String OCTET = "(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)";
     private static final Pattern IPV4 = Pattern.compile("^" + OCTET + "(\\." + OCTET + "){3}$");
@@ -17,28 +17,28 @@ final class ImportValues {
     private ImportValues() {
     }
 
-    static boolean isBlank(String s) {
+    public static boolean isBlank(String s) {
         return s == null || s.isBlank();
     }
 
-    static String trim(String s) {
+    public static String trim(String s) {
         return s == null ? "" : s.trim();
     }
 
-    static boolean isIp(String s) {
+    public static boolean isIp(String s) {
         return s != null && (IPV4.matcher(s.trim()).matches() || IPV6.matcher(s.trim()).matches());
     }
 
-    static boolean isBool(String s) {
+    public static boolean isBool(String s) {
         String v = trim(s).toLowerCase();
         return TRUE.contains(v) || FALSE.contains(v);
     }
 
-    static boolean toBool(String s) {
+    public static boolean toBool(String s) {
         return TRUE.contains(trim(s).toLowerCase());
     }
 
-    static Integer toIntOrNull(String s) {
+    public static Integer toIntOrNull(String s) {
         try {
             return Integer.valueOf(trim(s));
         } catch (NumberFormatException e) {
@@ -46,7 +46,7 @@ final class ImportValues {
         }
     }
 
-    static LocalDate toDateOrNull(String s) {
+    public static LocalDate toDateOrNull(String s) {
         try {
             return LocalDate.parse(trim(s));
         } catch (DateTimeParseException e) {
