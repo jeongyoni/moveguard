@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>인증서 수정 — MoveGuard</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header class="top">
+    <div class="brand">MoveGuard</div>
+    <div class="tagline">인증서 수정</div>
+</header>
+
+<main>
+    <p><a th:href="@{'/projects/' + ${projectId}}">← 사업 상세</a></p>
+    <h1>인증서 수정</h1>
+
+    <div class="errors" th:if="${errors}">
+        <h2>저장되지 않았습니다</h2>
+        <ul>
+            <li th:each="e : ${errors}" th:text="${e}">오류</li>
+        </ul>
+    </div>
+
+    <form th:action="@{'/projects/' + ${projectId} + '/certs/' + ${cert.certId} + '/edit'}"
+          method="post" class="form">
+        <p><label>도메인 *<br><input type="text" name="domain" th:value="${cert.domain}" required></label></p>
+        <p><label>발급자<br><input type="text" name="issuer" th:value="${cert.issuer}"></label></p>
+        <p><label>만료일 *<br><input type="date" name="notAfter" th:value="${cert.notAfter}" required></label></p>
+        <p><label>단계<br>
+            <select name="phase">
+                <option value="BEFORE" th:selected="${cert.phase == 'BEFORE'}">BEFORE</option>
+                <option value="AFTER" th:selected="${cert.phase == 'AFTER'}">AFTER</option>
+            </select></label></p>
+        <p><button class="btn" type="submit">저장</button></p>
+    </form>
+</main>
+</body>
+</html>

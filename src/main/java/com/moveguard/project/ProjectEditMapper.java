@@ -31,4 +31,22 @@ public interface ProjectEditMapper {
     void updateIp(Map<String, Object> params);
 
     void deleteIp(Long ipId);
+
+    // DNS
+    List<DnsView> findDnsRecords(Long projectId);
+
+    DnsView findDns(Long dnsId);
+
+    void updateDns(Map<String, Object> params);
+
+    void deleteDns(Long dnsId);
+
+    // 인증서
+    List<CertView> findCerts(Long projectId);
+
+    CertView findCert(Long certId);
+
+    void updateCert(Map<String, Object> params);
+
+    void deleteCert(Long certId);
 }
