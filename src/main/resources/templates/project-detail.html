@@ -123,6 +123,74 @@
     </form>
     <p class="empty" th:if="${#lists.isEmpty(assets)}">IP를 추가하려면 먼저 자산을 등록하세요.</p>
 
+    <!-- DNS 편집 -->
+    <h2>DNS</h2>
+    <table class="input-table wide" th:if="${!#lists.isEmpty(dnsRecords)}">
+        <thead>
+        <tr><th>도메인</th><th>종류</th><th>값</th><th>TTL</th><th>단계</th><th></th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="r : ${dnsRecords}">
+            <td th:text="${r.domain}">shop.example.com</td>
+            <td th:text="${r.recordType}">A</td>
+            <td th:text="${r.value}">203.0.113.11</td>
+            <td th:text="${r.ttl}">3600</td>
+            <td th:text="${r.phase}">BEFORE</td>
+            <td class="row-actions">
+                <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/dns/' + ${r.dnsId} + '/edit'}">수정</a>
+                <form th:action="@{'/projects/' + ${project.projectId} + '/dns/' + ${r.dnsId} + '/delete'}" method="post">
+                    <button class="btn ghost danger" type="submit">삭제</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p class="empty" th:if="${#lists.isEmpty(dnsRecords)}">등록된 DNS 레코드가 없습니다.</p>
+
+    <h3>DNS 추가</h3>
+    <form th:action="@{'/projects/' + ${project.projectId} + '/dns'}" method="post" class="inline-form">
+        <input type="text" name="domain" placeholder="도메인" required>
+        <select name="recordType">
+            <option>A</option><option>AAAA</option><option>CNAME</option><option>MX</option><option>TXT</option>
+        </select>
+        <input type="text" name="value" placeholder="값" required>
+        <input type="number" name="ttl" placeholder="TTL" min="0" value="300">
+        <select name="phase"><option value="BEFORE">BEFORE</option><option value="AFTER">AFTER</option></select>
+        <button class="btn" type="submit">추가</button>
+    </form>
+
+    <!-- 인증서 편집 -->
+    <h2>인증서</h2>
+    <table class="input-table wide" th:if="${!#lists.isEmpty(certs)}">
+        <thead>
+        <tr><th>도메인</th><th>발급자</th><th>만료일</th><th>단계</th><th></th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="c : ${certs}">
+            <td th:text="${c.domain}">shop.example.com</td>
+            <td th:text="${c.issuer} ?: '-'">Lets Encrypt</td>
+            <td th:text="${c.notAfter}">2026-11-10</td>
+            <td th:text="${c.phase}">BEFORE</td>
+            <td class="row-actions">
+                <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/certs/' + ${c.certId} + '/edit'}">수정</a>
+                <form th:action="@{'/projects/' + ${project.projectId} + '/certs/' + ${c.certId} + '/delete'}" method="post">
+                    <button class="btn ghost danger" type="submit">삭제</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p class="empty" th:if="${#lists.isEmpty(certs)}">등록된 인증서가 없습니다.</p>
+
+    <h3>인증서 추가</h3>
+    <form th:action="@{'/projects/' + ${project.projectId} + '/certs'}" method="post" class="inline-form">
+        <input type="text" name="domain" placeholder="도메인" required>
+        <input type="text" name="issuer" placeholder="발급자">
+        <input type="date" name="notAfter" required>
+        <select name="phase"><option value="BEFORE">BEFORE</option><option value="AFTER">AFTER</option></select>
+        <button class="btn" type="submit">추가</button>
+    </form>
+
     <!-- 진단 입력 미리보기 (읽기 전용) -->
     <details class="input-box">
         <summary>진단 입력 미리보기 (이전 전/후 구성)</summary>

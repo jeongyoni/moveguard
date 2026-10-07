@@ -29,6 +29,8 @@ public class ProjectFormController {
     private final ProjectEditMapper editMapper;
     private final AssetEditService assetEditService;
     private final IpEditService ipEditService;
+    private final DnsEditService dnsEditService;
+    private final CertEditService certEditService;
     private final DiagnosisContextLoader contextLoader;
 
     @GetMapping("/projects/new")
@@ -180,6 +182,112 @@ public class ProjectFormController {
         return "redirect:/projects/" + projectId;
     }
 
+    // ----- DNS CRUD (2d-1) -----
+
+    @PostMapping("/projects/{projectId}/dns")
+    public String addDns(@PathVariable Long projectId,
+                         @RequestParam String domain,
+                         @RequestParam(required = false) String recordType,
+                         @RequestParam(required = false) String value,
+                         @RequestParam(required = false) String ttl,
+                         @RequestParam(required = false) String phase,
+                         Model model) {
+        List<String> errors = dnsEditService.add(projectId, domain, recordType, value, ttl, phase);
+        if (errors.isEmpty()) {
+            return "redirect:/projects/" + projectId;
+        }
+        model.addAttribute("errors", errors);
+        return populateDetail(projectId, model);
+    }
+
+    @GetMapping("/projects/{projectId}/dns/{dnsId}/edit")
+    public String editDnsForm(@PathVariable Long projectId, @PathVariable Long dnsId, Model model) {
+        DnsView dns = editMapper.findDns(dnsId);
+        if (dns == null) {
+            return "redirect:/projects/" + projectId;
+        }
+        model.addAttribute("projectId", projectId);
+        model.addAttribute("dns", dns);
+        return "dns-form";
+    }
+
+    @PostMapping("/projects/{projectId}/dns/{dnsId}/edit")
+    public String editDns(@PathVariable Long projectId, @PathVariable Long dnsId,
+                          @RequestParam String domain,
+                          @RequestParam(required = false) String recordType,
+                          @RequestParam(required = false) String value,
+                          @RequestParam(required = false) String ttl,
+                          @RequestParam(required = false) String phase,
+                          Model model) {
+        List<String> errors = dnsEditService.update(dnsId, domain, recordType, value, ttl, phase);
+        if (errors.isEmpty()) {
+            return "redirect:/projects/" + projectId;
+        }
+        model.addAttribute("errors", errors);
+        model.addAttribute("projectId", projectId);
+        model.addAttribute("dns", new DnsView(dnsId, projectId, domain, recordType, value,
+                ImportValues.toIntOrNull(ttl) == null ? 0 : ImportValues.toIntOrNull(ttl), phase));
+        return "dns-form";
+    }
+
+    @PostMapping("/projects/{projectId}/dns/{dnsId}/delete")
+    public String deleteDns(@PathVariable Long projectId, @PathVariable Long dnsId) {
+        dnsEditService.delete(dnsId);
+        return "redirect:/projects/" + projectId;
+    }
+
+    // ----- 인증서 CRUD (2d-1) -----
+
+    @PostMapping("/projects/{projectId}/certs")
+    public String addCert(@PathVariable Long projectId,
+                          @RequestParam String domain,
+                          @RequestParam(required = false) String issuer,
+                          @RequestParam(required = false) String notAfter,
+                          @RequestParam(required = false) String phase,
+                          Model model) {
+        List<String> errors = certEditService.add(projectId, domain, issuer, notAfter, phase);
+        if (errors.isEmpty()) {
+            return "redirect:/projects/" + projectId;
+        }
+        model.addAttribute("errors", errors);
+        return populateDetail(projectId, model);
+    }
+
+    @GetMapping("/projects/{projectId}/certs/{certId}/edit")
+    public String editCertForm(@PathVariable Long projectId, @PathVariable Long certId, Model model) {
+        CertView cert = editMapper.findCert(certId);
+        if (cert == null) {
+            return "redirect:/projects/" + projectId;
+        }
+        model.addAttribute("projectId", projectId);
+        model.addAttribute("cert", cert);
+        return "cert-form";
+    }
+
+    @PostMapping("/projects/{projectId}/certs/{certId}/edit")
+    public String editCert(@PathVariable Long projectId, @PathVariable Long certId,
+                           @RequestParam String domain,
+                           @RequestParam(required = false) String issuer,
+                           @RequestParam(required = false) String notAfter,
+                           @RequestParam(required = false) String phase,
+                           Model model) {
+        List<String> errors = certEditService.update(certId, domain, issuer, notAfter, phase);
+        if (errors.isEmpty()) {
+            return "redirect:/projects/" + projectId;
+        }
+        model.addAttribute("errors", errors);
+        model.addAttribute("projectId", projectId);
+        model.addAttribute("cert", new CertView(certId, projectId, domain, issuer,
+                ImportValues.toDateOrNull(notAfter), phase));
+        return "cert-form";
+    }
+
+    @PostMapping("/projects/{projectId}/certs/{certId}/delete")
+    public String deleteCert(@PathVariable Long projectId, @PathVariable Long certId) {
+        certEditService.delete(certId);
+        return "redirect:/projects/" + projectId;
+    }
+
     private String populateDetail(Long projectId, Model model) {
         Project project = projectService.findProject(projectId).orElse(null);
         if (project == null) {
@@ -188,6 +296,8 @@ public class ProjectFormController {
         model.addAttribute("project", project);
         model.addAttribute("assets", editMapper.findAssets(projectId));
         model.addAttribute("ips", editMapper.findIps(projectId));
+        model.addAttribute("dnsRecords", editMapper.findDnsRecords(projectId));
+        model.addAttribute("certs", editMapper.findCerts(projectId));
         model.addAttribute("input", DiagnosisInput.of(contextLoader.load(projectId)));
         return "project-detail";
     }

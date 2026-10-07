@@ -65,4 +65,46 @@
         DELETE FROM asset_ip WHERE ip_id = #{ipId}
     </delete>
 
+    <select id="findDnsRecords" resultType="com.moveguard.project.DnsView">
+        SELECT dns_id, project_id, domain, record_type, value, ttl, phase
+        FROM dns_record WHERE project_id = #{projectId} ORDER BY dns_id
+    </select>
+
+    <select id="findDns" resultType="com.moveguard.project.DnsView">
+        SELECT dns_id, project_id, domain, record_type, value, ttl, phase
+        FROM dns_record WHERE dns_id = #{dnsId}
+    </select>
+
+    <update id="updateDns">
+        UPDATE dns_record
+        SET domain = #{domain}, record_type = #{recordType}, value = #{value},
+            ttl = #{ttl}, phase = #{phase}
+        WHERE dns_id = #{dnsId}
+    </update>
+
+    <delete id="deleteDns">
+        DELETE FROM dns_record WHERE dns_id = #{dnsId}
+    </delete>
+
+    <select id="findCerts" resultType="com.moveguard.project.CertView">
+        SELECT cert_id, project_id, domain, issuer, not_after, phase
+        FROM certificate WHERE project_id = #{projectId} ORDER BY cert_id
+    </select>
+
+    <select id="findCert" resultType="com.moveguard.project.CertView">
+        SELECT cert_id, project_id, domain, issuer, not_after, phase
+        FROM certificate WHERE cert_id = #{certId}
+    </select>
+
+    <update id="updateCert">
+        UPDATE certificate
+        SET domain = #{domain}, issuer = #{issuer, jdbcType=VARCHAR},
+            not_after = #{notAfter, jdbcType=DATE}, phase = #{phase}
+        WHERE cert_id = #{certId}
+    </update>
+
+    <delete id="deleteCert">
+        DELETE FROM certificate WHERE cert_id = #{certId}
+    </delete>
+
 </mapper>
