@@ -434,3 +434,10 @@ h2 {
 .errors h2 { font-size: 15px; margin: 0 0 8px; }
 .errors ul { margin: 0; padding-left: 18px; }
 .errors li { margin: 2px 0; }
+
+.inline-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0 24px; }
+.inline-form input, .inline-form select { padding: 6px 8px; }
+.row-actions { display: flex; gap: 6px; white-space: nowrap; }
+.btn.danger { color: #8a1f1f; border-color: #e3b7b7; }
+.form label { display: block; margin-bottom: 4px; }
+.form input, .form select { padding: 6px 8px; min-width: 260px; }

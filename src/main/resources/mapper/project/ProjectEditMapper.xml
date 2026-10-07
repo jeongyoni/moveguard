@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moveguard.project.ProjectEditMapper">
+
+    <select id="findAssets" resultType="com.moveguard.project.AssetDetail">
+        SELECT asset_id, project_id, name, asset_type, role, os_name, os_version
+        FROM asset
+        WHERE project_id = #{projectId}
+        ORDER BY asset_id
+    </select>
+
+    <select id="findAsset" resultType="com.moveguard.project.AssetDetail">
+        SELECT asset_id, project_id, name, asset_type, role, os_name, os_version
+        FROM asset
+        WHERE asset_id = #{assetId}
+    </select>
+
+    <select id="findAssetNames" resultType="string">
+        SELECT name FROM asset WHERE project_id = #{projectId}
+    </select>
+
+    <update id="updateAsset">
+        UPDATE asset
+        SET name = #{name}, asset_type = #{assetType}, role = #{role, jdbcType=VARCHAR},
+            os_name = #{osName, jdbcType=VARCHAR}, os_version = #{osVersion, jdbcType=VARCHAR}
+        WHERE asset_id = #{assetId}
+    </update>
+
+    <delete id="deleteAsset">
+        DELETE FROM asset WHERE asset_id = #{assetId}
+    </delete>
+
+</mapper>
