@@ -1,11 +1,6 @@
 package com.moveguard.diagnosis;
 
-import com.moveguard.project.Project;
 import com.moveguard.project.ProjectService;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,8 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class DiagnosisViewController {
 
     private final ProjectService projectService;
-    private final DiagnosisService diagnosisService;
-    private final DiagnosisContextLoader contextLoader;
+    private final DiagnosisPage diagnosisPage;
 
     @GetMapping("/")
     public String projects(Model model) {
@@ -33,39 +27,6 @@ public class DiagnosisViewController {
 
     @PostMapping("/projects/{projectId}/diagnose")
     public String diagnose(@PathVariable Long projectId, Model model) {
-        Project project = projectService.findProject(projectId).orElse(null);
-        if (project == null) {
-            return "redirect:/";
-        }
-        DiagnosisResult result = diagnosisService.diagnose(projectId).orElse(null);
-        if (result == null) {
-            return "redirect:/";
-        }
-
-        model.addAttribute("project", project);
-        model.addAttribute("result", result);
-        model.addAttribute("factors", summarize(result.findings()));
-        // "무엇을 보고 판단했는지"를 같이 보여준다 — 결과만으로는 근거가 안 보인다
-        model.addAttribute("input", DiagnosisInput.of(contextLoader.load(projectId)));
-        return "diagnosis";
-    }
-
-    /**
-     * 위험요인별 발견 건수와 최고 RPN — 어느 영역이 위험한지 한눈에 보기 위한 집계.
-     * findings가 RPN 내림차순이므로, 요인도 가장 위험한 것부터 나온다.
-     */
-    private List<FactorSummary> summarize(List<DiagnosisResult.Item> findings) {
-        Map<String, FactorSummary> byCode = new LinkedHashMap<>();
-        for (DiagnosisResult.Item item : findings) {
-            FactorSummary prev = byCode.get(item.factorCode());
-            byCode.put(item.factorCode(), prev == null
-                    ? new FactorSummary(item.factorCode(), item.factorName(), 1, item.rpn())
-                    : new FactorSummary(prev.code(), prev.name(), prev.count() + 1,
-                            Math.max(prev.maxRpn(), item.rpn())));
-        }
-        return new ArrayList<>(byCode.values());
-    }
-
-    public record FactorSummary(String code, String name, int count, int maxRpn) {
+        return diagnosisPage.render(projectId, model);
     }
 }

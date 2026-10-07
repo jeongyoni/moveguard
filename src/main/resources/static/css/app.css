@@ -422,3 +422,15 @@ h2 {
     padding: 28px;
     color: var(--muted);
 }
+
+.errors {
+    margin-top: 20px;
+    padding: 14px 16px;
+    border: 1px solid #e3b7b7;
+    background: #fbeeee;
+    border-radius: 8px;
+    color: #8a1f1f;
+}
+.errors h2 { font-size: 15px; margin: 0 0 8px; }
+.errors ul { margin: 0; padding-left: 18px; }
+.errors li { margin: 2px 0; }
