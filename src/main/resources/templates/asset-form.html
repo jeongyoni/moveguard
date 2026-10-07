@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>자산 수정 — MoveGuard</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header class="top">
+    <div class="brand">MoveGuard</div>
+    <div class="tagline">자산 수정</div>
+</header>
+
+<main>
+    <p><a th:href="@{'/projects/' + ${projectId}}">← 사업 상세</a></p>
+    <h1>자산 수정</h1>
+
+    <div class="errors" th:if="${errors}">
+        <h2>저장되지 않았습니다</h2>
+        <ul>
+            <li th:each="e : ${errors}" th:text="${e}">오류</li>
+        </ul>
+    </div>
+
+    <form th:action="@{'/projects/' + ${projectId} + '/assets/' + ${asset.assetId} + '/edit'}"
+          method="post" class="form">
+        <p><label>자산명 *<br><input type="text" name="name" th:value="${asset.name}" required></label></p>
+        <p><label>유형<br>
+            <select name="assetType">
+                <option value="SERVER" th:selected="${asset.assetType == 'SERVER'}">SERVER</option>
+                <option value="EXTERNAL" th:selected="${asset.assetType == 'EXTERNAL'}">EXTERNAL</option>
+            </select></label></p>
+        <p><label>역할<br>
+            <select name="role">
+                <option value="" th:selected="${asset.role == null}">역할 없음</option>
+                <option value="WEB" th:selected="${asset.role == 'WEB'}">WEB</option>
+                <option value="WAS" th:selected="${asset.role == 'WAS'}">WAS</option>
+                <option value="DB" th:selected="${asset.role == 'DB'}">DB</option>
+                <option value="ETC" th:selected="${asset.role == 'ETC'}">ETC</option>
+            </select></label></p>
+        <p><label>OS 이름<br><input type="text" name="osName" th:value="${asset.osName}"></label></p>
+        <p><label>OS 버전<br><input type="text" name="osVersion" th:value="${asset.osVersion}"></label></p>
+        <p><button class="btn" type="submit">저장</button></p>
+    </form>
+</main>
+</body>
+</html>
