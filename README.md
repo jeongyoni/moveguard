@@ -6,6 +6,7 @@ IDC → 클라우드(AWS) **이전(마이그레이션) 사업의 전환 위험�
 ## 주요 기능
 
 - 이전사업 단위로 자산·IP·의존관계·DNS·인증서·설치 소프트웨어·백업 데이터를 진단 입력으로 수집
+- **엑셀 업로드**로 이전사업 등록 (양식 다운로드 → 검증 → 저장 → 진단)
 - 규칙 기반 위험 진단 (FMEA RPN 점수화) — 네트워크·DNS·보안·호환성·백업
 - 위험도 등급 산정 및 **전환 차단(blocking)** 판정
 - 규칙별 조치 가이드 문구 제공
@@ -98,7 +99,21 @@ docker exec -i moveguard-mysql mysql -uroot -proot1234 moveguard < src/main/reso
 > **윈도우에서는 PowerShell이 아니라 Git Bash(또는 cmd)에서 실행하세요.** PowerShell의 파이프는 파일을
 > 콘솔 코드페이지로 다시 인코딩해서 한글이 전부 `?`로 저장됩니다. 이미 깨졌다면 위 4개를 다시 적용하면 됩니다.
 
-### 3. 애플리케이션 실행
+### 3. 로컬 설정 (`application-local.yml`)
+
+DB 접속 정보가 든 `src/main/resources/application-local.yml`은 비밀정보라 저장소에 포함하지 않습니다(.gitignore).
+아래 내용으로 직접 만드세요. (docker-compose 기본값 기준)
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/moveguard?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: root1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+```
+
+### 4. 애플리케이션 실행
 
 ```bash
 ./gradlew bootRun
@@ -106,7 +121,12 @@ docker exec -i moveguard-mysql mysql -uroot -proot1234 moveguard < src/main/reso
 
 기본 포트는 `8080`, 프로필은 `local`(→ `application-local.yml`)입니다.
 
-### 4. 테스트
+### 5. 이전사업 등록 (엑셀 업로드)
+
+브라우저로 `http://localhost:8080/` → **"엑셀로 사업 등록"** → 양식 다운로드 → 작성 → 업로드하면
+검증 후 저장하고 바로 진단 결과를 보여줍니다. (시드 없이 사업을 넣는 가장 쉬운 방법)
+
+### 6. 테스트
 
 ```bash
 ./gradlew test

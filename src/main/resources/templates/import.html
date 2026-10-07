@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>엑셀로 사업 등록 — MoveGuard</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header class="top">
+    <div class="brand">MoveGuard</div>
+    <div class="tagline">엑셀로 이전사업 등록</div>
+</header>
+
+<main>
+    <p><a th:href="@{/}">← 사업 목록</a></p>
+    <h1>엑셀로 사업 등록</h1>
+    <p class="hint">
+        양식을 내려받아 시트(사업·자산·IP·의존관계·DNS·인증서·소프트웨어·백업)를 채운 뒤 업로드하세요.
+        검증을 통과하면 저장 후 바로 진단 결과를 보여줍니다. 하나라도 오류가 있으면 저장하지 않습니다.
+    </p>
+
+    <p>
+        <a class="btn" th:href="@{/projects/import/template}">양식 다운로드 (.xlsx)</a>
+    </p>
+
+    <form th:action="@{/projects/import}" method="post" enctype="multipart/form-data">
+        <p><input type="file" name="file" accept=".xlsx" required></p>
+        <p><button class="btn" type="submit">업로드하고 진단</button></p>
+    </form>
+
+    <div class="errors" th:if="${fileError}">
+        <p th:text="${fileError}">파일 오류</p>
+    </div>
+
+    <div class="errors" th:if="${errors}">
+        <h2>검증 오류 (<span th:text="${#lists.size(errors)}">0</span>건) — 저장되지 않았습니다</h2>
+        <ul>
+            <li th:each="e : ${errors}" th:text="${e}">오류</li>
+        </ul>
+    </div>
+</main>
+</body>
+</html>
