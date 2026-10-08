@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>WAR 하드코딩 IP 분석 — MoveGuard</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header class="top">
+    <div class="brand">MoveGuard</div>
+    <div class="tagline">WAR/JAR 하드코딩 IP 분석</div>
+</header>
+
+<main>
+    <p><a th:href="@{'/projects/' + ${projectId}}">← 사업 상세</a></p>
+    <h1>WAR/JAR 하드코딩 IP 분석</h1>
+    <p class="hint">
+        배포 파일(.war/.jar)을 올리면 내부 설정 파일(application.yml·properties, context.xml 등)에서
+        JDBC URL·접속 주소에 <strong>하드코딩된 IP</strong>를 찾아냅니다. 파일은 메모리에서만 분석하고 저장하지 않습니다.
+        확인 후 자산의 의존성으로 추가하면 <strong>IP-03</strong> 규칙이 진단에 반영합니다.
+    </p>
+
+    <form th:action="@{'/projects/' + ${projectId} + '/war-scan'}" method="post" enctype="multipart/form-data">
+        <p><input type="file" name="file" accept=".war,.jar" required></p>
+        <p><button class="btn" type="submit">분석</button></p>
+    </form>
+
+    <div class="errors" th:if="${fileError}">
+        <p th:text="${fileError}">파일 오류</p>
+    </div>
+    <div class="errors" th:if="${applyError}">
+        <p th:text="${applyError}">저장 오류</p>
+    </div>
+
+    <div th:if="${scanned}">
+        <h2>분석 결과 — <span th:text="${fileName}">app.war</span>
+            (<span th:text="${#lists.size(hits)}">0</span>건)</h2>
+
+        <p th:if="${#lists.isEmpty(hits)}" class="hint">하드코딩된 IP를 찾지 못했습니다.</p>
+
+        <form th:if="${not #lists.isEmpty(hits)}"
+              th:action="@{'/projects/' + ${projectId} + '/war-scan/apply'}" method="post">
+            <p>
+                <label>의존성을 추가할 자산(이 WAR가 동작하는 서버)<br>
+                    <select name="fromAssetId" required>
+                        <option value="" disabled selected>자산 선택</option>
+                        <option th:each="a : ${assets}" th:value="${a.assetId}" th:text="${a.name}">web01</option>
+                    </select>
+                </label>
+            </p>
+            <table>
+                <thead>
+                <tr>
+                    <th>추가</th><th>IP</th><th>구분</th><th>포트</th><th>JDBC</th>
+                    <th>파일</th><th>줄</th><th>내용</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="h : ${hits}">
+                    <td><input type="checkbox" name="selected" th:value="${h.token}" th:checked="${h.publicIp}"></td>
+                    <td th:text="${h.ip}">1.2.3.4</td>
+                    <td><span th:text="${h.publicIp} ? '공인' : '사설'"
+                              th:class="${h.publicIp} ? 'tag danger' : 'tag'">공인</span></td>
+                    <td th:text="${h.port}">3306</td>
+                    <td th:text="${h.jdbc} ? 'Y' : ''">Y</td>
+                    <td th:text="${h.entry}">WEB-INF/classes/application.properties</td>
+                    <td th:text="${h.line}">12</td>
+                    <td><code th:text="${h.snippet}">...</code></td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="hint">공인 IP는 기본 선택됩니다. 추가 후 사업 상세에서 "다시 진단"을 실행하세요.</p>
+            <p><button class="btn" type="submit">선택 항목을 의존성으로 추가</button></p>
+        </form>
+    </div>
+</main>
+</body>
+</html>
