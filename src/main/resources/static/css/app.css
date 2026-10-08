@@ -536,6 +536,11 @@ form.inline { margin: 0; }
 .muted-note { font-size: 13px; color: var(--muted); }
 p.muted-note { margin-top: -14px; }
 
+/* 핵심/확장 그룹 라벨 (진단 결과) */
+.group-label { font-size: 13px; font-weight: 700; color: var(--text); margin: 14px 0 8px; padding-left: 10px; border-left: 4px solid var(--line); }
+.group-label.core { border-left-color: var(--amber); }
+.group-label.ext { border-left-color: var(--blue); }
+
 /* 점검 범위 — 핵심 / 확장 (B안) */
 .scope { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 4px 0 6px; }
 .scope-group { background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
