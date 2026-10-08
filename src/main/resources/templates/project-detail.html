@@ -26,6 +26,7 @@
             <button class="btn" type="submit">다시 진단</button>
         </form>
         <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/war-scan'}">WAR 하드코딩 IP 분석</a>
+        <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/report'}" target="_blank">제안서용 리포트</a>
     </div>
 
     <div class="errors" th:if="${errors}">

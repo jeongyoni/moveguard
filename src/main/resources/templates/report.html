@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'이전 위험진단 리포트 — ' + ${project.name}">이전 위험진단 리포트</title>
+    <link rel="stylesheet" th:href="@{/css/report.css}">
+</head>
+<body>
+
+<div class="toolbar no-print">
+    <button class="primary" type="button" onclick="window.print()">PDF로 저장 / 인쇄</button>
+    <a th:href="@{'/projects/' + ${project.projectId}}">← 사업 상세</a>
+</div>
+
+<div class="page">
+    <div class="rpt-head">
+        <div class="brand">시스원 · MoveGuard
+            <small>클라우드 이전 사전 위험진단</small>
+        </div>
+        <div class="rpt-meta">
+            <div th:text="'작성일 ' + ${reportDate}">작성일 2026-10-08</div>
+            <div>MSP 사업부 기술영업</div>
+        </div>
+    </div>
+
+    <h1 class="rpt-title">클라우드 이전 사전 위험진단 리포트</h1>
+    <p class="sub">전환을 시작하기 전에, 이전을 깨뜨릴 수 있는 위험을 사전에 진단한 결과입니다.</p>
+
+    <div class="meta-grid">
+        <div><b>고객</b><span th:text="${project.customerName}">가나다커머스</span></div>
+        <div><b>사업명</b><span th:text="${project.name}">쇼핑몰 이전</span></div>
+        <div><b>이전 구간</b><span th:text="${project.sourceEnv} + ' → ' + ${project.targetEnv}">IDC → AWS 서울</span></div>
+        <div><b>전환 예정</b><span th:text="${project.plannedDate}">2026-10-24</span></div>
+    </div>
+
+    <!-- 판정 요약 -->
+    <section class="verdict" th:classappend="${result.riskLevel}">
+        <div>
+            <div class="v-level" th:text="${result.riskLevel}">HIGH</div>
+            <div class="v-cap">위험 등급 (최고 RPN 기준)</div>
+        </div>
+        <div>
+            <span class="badge block" th:if="${result.blocked}">전환 차단</span>
+            <span class="badge ok" th:unless="${result.blocked}">전환 가능</span>
+            <div class="v-cap" th:if="${result.blocked}">차단 규칙에 걸려 지금 상태로는 이전 권고 불가</div>
+            <div class="v-cap" th:unless="${result.blocked}">전환을 막는 치명적 위험은 없음</div>
+        </div>
+        <div class="metrics">
+            <div class="metric"><b th:text="${result.maxRpn}">504</b><span>최고 RPN</span></div>
+            <div class="metric"><b th:text="${result.totalScore}">35.10</b><span>종합 점수</span></div>
+            <div class="metric"><b th:text="${#lists.size(result.findings)}">16</b><span>발견 건수</span></div>
+        </div>
+    </section>
+
+    <!-- 위험요인별 요약 -->
+    <h2>위험요인별 요약</h2>
+    <table>
+        <thead>
+        <tr><th>위험요인</th><th class="num">발견 건수</th><th class="num">최고 RPN</th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="f : ${factors}">
+            <td th:text="${f.name}">OS·DBMS 호환성</td>
+            <td class="num" th:text="${f.count}">7</td>
+            <td class="num" th:text="${f.maxRpn}">378</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 주요 위험과 권고 -->
+    <h2>주요 위험과 권고 조치 (위험도 순)</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>구분</th><th>위험 항목</th><th class="num">RPN</th><th>차단</th><th>권고 조치</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="it : ${result.findings}">
+            <td th:text="${it.factorName}">호환성</td>
+            <td th:text="${it.title}">이전 후 버전이 이미 지원 종료(EOL)됨</td>
+            <td class="num" th:text="${it.rpn}">504</td>
+            <td><span class="tag-b" th:if="${it.blocking}">차단</span></td>
+            <td th:text="${it.mitigation}">지원 중인 버전으로 목표를 조정하십시오.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p class="sub" th:if="${#lists.isEmpty(result.findings)}" style="margin-top:14px">
+        발견된 위험이 없습니다. 현재 구성 기준으로 전환을 막는 위험은 확인되지 않았습니다.
+    </p>
+
+    <div class="disc">
+        ※ 본 리포트는 입력된 이전 전/후 구성을 기준으로 규칙 22개로 자동 진단한 결과입니다.
+        위험 점수(RPN)는 심각도 × 발생가능성 × 검출난이도(각 1~10)로 산정하며, ‘차단’ 항목이 1건이라도 있으면
+        점수와 무관하게 전환이 차단됩니다. 실제 전환 전 담당 엔지니어의 검토를 권장합니다.
+    </div>
+
+    <div class="rpt-foot">
+        <span>시스원 MSP 사업부 · MoveGuard 사전 위험진단</span>
+        <span th:text="${reportDate}">2026-10-08</span>
+    </div>
+</div>
+
+</body>
+</html>

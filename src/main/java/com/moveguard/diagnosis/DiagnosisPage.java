@@ -41,7 +41,7 @@ public class DiagnosisPage {
     }
 
     /** 위험요인별 발견 건수와 최고 RPN (findings는 RPN 내림차순). */
-    private List<FactorSummary> summarize(List<DiagnosisResult.Item> findings) {
+    public static List<FactorSummary> summarize(List<DiagnosisResult.Item> findings) {
         Map<String, FactorSummary> byCode = new LinkedHashMap<>();
         for (DiagnosisResult.Item item : findings) {
             FactorSummary prev = byCode.get(item.factorCode());
