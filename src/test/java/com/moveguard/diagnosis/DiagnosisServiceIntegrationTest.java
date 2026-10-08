@@ -38,6 +38,19 @@ class DiagnosisServiceIntegrationTest {
     }
 
     @Test
+    @DisplayName("재진단 시 직전 실행 요약(previous)이 비교 기준으로 채워진다")
+    void reDiagnosisCarriesPrevious() {
+        DiagnosisResult first = diagnosisService.diagnose(1L).orElseThrow();
+        DiagnosisResult second = diagnosisService.diagnose(1L).orElseThrow();
+
+        assertThat(second.previous()).isNotNull();
+        assertThat(second.previous().getRunId()).isEqualTo(first.runId());
+        assertThat(second.previous().getFindingCount()).isEqualTo(first.findings().size());
+        assertThat(second.previous().getMaxRpn()).isEqualTo(first.maxRpn());
+        assertThat(second.previous().getRiskLevel()).isEqualTo(first.riskLevel().name());
+    }
+
+    @Test
     @DisplayName("없는 사업이면 결과 없음")
     void unknownProject() {
         assertThat(diagnosisService.diagnose(999L)).isEmpty();

@@ -33,6 +33,9 @@ public interface DiagnosisMapper {
 
     List<RuleDefinition> findEnabledRules();
 
+    /** 해당 사업의 가장 최근 진단 실행 요약 (없으면 null). 재진단 비교의 baseline. */
+    RunSummary findLatestRun(Long projectId);
+
     void insertRun(DiagnosisRun run);
 
     void insertFindings(@Param("findings") List<FindingRecord> findings);

@@ -75,6 +75,20 @@
         WHERE r.enabled = 1
     </select>
 
+    <select id="findLatestRun" resultType="com.moveguard.diagnosis.RunSummary">
+        SELECT r.run_id        AS runId,
+               r.executed_at   AS executedAt,
+               r.risk_level    AS riskLevel,
+               r.blocked       AS blocked,
+               r.finding_count AS findingCount,
+               COALESCE((SELECT MAX(f.rpn) FROM diagnosis_finding f WHERE f.run_id = r.run_id), 0) AS maxRpn,
+               r.total_score   AS totalScore
+        FROM diagnosis_run r
+        WHERE r.project_id = #{projectId}
+        ORDER BY r.executed_at DESC, r.run_id DESC
+        LIMIT 1
+    </select>
+
     <insert id="insertRun" useGeneratedKeys="true" keyProperty="runId">
         INSERT INTO diagnosis_run (project_id, total_score, risk_level, blocked, finding_count)
         VALUES (#{projectId}, #{totalScore}, #{riskLevel}, #{blocked}, #{findingCount})

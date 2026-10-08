@@ -37,6 +37,9 @@ public class DiagnosisService {
         List<EvaluatedFinding> evaluated = assessment.findings();
         RiskScore score = assessment.score();
 
+        // 이번 실행을 저장하기 전의 최신 실행이 "직전 진단" 비교 기준이 된다.
+        RunSummary previous = diagnosisMapper.findLatestRun(projectId);
+
         DiagnosisRun run = new DiagnosisRun(projectId, score.totalScore(), score.level(),
                 score.blocked(), evaluated.size());
         diagnosisMapper.insertRun(run);
@@ -48,6 +51,6 @@ public class DiagnosisService {
                     .toList());
         }
 
-        return Optional.of(DiagnosisResult.of(run.getRunId(), projectId, score, evaluated));
+        return Optional.of(DiagnosisResult.of(run.getRunId(), projectId, score, evaluated, previous));
     }
 }
