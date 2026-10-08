@@ -2,6 +2,7 @@ package com.moveguard.project;
 
 import com.moveguard.imports.ImportValues;
 import com.moveguard.imports.ProjectImportMapper;
+import com.moveguard.warscan.IpAddresses;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,23 +19,22 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class IpEditService {
 
-    private static final Set<String> IP_TYPE = Set.of("PUBLIC", "PRIVATE");
     private static final Set<String> PHASE = Set.of("BEFORE", "AFTER");
 
     private final ProjectEditMapper editMapper;
     private final ProjectImportMapper importMapper;
 
     @Transactional
-    public List<String> add(long projectId, Long assetId, String address, String ipType,
+    public List<String> add(long projectId, Long assetId, String address,
                             String phase, String extWhitelisted, String note) {
-        List<String> errors = validate(projectId, assetId, address, ipType, phase, null);
+        List<String> errors = validate(projectId, assetId, address, phase, null);
         if (!errors.isEmpty()) {
             return errors;
         }
         Map<String, Object> row = new HashMap<>();
         row.put("assetId", assetId);
         row.put("address", address.trim());
-        row.put("ipType", ipType.trim());
+        row.put("ipType", IpAddresses.classify(address));   // 주소로 공인/사설 자동 판별
         row.put("phase", phase.trim());
         row.put("extWhitelisted", ImportValues.toBool(extWhitelisted));
         row.put("note", blankToNull(note));
@@ -43,13 +43,13 @@ public class IpEditService {
     }
 
     @Transactional
-    public List<String> update(long ipId, Long assetId, String address, String ipType,
+    public List<String> update(long ipId, Long assetId, String address,
                                String phase, String extWhitelisted, String note) {
         IpView current = editMapper.findIp(ipId);
         if (current == null) {
             return List.of("IP를 찾을 수 없습니다");
         }
-        List<String> errors = validate(projectIdOf(current), assetId, address, ipType, phase, ipId);
+        List<String> errors = validate(projectIdOf(current), assetId, address, phase, ipId);
         if (!errors.isEmpty()) {
             return errors;
         }
@@ -57,7 +57,7 @@ public class IpEditService {
         row.put("ipId", ipId);
         row.put("assetId", assetId);
         row.put("address", address.trim());
-        row.put("ipType", ipType.trim());
+        row.put("ipType", IpAddresses.classify(address));   // 주소로 공인/사설 자동 판별
         row.put("phase", phase.trim());
         row.put("extWhitelisted", ImportValues.toBool(extWhitelisted));
         row.put("note", blankToNull(note));
@@ -76,7 +76,7 @@ public class IpEditService {
     }
 
     /** excludeIpId: 수정 시 자기 자신은 중복으로 보지 않도록 제외 */
-    private List<String> validate(Long projectId, Long assetId, String address, String ipType,
+    private List<String> validate(Long projectId, Long assetId, String address,
                                   String phase, Long excludeIpId) {
         List<String> errors = new ArrayList<>();
 
@@ -88,9 +88,6 @@ public class IpEditService {
         }
         if (!ImportValues.isIp(address)) {
             errors.add("IP 형식 오류: " + ImportValues.trim(address));
-        }
-        if (ImportValues.isBlank(ipType) || !IP_TYPE.contains(ipType.trim())) {
-            errors.add("IP종류는 PUBLIC 또는 PRIVATE이어야 합니다");
         }
         if (ImportValues.isBlank(phase) || !PHASE.contains(phase.trim())) {
             errors.add("단계는 BEFORE 또는 AFTER여야 합니다");

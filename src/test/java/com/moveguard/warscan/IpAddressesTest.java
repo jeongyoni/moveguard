@@ -36,6 +36,18 @@ class IpAddressesTest {
     }
 
     @Test
+    @DisplayName("PUBLIC/PRIVATE 자동 분류")
+    void classify() {
+        assertThat(IpAddresses.classify("52.79.11.22")).isEqualTo("PUBLIC");
+        assertThat(IpAddresses.classify("10.10.1.11")).isEqualTo("PRIVATE");
+        assertThat(IpAddresses.classify("192.168.0.5")).isEqualTo("PRIVATE");
+        assertThat(IpAddresses.classify("::1")).isEqualTo("PRIVATE");
+        assertThat(IpAddresses.classify("fe80::1")).isEqualTo("PRIVATE");
+        assertThat(IpAddresses.classify("2001:db8::1")).isEqualTo("PUBLIC");
+        assertThat(IpAddresses.classify("not-an-ip")).isNull();
+    }
+
+    @Test
     @DisplayName("잘못된 형식은 리터럴·공인 모두 false")
     void invalid() {
         assertThat(IpAddresses.isIpv4Literal("999.1.1.1")).isFalse();

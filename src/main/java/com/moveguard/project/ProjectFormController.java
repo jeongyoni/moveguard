@@ -130,12 +130,11 @@ public class ProjectFormController {
     public String addIp(@PathVariable Long projectId,
                         @RequestParam(required = false) Long assetId,
                         @RequestParam String address,
-                        @RequestParam(required = false) String ipType,
                         @RequestParam(required = false) String phase,
                         @RequestParam(required = false) String extWhitelisted,
                         @RequestParam(required = false) String note,
                         Model model) {
-        List<String> errors = ipEditService.add(projectId, assetId, address, ipType, phase,
+        List<String> errors = ipEditService.add(projectId, assetId, address, phase,
                 extWhitelisted, note);
         if (errors.isEmpty()) {
             return "redirect:/projects/" + projectId;
@@ -160,19 +159,19 @@ public class ProjectFormController {
     public String editIp(@PathVariable Long projectId, @PathVariable Long ipId,
                          @RequestParam(required = false) Long assetId,
                          @RequestParam String address,
-                         @RequestParam(required = false) String ipType,
                          @RequestParam(required = false) String phase,
                          @RequestParam(required = false) String extWhitelisted,
                          @RequestParam(required = false) String note,
                          Model model) {
-        List<String> errors = ipEditService.update(ipId, assetId, address, ipType, phase,
+        List<String> errors = ipEditService.update(ipId, assetId, address, phase,
                 extWhitelisted, note);
         if (errors.isEmpty()) {
             return "redirect:/projects/" + projectId;
         }
         model.addAttribute("errors", errors);
         model.addAttribute("projectId", projectId);
-        model.addAttribute("ip", new IpView(ipId, assetId, null, address, ipType, phase,
+        model.addAttribute("ip", new IpView(ipId, assetId, null, address,
+                com.moveguard.warscan.IpAddresses.classify(address), phase,
                 ImportValues.toBool(extWhitelisted), note));
         model.addAttribute("assets", editMapper.findAssets(projectId));
         return "ip-form";

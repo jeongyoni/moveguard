@@ -78,11 +78,51 @@
         <button class="btn" type="submit">추가</button>
     </form>
 
+    <!-- 소프트웨어 편집 (자산의 OS 외 제품·버전: CMP-02/03/07 판정 근거) -->
+    <h2>소프트웨어 (제품·버전)</h2>
+    <table class="input-table wide" th:if="${!#lists.isEmpty(software)}">
+        <thead>
+        <tr><th>자산</th><th>제품</th><th>역할</th><th>버전</th><th>릴리스라인</th><th>단계</th><th></th></tr>
+        </thead>
+        <tbody>
+        <tr th:each="s : ${software}">
+            <td th:text="${s.assetName}">web01</td>
+            <td th:text="${s.product}">tomcat</td>
+            <td th:text="${s.role} ?: '-'">WAS</td>
+            <td th:text="${s.version}">9.0.80</td>
+            <td th:text="${s.releaseLine}">9.0</td>
+            <td th:text="${s.phase}">BEFORE</td>
+            <td class="row-actions">
+                <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/software/' + ${s.softwareId} + '/edit'}">수정</a>
+                <form th:action="@{'/projects/' + ${project.projectId} + '/software/' + ${s.softwareId} + '/delete'}" method="post" onsubmit="return confirm('이 항목을 삭제할까요? 되돌릴 수 없습니다.');">
+                    <button class="btn ghost danger" type="submit">삭제</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <p class="empty" th:if="${#lists.isEmpty(software)}">등록된 소프트웨어가 없습니다. (Tomcat·Java·MySQL 버전을 넣어야 호환성 판정이 됩니다)</p>
+
+    <h3>소프트웨어 추가</h3>
+    <form th:action="@{'/projects/' + ${project.projectId} + '/software'}" method="post" class="inline-form"
+          th:if="${!#lists.isEmpty(assets)}">
+        <select name="assetId">
+            <option th:each="a : ${assets}" th:value="${a.assetId}" th:text="${a.name}">web01</option>
+        </select>
+        <input type="text" name="product" placeholder="제품 (tomcat)" required>
+        <input type="text" name="role" placeholder="역할 (WAS)">
+        <input type="text" name="version" placeholder="버전 (9.0.80)" required>
+        <input type="text" name="releaseLine" placeholder="릴리스라인 (9.0)" required>
+        <select name="phase"><option value="BEFORE">BEFORE</option><option value="AFTER">AFTER</option></select>
+        <button class="btn" type="submit">추가</button>
+    </form>
+    <p class="empty" th:if="${#lists.isEmpty(assets)}">소프트웨어를 추가하려면 먼저 자산을 등록하세요.</p>
+
     <!-- IP 편집 -->
     <h2>IP</h2>
     <table class="input-table wide" th:if="${!#lists.isEmpty(ips)}">
         <thead>
-        <tr><th>자산</th><th>주소</th><th>종류</th><th>단계</th><th>허용목록</th><th>비고</th><th></th></tr>
+        <tr><th>자산</th><th>주소</th><th>종류</th><th>단계</th><th>외부 기관 등록</th><th>비고</th><th></th></tr>
         </thead>
         <tbody>
         <tr th:each="ip : ${ips}">
@@ -90,11 +130,12 @@
             <td th:text="${ip.address}">203.0.113.11</td>
             <td th:text="${ip.ipType}">PUBLIC</td>
             <td th:text="${ip.phase}">BEFORE</td>
-            <td th:text="${ip.extWhitelisted} ? 'Y' : 'N'">N</td>
+            <td th:text="${ip.extWhitelisted} ? '✓ 등록' : ''"
+                th:classappend="${ip.extWhitelisted} ? 'ext-yes' : ''">✓ 등록</td>
             <td th:text="${ip.note} ?: '-'">-</td>
             <td class="row-actions">
                 <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/ips/' + ${ip.ipId} + '/edit'}">수정</a>
-                <form th:action="@{'/projects/' + ${project.projectId} + '/ips/' + ${ip.ipId} + '/delete'}" method="post">
+                <form th:action="@{'/projects/' + ${project.projectId} + '/ips/' + ${ip.ipId} + '/delete'}" method="post" onsubmit="return confirm('이 항목을 삭제할까요? 되돌릴 수 없습니다.');">
                     <button class="btn ghost danger" type="submit">삭제</button>
                 </form>
             </td>
@@ -110,18 +151,15 @@
             <option th:each="a : ${assets}" th:value="${a.assetId}" th:text="${a.name}">web01</option>
         </select>
         <input type="text" name="address" placeholder="IP 주소" required>
-        <select name="ipType">
-            <option value="PUBLIC">PUBLIC</option>
-            <option value="PRIVATE">PRIVATE</option>
-        </select>
         <select name="phase">
             <option value="BEFORE">BEFORE</option>
             <option value="AFTER">AFTER</option>
         </select>
-        <label class="chk"><input type="checkbox" name="extWhitelisted" value="true"> 외부 허용목록</label>
+        <label class="chk"><input type="checkbox" name="extWhitelisted" value="true"> 외부 기관 등록</label>
         <input type="text" name="note" placeholder="비고">
         <button class="btn" type="submit">추가</button>
     </form>
+    <p class="hint" th:if="${!#lists.isEmpty(assets)}">종류(공인/사설)는 주소를 보고 자동으로 판별됩니다.</p>
     <p class="empty" th:if="${#lists.isEmpty(assets)}">IP를 추가하려면 먼저 자산을 등록하세요.</p>
 
     <!-- DNS 편집 -->
@@ -139,7 +177,7 @@
             <td th:text="${r.phase}">BEFORE</td>
             <td class="row-actions">
                 <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/dns/' + ${r.dnsId} + '/edit'}">수정</a>
-                <form th:action="@{'/projects/' + ${project.projectId} + '/dns/' + ${r.dnsId} + '/delete'}" method="post">
+                <form th:action="@{'/projects/' + ${project.projectId} + '/dns/' + ${r.dnsId} + '/delete'}" method="post" onsubmit="return confirm('이 항목을 삭제할까요? 되돌릴 수 없습니다.');">
                     <button class="btn ghost danger" type="submit">삭제</button>
                 </form>
             </td>
@@ -174,7 +212,7 @@
             <td th:text="${c.phase}">BEFORE</td>
             <td class="row-actions">
                 <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/certs/' + ${c.certId} + '/edit'}">수정</a>
-                <form th:action="@{'/projects/' + ${project.projectId} + '/certs/' + ${c.certId} + '/delete'}" method="post">
+                <form th:action="@{'/projects/' + ${project.projectId} + '/certs/' + ${c.certId} + '/delete'}" method="post" onsubmit="return confirm('이 항목을 삭제할까요? 되돌릴 수 없습니다.');">
                     <button class="btn ghost danger" type="submit">삭제</button>
                 </form>
             </td>
@@ -192,46 +230,6 @@
         <button class="btn" type="submit">추가</button>
     </form>
 
-    <!-- 소프트웨어 편집 -->
-    <h2>소프트웨어</h2>
-    <table class="input-table wide" th:if="${!#lists.isEmpty(software)}">
-        <thead>
-        <tr><th>자산</th><th>제품</th><th>역할</th><th>버전</th><th>릴리스라인</th><th>단계</th><th></th></tr>
-        </thead>
-        <tbody>
-        <tr th:each="s : ${software}">
-            <td th:text="${s.assetName}">web01</td>
-            <td th:text="${s.product}">tomcat</td>
-            <td th:text="${s.role} ?: '-'">WAS</td>
-            <td th:text="${s.version}">9.0.80</td>
-            <td th:text="${s.releaseLine}">9.0</td>
-            <td th:text="${s.phase}">BEFORE</td>
-            <td class="row-actions">
-                <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/software/' + ${s.softwareId} + '/edit'}">수정</a>
-                <form th:action="@{'/projects/' + ${project.projectId} + '/software/' + ${s.softwareId} + '/delete'}" method="post">
-                    <button class="btn ghost danger" type="submit">삭제</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <p class="empty" th:if="${#lists.isEmpty(software)}">등록된 소프트웨어가 없습니다.</p>
-
-    <h3>소프트웨어 추가</h3>
-    <form th:action="@{'/projects/' + ${project.projectId} + '/software'}" method="post" class="inline-form"
-          th:if="${!#lists.isEmpty(assets)}">
-        <select name="assetId">
-            <option th:each="a : ${assets}" th:value="${a.assetId}" th:text="${a.name}">web01</option>
-        </select>
-        <input type="text" name="product" placeholder="제품 (tomcat)" required>
-        <input type="text" name="role" placeholder="역할 (WAS)">
-        <input type="text" name="version" placeholder="버전 (9.0.80)" required>
-        <input type="text" name="releaseLine" placeholder="릴리스라인 (9.0)" required>
-        <select name="phase"><option value="BEFORE">BEFORE</option><option value="AFTER">AFTER</option></select>
-        <button class="btn" type="submit">추가</button>
-    </form>
-    <p class="empty" th:if="${#lists.isEmpty(assets)}">소프트웨어를 추가하려면 먼저 자산을 등록하세요.</p>
-
     <!-- 백업 편집 -->
     <h2>백업</h2>
     <table class="input-table wide" th:if="${!#lists.isEmpty(backups)}">
@@ -247,7 +245,7 @@
             <td th:text="${b.phase}">BEFORE</td>
             <td class="row-actions">
                 <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/backups/' + ${b.backupId} + '/edit'}">수정</a>
-                <form th:action="@{'/projects/' + ${project.projectId} + '/backups/' + ${b.backupId} + '/delete'}" method="post">
+                <form th:action="@{'/projects/' + ${project.projectId} + '/backups/' + ${b.backupId} + '/delete'}" method="post" onsubmit="return confirm('이 항목을 삭제할까요? 되돌릴 수 없습니다.');">
                     <button class="btn ghost danger" type="submit">삭제</button>
                 </form>
             </td>
