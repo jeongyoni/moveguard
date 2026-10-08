@@ -49,8 +49,10 @@ h2 { font-size: 15px; color: var(--navy); margin: 26px 0 10px; border-bottom: 1p
 table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
 th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
 thead th { background: var(--light); color: var(--muted); font-size: 11px; }
-td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-.tag-b { background: #fee2e2; color: #991b1b; border-radius: 4px; padding: 1px 6px; font-size: 11px; font-weight: 700; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+th.col-b, td.col-b { text-align: center; white-space: nowrap; width: 46px; }
+.tag-b { display: inline-block; white-space: nowrap; background: #fee2e2; color: #991b1b; border-radius: 4px; padding: 1px 6px; font-size: 11px; font-weight: 700; }
+.badge { white-space: nowrap; }
 
 /* 한 줄 요약 (판정 기반) — 색을 판정에 맞춤 */
 .summary { font-size: 13.5px; color: var(--ink); background: #fff7ed; border-left: 4px solid var(--amber); border-radius: 0 6px 6px 0; padding: 10px 14px; margin: 12px 0 0; }

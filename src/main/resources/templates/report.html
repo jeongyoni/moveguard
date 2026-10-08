@@ -99,7 +99,7 @@
     <table>
         <thead>
         <tr>
-            <th>구분</th><th>위험 항목</th><th class="num">RPN</th><th>차단</th><th>권고 조치</th>
+            <th>구분</th><th>위험 항목</th><th class="num">RPN</th><th class="col-b">차단</th><th>권고 조치</th>
         </tr>
         </thead>
         <tbody>
@@ -107,7 +107,7 @@
             <td th:text="${it.factorName}">호환성</td>
             <td th:text="${it.title}">이전 후 버전이 이미 지원 종료(EOL)됨</td>
             <td class="num" th:text="${it.rpn}">504</td>
-            <td><span class="tag-b" th:if="${it.blocking}">차단</span></td>
+            <td class="col-b"><span class="tag-b" th:if="${it.blocking}">차단</span></td>
             <td th:text="${it.mitigation}">지원 중인 버전으로 목표를 조정하십시오.</td>
         </tr>
         </tbody>
