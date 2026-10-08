@@ -32,8 +32,61 @@
         <p th:text="${applyError}">저장 오류</p>
     </div>
 
+    <div th:if="${scanned and report != null and report.hasFindings()}">
+        <h2>애플리케이션 분석 — <span th:text="${fileName}">app.war</span></h2>
+        <ul>
+            <li th:if="${report.requiredJava != null}">
+                컴파일된 Java: <strong th:text="${report.requiredJava}">8</strong>
+                <span class="hint" th:text="'(class 포맷 ' + ${report.maxClassMajor} + ', ' + ${report.classCount} + '개 분석)'">()</span>
+            </li>
+            <li>
+                서블릿 패키지:
+                <span th:if="${report.usesJavax}" class="tag danger">javax.servlet 사용</span>
+                <span th:if="${report.usesJakarta}" class="tag">jakarta.servlet 사용</span>
+                <span th:if="${!report.usesJavax and !report.usesJakarta}" class="hint">흔적 없음</span>
+            </li>
+            <li th:if="${report.servletSpec != null}">서블릿 스펙: <strong th:text="${report.servletSpec}">3.1</strong></li>
+        </ul>
+        <p th:if="${report.usesJavax}" class="hint">
+            ⚠ javax.servlet을 사용합니다. 목표가 <strong>Tomcat 10 이상</strong>이면 jakarta로의 코드 변경이 필요합니다(규칙 CMP-03).
+        </p>
+
+        <div th:if="${report.requiredJava != null and not #lists.isEmpty(assets)}">
+            <form th:action="@{'/projects/' + ${projectId} + '/war-scan/add-java'}" method="post" class="inline">
+                <input type="hidden" name="version" th:value="${report.requiredJava}">
+                <input type="hidden" name="releaseLine" th:value="${report.requiredJava}">
+                <label>자산
+                    <select name="assetId" required>
+                        <option value="" disabled selected>자산 선택</option>
+                        <option th:each="a : ${assets}" th:value="${a.assetId}" th:text="${a.name}">web01</option>
+                    </select>
+                </label>
+                <label>단계
+                    <select name="phase">
+                        <option value="BEFORE" selected>BEFORE</option>
+                        <option value="AFTER">AFTER</option>
+                    </select>
+                </label>
+                <button class="btn ghost" type="submit">Java 버전을 소프트웨어로 추가</button>
+            </form>
+        </div>
+
+        <details th:if="${not #lists.isEmpty(report.libraries)}">
+            <summary th:text="'라이브러리 ' + ${#lists.size(report.libraries)} + '개'">라이브러리</summary>
+            <table>
+                <thead><tr><th>라이브러리</th><th>버전</th></tr></thead>
+                <tbody>
+                <tr th:each="l : ${report.libraries}">
+                    <td th:text="${l.name}">spring-web</td>
+                    <td th:text="${l.version}">6.1.0</td>
+                </tr>
+                </tbody>
+            </table>
+        </details>
+    </div>
+
     <div th:if="${scanned}">
-        <h2>분석 결과 — <span th:text="${fileName}">app.war</span>
+        <h2>하드코딩 IP — <span th:text="${fileName}">app.war</span>
             (<span th:text="${#lists.size(hits)}">0</span>건)</h2>
 
         <p th:if="${#lists.isEmpty(hits)}" class="hint">하드코딩된 IP를 찾지 못했습니다.</p>
