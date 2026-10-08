@@ -25,6 +25,7 @@
         <form th:action="@{'/projects/' + ${project.projectId} + '/diagnose'}" method="post">
             <button class="btn" type="submit">다시 진단</button>
         </form>
+        <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/war-scan'}">WAR 하드코딩 IP 분석</a>
     </div>
 
     <div class="errors" th:if="${errors}">
