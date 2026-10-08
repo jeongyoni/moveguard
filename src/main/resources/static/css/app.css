@@ -528,3 +528,6 @@ details > summary {
 /* 인라인 폼(war-scan의 추가 버튼 줄) */
 .inline { display: inline-flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 form.inline { margin: 0; }
+
+/* 외부 기관 등록 표시(IP-04 판정 근거) — 눈에 띄게 */
+.ext-yes { color: var(--amber); font-weight: 700; }

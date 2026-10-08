@@ -19,6 +19,28 @@ public final class IpAddresses {
         return s != null && IPV4_FULL.matcher(s).matches();
     }
 
+    /**
+     * 주소를 PUBLIC / PRIVATE로 자동 분류한다.
+     * IPv4는 사설·예약 대역 판정, IPv6는 루프백(::1)·링크로컬(fe80)·유니크로컬(fc/fd)만 PRIVATE.
+     * 형식을 알 수 없으면 null.
+     */
+    public static String classify(String s) {
+        if (s == null) {
+            return null;
+        }
+        String t = s.trim().toLowerCase();
+        if (isIpv4Literal(t)) {
+            return isPublicIpv4(t) ? "PUBLIC" : "PRIVATE";
+        }
+        if (t.contains(":")) { // IPv6
+            if (t.equals("::1") || t.startsWith("fe80") || t.startsWith("fc") || t.startsWith("fd")) {
+                return "PRIVATE";
+            }
+            return "PUBLIC";
+        }
+        return null;
+    }
+
     /** 공인 IPv4인지. 유효한 IPv4이면서 사설·루프백·링크로컬·예약 대역이 아니면 true. */
     public static boolean isPublicIpv4(String s) {
         if (!isIpv4Literal(s)) {
