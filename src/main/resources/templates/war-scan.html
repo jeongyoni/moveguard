@@ -32,7 +32,7 @@
         <p th:text="${applyError}">저장 오류</p>
     </div>
 
-    <div th:if="${scanned and report != null and report.hasFindings()}">
+    <div th:if="${report != null and report.hasFindings()}">
         <h2>애플리케이션 분석 — <span th:text="${fileName}">app.war</span></h2>
         <ul>
             <li th:if="${report.requiredJava != null}">
@@ -106,7 +106,7 @@
         </details>
     </div>
 
-    <div th:if="${scanned}">
+    <div th:if="${hits != null}">
         <h2>하드코딩 IP — <span th:text="${fileName}">app.war</span>
             (<span th:text="${#lists.size(hits)}">0</span>건)</h2>
 
