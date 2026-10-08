@@ -28,9 +28,14 @@ public class ReportController {
             return "redirect:/projects/" + projectId;
         }
 
+        var factors = DiagnosisPage.summarize(result.findings());
+        int maxFactorRpn = factors.stream()
+                .mapToInt(DiagnosisPage.FactorSummary::maxRpn).max().orElse(1);
+
         model.addAttribute("project", project);
         model.addAttribute("result", result);
-        model.addAttribute("factors", DiagnosisPage.summarize(result.findings()));
+        model.addAttribute("factors", factors);
+        model.addAttribute("maxFactorRpn", maxFactorRpn);
         model.addAttribute("reportDate", LocalDate.now());
         return "report";
     }
