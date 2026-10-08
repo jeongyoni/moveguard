@@ -53,15 +53,13 @@
     </section>
 
     <!-- 한 줄 요약 (판정에 따라 자동 생성) -->
-    <p class="summary" th:if="${result.blocked}">
-        현재 구성으로 전환하면 장애 위험이 높습니다. 전환을 막는
-        <b th:text="${blockingCount}">8</b>건의 치명적 항목을 먼저 해소한 뒤 전환을 진행하시기를 권고드립니다.
+    <p class="summary block" th:if="${result.blocked}">
+        전환을 막는 ‘차단’ 항목 <b th:text="${blockingCount}">8</b>건이 발견되어, 현재 구성으로는 전환이 차단됩니다.
     </p>
-    <p class="summary" th:if="${!result.blocked and result.riskLevel.name() != 'LOW'}">
-        전환을 차단할 치명적 항목은 없으나, 전환 전 조치가 필요한 위험
-        <b th:text="${#lists.size(result.findings)}">6</b>건이 확인되었습니다.
+    <p class="summary caution" th:if="${!result.blocked and result.riskLevel.name() != 'LOW'}">
+        전환을 차단할 항목은 없으나, 전환 전 조치가 필요한 위험 <b th:text="${#lists.size(result.findings)}">6</b>건이 확인되었습니다.
     </p>
-    <p class="summary" th:if="${!result.blocked and result.riskLevel.name() == 'LOW'}">
+    <p class="summary ok" th:if="${!result.blocked and result.riskLevel.name() == 'LOW'}">
         현재 구성에서 전환을 깨뜨릴 주요 위험은 확인되지 않았습니다.
     </p>
 
