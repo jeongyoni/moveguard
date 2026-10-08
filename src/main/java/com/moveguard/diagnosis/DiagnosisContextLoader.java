@@ -24,6 +24,7 @@ public class DiagnosisContextLoader {
                 diagnosisMapper.findPlannedDate(projectId),
                 diagnosisMapper.findAssetSoftware(projectId),
                 compatMapper.findAllReleases(),
-                diagnosisMapper.findBackupPlans(projectId));
+                diagnosisMapper.findBackupPlans(projectId),
+                compatMapper.findDriverRequirements());
     }
 }

@@ -70,6 +70,11 @@ class CompatSyncServiceTest {
         }
 
         @Override
+        public List<com.moveguard.compat.DriverRequirement> findDriverRequirements() {
+            return List.of();
+        }
+
+        @Override
         public List<String> findManualVersions(String product) {
             return manualVersions.getOrDefault(product, List.of());
         }

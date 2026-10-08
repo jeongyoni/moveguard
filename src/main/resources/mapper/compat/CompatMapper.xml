@@ -21,6 +21,12 @@
         FROM compat_release
     </select>
 
+    <select id="findDriverRequirements" resultType="com.moveguard.compat.DriverRequirement">
+        SELECT requirement_id, db_product, db_release_line, driver_product,
+               min_version, note, is_manual AS manual
+        FROM driver_requirement
+    </select>
+
     <select id="findManualVersions" resultType="string">
         SELECT version
         FROM compat_release

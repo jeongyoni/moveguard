@@ -13,6 +13,9 @@ public interface CompatMapper {
     /** 진단 규칙이 참조할 전체 릴리스 목록 */
     List<CompatRelease> findAllReleases();
 
+    /** JDBC 드라이버 호환 매트릭스 (수동 관리) */
+    List<DriverRequirement> findDriverRequirements();
+
     /** 수동 관리(is_manual = 1) 릴리스의 version 목록 — 동기화가 덮어쓰지 않도록 제외용 */
     List<String> findManualVersions(String product);
 

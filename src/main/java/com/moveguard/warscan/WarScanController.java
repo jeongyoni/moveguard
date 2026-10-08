@@ -49,13 +49,14 @@ public class WarScanController {
         return "war-scan";
     }
 
-    @PostMapping("/projects/{projectId}/war-scan/add-java")
-    public String addJava(@PathVariable long projectId,
-                          @RequestParam(value = "assetId", required = false) Long assetId,
-                          @RequestParam("version") String version,
-                          @RequestParam("releaseLine") String releaseLine,
-                          @RequestParam("phase") String phase, Model model) {
-        List<String> errors = softwareEditService.add(projectId, assetId, "java", null,
+    @PostMapping("/projects/{projectId}/war-scan/add-software")
+    public String addSoftware(@PathVariable long projectId,
+                              @RequestParam(value = "assetId", required = false) Long assetId,
+                              @RequestParam("product") String product,
+                              @RequestParam("version") String version,
+                              @RequestParam("releaseLine") String releaseLine,
+                              @RequestParam("phase") String phase, Model model) {
+        List<String> errors = softwareEditService.add(projectId, assetId, product, null,
                 version, releaseLine, phase);
         if (!errors.isEmpty()) {
             model.addAttribute("projectId", projectId);

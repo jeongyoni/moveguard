@@ -45,6 +45,20 @@ CREATE TABLE compat_release (
         REFERENCES compat_product (product) ON DELETE CASCADE
 ) ENGINE = InnoDB COMMENT = '제품 릴리스별 지원 정보';
 
+-- JDBC 드라이버↔DB 요구 버전 (endoflife.date에 없어 수동 관리)
+CREATE TABLE driver_requirement (
+    requirement_id   BIGINT      NOT NULL AUTO_INCREMENT,
+    db_product       VARCHAR(50) NOT NULL COMMENT '대상 DB 제품 (mysql, oracle-database 등)',
+    db_release_line  VARCHAR(30)          COMMENT 'NULL이면 제품 전체, 아니면 특정 라인(8.4 등)',
+    driver_product   VARCHAR(60) NOT NULL COMMENT '드라이버 제품명 (mysql-connector-j, ojdbc8 등)',
+    min_version      VARCHAR(30) NOT NULL COMMENT '요구되는 최소 드라이버 버전',
+    note             VARCHAR(255),
+    is_manual        TINYINT(1)  NOT NULL DEFAULT 1 COMMENT '수동 관리 데이터',
+    updated_at       DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (requirement_id),
+    KEY idx_driver_req (db_product, driver_product)
+) ENGINE = InnoDB COMMENT = 'JDBC 드라이버 호환 매트릭스 (수동 관리)';
+
 -- 자산에 설치된 소프트웨어 (이전 전/후)
 CREATE TABLE asset_software (
     software_id     BIGINT      NOT NULL AUTO_INCREMENT,

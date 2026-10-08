@@ -56,6 +56,7 @@ class WarAppAnalyzerTest {
                         + "</web-app>").getBytes(StandardCharsets.UTF_8));
         entries.put("WEB-INF/lib/spring-web-6.1.0.jar", new byte[]{1, 2, 3});
         entries.put("WEB-INF/lib/jakarta.servlet-api-6.0.0.jar", new byte[]{1});
+        entries.put("WEB-INF/lib/mysql-connector-j-8.0.33.jar", new byte[]{1});
         entries.put("WEB-INF/classes/application.properties",
                 "name=x\n".getBytes(StandardCharsets.UTF_8));           // 무시 대상
 
@@ -71,7 +72,14 @@ class WarAppAnalyzerTest {
         Map<String, String> libs = r.getLibraries().stream()
                 .collect(Collectors.toMap(WarAppReport.WarLib::getName, WarAppReport.WarLib::getVersion));
         assertThat(libs).containsEntry("spring-web", "6.1.0")
-                .containsEntry("jakarta.servlet-api", "6.0.0");
+                .containsEntry("jakarta.servlet-api", "6.0.0")
+                .containsEntry("mysql-connector-j", "8.0.33");
+
+        // JDBC 드라이버만 driverProduct가 채워진다
+        Map<String, String> drivers = r.getLibraries().stream()
+                .filter(l -> l.getDriverProduct() != null)
+                .collect(Collectors.toMap(WarAppReport.WarLib::getName, WarAppReport.WarLib::getDriverProduct));
+        assertThat(drivers).containsExactlyEntriesOf(Map.of("mysql-connector-j", "mysql-connector-j"));
     }
 
     @Test

@@ -52,7 +52,8 @@
         </p>
 
         <div th:if="${report.requiredJava != null and not #lists.isEmpty(assets)}">
-            <form th:action="@{'/projects/' + ${projectId} + '/war-scan/add-java'}" method="post" class="inline">
+            <form th:action="@{'/projects/' + ${projectId} + '/war-scan/add-software'}" method="post" class="inline">
+                <input type="hidden" name="product" value="java">
                 <input type="hidden" name="version" th:value="${report.requiredJava}">
                 <input type="hidden" name="releaseLine" th:value="${report.requiredJava}">
                 <label>자산
@@ -73,12 +74,32 @@
 
         <details th:if="${not #lists.isEmpty(report.libraries)}">
             <summary th:text="'라이브러리 ' + ${#lists.size(report.libraries)} + '개'">라이브러리</summary>
+            <p class="hint">JDBC 드라이버는 자산 소프트웨어로 추가하면 CMP-07(드라이버 버전 미달)이 진단에 반영합니다.</p>
             <table>
-                <thead><tr><th>라이브러리</th><th>버전</th></tr></thead>
+                <thead><tr><th>라이브러리</th><th>버전</th><th>JDBC 드라이버 추가</th></tr></thead>
                 <tbody>
                 <tr th:each="l : ${report.libraries}">
                     <td th:text="${l.name}">spring-web</td>
                     <td th:text="${l.version}">6.1.0</td>
+                    <td>
+                        <form th:if="${l.driverProduct != null and l.version != null and not #lists.isEmpty(assets)}"
+                              th:action="@{'/projects/' + ${projectId} + '/war-scan/add-software'}"
+                              method="post" class="inline">
+                            <input type="hidden" name="product" th:value="${l.driverProduct}">
+                            <input type="hidden" name="version" th:value="${l.version}">
+                            <input type="hidden" name="releaseLine" th:value="${l.version}">
+                            <select name="assetId" required>
+                                <option value="" disabled selected>자산</option>
+                                <option th:each="a : ${assets}" th:value="${a.assetId}" th:text="${a.name}">web01</option>
+                            </select>
+                            <select name="phase">
+                                <option value="AFTER" selected>AFTER</option>
+                                <option value="BEFORE">BEFORE</option>
+                            </select>
+                            <button class="btn ghost" type="submit"
+                                    th:text="${l.driverProduct} + ' 추가'">드라이버 추가</button>
+                        </form>
+                    </td>
                 </tr>
                 </tbody>
             </table>
