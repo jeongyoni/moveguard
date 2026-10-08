@@ -6,6 +6,7 @@ import static com.moveguard.diagnosis.rule.Fixtures.DB;
 import static com.moveguard.diagnosis.rule.Fixtures.PLANNED_DATE;
 import static com.moveguard.diagnosis.rule.Fixtures.compatContext;
 import static com.moveguard.diagnosis.rule.Fixtures.release;
+import static com.moveguard.diagnosis.rule.Fixtures.releaseExt;
 import static com.moveguard.diagnosis.rule.Fixtures.sw;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,6 +51,16 @@ class EolAfterVersionRuleTest {
         assertThat(rule.evaluate(compatContext(
                 List.of(sw(DB, "mysql", "5.7.44", "5.7", BEFORE)),
                 List.of(release("mysql", "5.7", true, LocalDate.of(2023, 10, 31), null)),
+                PLANNED_DATE))).isEmpty();
+    }
+
+    @Test
+    @DisplayName("연장 지원(Extended) 구간이면 CMP-01이 아니라 CMP-06 소관 → 해당 없음")
+    void ignoresExtendedSupportWindow() {
+        assertThat(rule.evaluate(compatContext(
+                List.of(sw(DB, "oracle-database", "19.0.0", "19", AFTER)),
+                List.of(releaseExt("oracle-database", "19", true,
+                        LocalDate.of(2024, 4, 30), LocalDate.of(2027, 4, 30))),
                 PLANNED_DATE))).isEmpty();
     }
 

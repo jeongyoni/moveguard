@@ -11,18 +11,18 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
- * CMP-01: 이전 후 소프트웨어 버전이 이미 지원 종료(EOL)됨.
- * 보안 패치를 받을 수 없는 버전으로 이전하는 것을 막는다.
- * 단, 활성 지원은 끝났어도 연장 지원(Extended) 구간인 경우는 CMP-06에서 다루므로 제외한다.
+ * CMP-06: 이전 후 버전이 연장 지원(Extended Support) 구간.
+ * 활성(일반) 지원은 끝났지만 전환 예정일 기준으로 연장 지원은 아직 유효한 상태.
+ * 기술 지원은 되지만 추가 비용·제약이 따르므로 경고한다. (완전 EOL이면 CMP-01)
  */
 @Component
-public class EolAfterVersionRule implements RiskRuleEvaluator {
+public class ExtendedSupportRule implements RiskRuleEvaluator {
 
-    public static final String CODE = "CMP-01";
+    public static final String CODE = "CMP-06";
 
     @Override
     public String ruleCode() {
@@ -31,16 +31,16 @@ public class EolAfterVersionRule implements RiskRuleEvaluator {
 
     @Override
     public List<Finding> evaluate(DiagnosisContext context) {
-        List<Finding> findings = new ArrayList<>();
-        LocalDate asOf = context.plannedDate().orElse(null);
+        Optional<LocalDate> plannedDate = context.plannedDate();
+        if (plannedDate.isEmpty()) {
+            return List.of();
+        }
+        LocalDate asOf = plannedDate.get();
 
+        List<Finding> findings = new ArrayList<>();
         for (AssetSoftware sw : context.software(Phase.AFTER)) {
             CompatRelease release = context.release(sw.getProduct(), sw.getReleaseLine()).orElse(null);
-            if (release == null || !release.isEol()) {
-                continue;
-            }
-            // 연장 지원(Extended) 구간이면 "지원 불가"가 아니라 "유상 지원" → CMP-06 소관
-            if (release.inExtendedSupport(asOf)) {
+            if (release == null || !release.inExtendedSupport(asOf)) {
                 continue;
             }
 
@@ -49,7 +49,7 @@ public class EolAfterVersionRule implements RiskRuleEvaluator {
                     "asset", assetName,
                     "product", sw.getProduct(),
                     "version", sw.getVersion(),
-                    "eol", Objects.toString(release.getEolDate(), "지원 종료"))));
+                    "extSupport", release.getExtSupportDate().toString())));
         }
         return findings;
     }
