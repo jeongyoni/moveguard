@@ -73,7 +73,7 @@
             <option value="DB">DB</option>
             <option value="ETC">ETC</option>
         </select>
-        <input type="text" name="osName" placeholder="OS이름">
+        <input type="text" name="osName" placeholder="OS이름 (예: Rocky Linux)" list="os-list">
         <input type="text" name="osVersion" placeholder="OS버전">
         <button class="btn" type="submit">추가</button>
     </form>
@@ -109,7 +109,7 @@
         <select name="assetId">
             <option th:each="a : ${assets}" th:value="${a.assetId}" th:text="${a.name}">web01</option>
         </select>
-        <input type="text" name="product" placeholder="제품 (tomcat)" required>
+        <input type="text" name="product" placeholder="제품 (tomcat)" required list="product-list">
         <input type="text" name="role" placeholder="역할 (WAS)">
         <input type="text" name="version" placeholder="버전 (9.0.80)" required>
         <input type="text" name="releaseLine" placeholder="릴리스라인 (9.0)" required>
@@ -358,6 +358,32 @@
             </tbody>
         </table>
     </details>
+
+    <!-- 입력 자동완성 목록 -->
+    <datalist id="os-list">
+        <option value="Rocky Linux"></option>
+        <option value="RHEL"></option>
+        <option value="CentOS"></option>
+        <option value="AlmaLinux"></option>
+        <option value="Oracle Linux"></option>
+        <option value="Ubuntu"></option>
+        <option value="Debian"></option>
+        <option value="Amazon Linux"></option>
+        <option value="SUSE Linux"></option>
+        <option value="Windows Server"></option>
+    </datalist>
+    <datalist id="product-list">
+        <option value="tomcat"></option>
+        <option value="java"></option>
+        <option value="mysql"></option>
+        <option value="oracle-database"></option>
+        <option value="postgresql"></option>
+        <option value="nginx"></option>
+        <option value="mysql-connector-j"></option>
+        <option value="mariadb-java-client"></option>
+        <option value="ojdbc8"></option>
+        <option value="ojdbc11"></option>
+    </datalist>
 </main>
 </body>
 </html>
