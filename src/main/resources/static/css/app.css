@@ -536,6 +536,19 @@ form.inline { margin: 0; }
 .muted-note { font-size: 13px; color: var(--muted); }
 p.muted-note { margin-top: -14px; }
 
+/* 점검 범위 — 핵심 / 확장 (B안) */
+.scope { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 4px 0 6px; }
+.scope-group { background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.scope-group.core { border-left: 4px solid var(--amber); }
+.scope-group.ext { border-left: 4px solid var(--blue); }
+.scope-head { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+.scope-head span { display: block; font-size: 12px; font-weight: 400; color: var(--muted); margin-top: 2px; }
+.scope-group ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.scope-group li { display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: var(--text); }
+.scope-group li b { color: var(--amber); font-weight: 700; }
+.scope-group.ext li b { color: var(--blue); }
+@media (max-width: 720px) { .scope { grid-template-columns: 1fr; } }
+
 /* ============================================================
    가독성 개선 (2차) — 대비·간격·표 줄무늬·입력 폼 카드화
    ============================================================ */
