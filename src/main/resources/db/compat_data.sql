@@ -102,7 +102,8 @@ INSERT INTO driver_requirement (db_product, db_release_line, driver_product, min
 ('postgresql',      NULL,   'postgresql',           '42.2.0', 'PostgreSQL JDBC 42.2 이상 권장');
 
 -- 4. 더미 이전사업에 소프트웨어 정보 추가
---    기대 결과: CMP-01(mysql 9.6 EOL), CMP-02(Tomcat 11은 Java 17 필요), CMP-03(9.0→11.0), CMP-05(5.7→9.6)
+--    기대 결과: CMP-01(mysql 9.6 EOL), CMP-02(Tomcat 11은 Java 17 필요), CMP-03(9.0→11.0),
+--             CMP-05(5.7→9.6), CMP-07(mysql 9.6은 connector-j 9.0+ 필요한데 8.0.33 미달)
 SET @p := (SELECT project_id FROM migration_project ORDER BY project_id LIMIT 1);
 SET @web := (SELECT asset_id FROM asset WHERE project_id = @p AND name = 'web01');
 SET @db  := (SELECT asset_id FROM asset WHERE project_id = @p AND name = 'db01');
@@ -115,8 +116,9 @@ INSERT INTO asset_software (asset_id, product, role, version, release_line, phas
 (@db,  'rocky-linux', 'OS',      '8.9',       '8',    'BEFORE');
 
 INSERT INTO asset_software (asset_id, product, role, version, release_line, phase) VALUES
-(@web, 'tomcat',      'WAS',     '11.0.22',   '11.0', 'AFTER'),
-(@web, 'java',        'RUNTIME', '11.0.24',   '11',   'AFTER'),
-(@web, 'rocky-linux', 'OS',      '9.4',       '9',    'AFTER'),
-(@db,  'mysql',       'DB',      '9.6.1',     '9.6',  'AFTER'),
-(@db,  'rocky-linux', 'OS',      '9.4',       '9',    'AFTER');
+(@web, 'tomcat',            'WAS',     '11.0.22',   '11.0', 'AFTER'),
+(@web, 'java',              'RUNTIME', '11.0.24',   '11',   'AFTER'),
+(@web, 'mysql-connector-j', 'DRIVER',  '8.0.33',    '8.0',  'AFTER'),
+(@web, 'rocky-linux',       'OS',      '9.4',       '9',    'AFTER'),
+(@db,  'mysql',             'DB',      '9.6.1',     '9.6',  'AFTER'),
+(@db,  'rocky-linux',       'OS',      '9.4',       '9',    'AFTER');

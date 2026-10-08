@@ -30,7 +30,8 @@ class DiagnosisServiceIntegrationTest {
         assertThat(result.findings())
                 .extracting(DiagnosisResult.Item::ruleCode)
                 .containsExactly("IP-04", "IP-01", "CMP-03", "CMP-02", "PORT-01", "IP-03", "DNS-01",
-                        "BAK-02", "CERT-01", "IP-02", "CMP-05", "CMP-05", "CMP-05", "CMP-01", "BAK-03");
+                        "BAK-02", "CMP-07", "CERT-01", "IP-02", "CMP-05", "CMP-05", "CMP-05",
+                        "CMP-01", "BAK-03");
         assertThat(result.findings())
                 .extracting(DiagnosisResult.Item::message)
                 .noneMatch(message -> message.contains("{"));
