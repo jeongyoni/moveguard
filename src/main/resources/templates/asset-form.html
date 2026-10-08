@@ -38,10 +38,23 @@
                 <option value="DB" th:selected="${asset.role == 'DB'}">DB</option>
                 <option value="ETC" th:selected="${asset.role == 'ETC'}">ETC</option>
             </select></label></p>
-        <p><label>OS 이름<br><input type="text" name="osName" th:value="${asset.osName}"></label></p>
+        <p><label>OS 이름<br><input type="text" name="osName" th:value="${asset.osName}" list="os-list"></label></p>
         <p><label>OS 버전<br><input type="text" name="osVersion" th:value="${asset.osVersion}"></label></p>
         <p><button class="btn" type="submit">저장</button></p>
     </form>
+
+    <datalist id="os-list">
+        <option value="Rocky Linux"></option>
+        <option value="RHEL"></option>
+        <option value="CentOS"></option>
+        <option value="AlmaLinux"></option>
+        <option value="Oracle Linux"></option>
+        <option value="Ubuntu"></option>
+        <option value="Debian"></option>
+        <option value="Amazon Linux"></option>
+        <option value="SUSE Linux"></option>
+        <option value="Windows Server"></option>
+    </datalist>
 </main>
 </body>
 </html>

@@ -532,6 +532,44 @@ form.inline { margin: 0; }
 /* 외부 기관 등록 표시(IP-04 판정 근거) — 눈에 띄게 */
 .ext-yes { color: var(--amber); font-weight: 700; }
 
+/* ============================================================
+   가독성 개선 (2차) — 대비·간격·표 줄무늬·입력 폼 카드화
+   ============================================================ */
+:root { --muted: #a9b4c3; }        /* 보조 텍스트 대비 상향 */
+
+body { font-size: 15.5px; }
+main { max-width: 1160px; }
+
+/* 섹션 제목을 구분선으로 — 긴 상세 페이지가 한눈에 나뉘어 보이게 */
+h2 {
+    font-size: 20px;
+    margin: 40px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+}
+h3 { font-size: 15px; margin: 18px 0 10px; }
+
+/* 표: 줄무늬 + 넉넉한 셀 + 또렷한 hover */
+th, td { padding: 11px 14px; }
+thead th { letter-spacing: 0.2px; }
+tbody tr:nth-child(even) { background: rgba(148, 163, 184, 0.05); }
+tbody tr:hover { background: rgba(56, 189, 248, 0.09); }
+
+/* 추가 폼을 카드처럼 묶어 입력 영역을 분리 */
+.inline-form {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    gap: 10px;
+}
+.inline-form input, .inline-form select { padding: 9px 11px; }
+input, select, textarea { font-size: 14.5px; }
+input:focus, select:focus, textarea:focus {
+    outline: 2px solid var(--blue);
+    outline-offset: 1px;
+}
+
 /* 재진단 비교 배너 */
 .compare {
     display: flex;
