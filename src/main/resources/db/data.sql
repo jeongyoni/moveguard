@@ -127,6 +127,11 @@ VALUES ('maintenance_window', 'STRING', '작업 가능 시간대'),
        ('data_size_gb', 'NUMBER', '이전 데이터 용량(GB)'),
        ('owner_contact', 'STRING', '자산 담당자 연락처');
 
+-- 기술영업 지원 범위: 핵심 2영역(공인IP·네트워크 + OS·DBMS 호환성)만 활성.
+-- 보안·DNS·백업은 비활성(필요 시 enabled=1로 복구). 전환을 직접 깨뜨리고 기술력이 돋보이는 범위에 집중.
+UPDATE risk_rule SET enabled = 0
+WHERE factor_id IN (SELECT factor_id FROM risk_factor WHERE code IN ('SECURITY', 'DNS', 'BACKUP'));
+
 -- 더미 이전사업: 쇼핑몰 IDC → AWS 이전
 -- 기대 진단 결과: IP-01, IP-02, IP-03, IP-04, DNS-01 / 전환 차단
 INSERT INTO migration_project (name, customer_name, source_env, target_env, status, planned_date)
