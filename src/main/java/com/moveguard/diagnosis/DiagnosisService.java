@@ -23,6 +23,23 @@ public class DiagnosisService {
     private final DiagnosisMapper diagnosisMapper;
     private final DiagnosisEngine engine;
 
+    /**
+     * 저장하지 않고 현재 구성으로 진단 결과만 계산한다 (리포트·미리보기용).
+     * 실행 이력(diagnosis_run)을 남기지 않으므로 재진단 비교에 영향을 주지 않는다.
+     */
+    @Transactional(readOnly = true)
+    public Optional<DiagnosisResult> preview(Long projectId) {
+        if (projectMapper.findById(projectId).isEmpty()) {
+            return Optional.empty();
+        }
+        DiagnosisContext context = contextLoader.load(projectId);
+        Map<String, RuleDefinition> rules = diagnosisMapper.findEnabledRules().stream()
+                .collect(Collectors.toMap(RuleDefinition::getRuleCode, Function.identity()));
+        Assessment assessment = engine.assess(context, rules);
+        return Optional.of(DiagnosisResult.of(null, projectId, assessment.score(),
+                assessment.findings(), null));
+    }
+
     @Transactional
     public Optional<DiagnosisResult> diagnose(Long projectId) {
         if (projectMapper.findById(projectId).isEmpty()) {

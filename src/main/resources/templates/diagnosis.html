@@ -233,6 +233,7 @@
         <form th:action="@{'/projects/' + ${project.projectId} + '/diagnose'}" method="post">
             <button class="btn" type="submit">다시 진단</button>
         </form>
+        <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/report'}" target="_blank">제안서용 리포트</a>
         <form th:action="@{/}" method="get">
             <button class="btn ghost" type="submit">사업 목록</button>
         </form>
