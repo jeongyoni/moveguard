@@ -41,7 +41,14 @@ VALUES
  '메이저 버전을 여러 단계 건너뜀',
  7, 5, 5, 0,
  '{asset}의 {product}이(가) {from}에서 {to}(으)로 이전합니다. 중간 버전을 건너뛰는 업그레이드는 데이터 변환·문법 변경 위험이 있습니다.',
- '벤더가 권장하는 업그레이드 경로를 확인하고, 필요하면 단계적 업그레이드로 계획하십시오.');
+ '벤더가 권장하는 업그레이드 경로를 확인하고, 필요하면 단계적 업그레이드로 계획하십시오.'),
+
+('CMP-06',
+ (SELECT factor_id FROM risk_factor WHERE code = 'COMPAT'),
+ '이전 후 버전이 연장 지원(유상) 구간임',
+ 5, 5, 3, 0,
+ '{asset}의 이전 후 {product} {version}은(는) 활성(일반) 지원이 종료되어 {extSupport}까지 연장 지원 구간입니다. 기술 지원은 가능하나 추가 비용·제약이 따릅니다.',
+ '지원 기간이 더 긴 상위 버전으로 목표를 조정하거나, 연장 지원 계약 비용을 전환 계획에 반영하십시오.');
 
 -- 2. 동기화 대상 제품
 INSERT INTO compat_product (product, label, category, version_command, source_url, fetch_status) VALUES

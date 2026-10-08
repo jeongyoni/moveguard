@@ -73,6 +73,13 @@ final class Fixtures {
                 null, !eol, null, minJavaVersion, false);
     }
 
+    /** 연장 지원 종료일(extSupportDate)까지 지정하는 릴리스 (Oracle 등) */
+    static CompatRelease releaseExt(String product, String version, boolean eol, LocalDate eolDate,
+                                    LocalDate extSupportDate) {
+        return new CompatRelease(null, product, version, version, null, false, eol, eolDate,
+                extSupportDate, !eol, null, null, false);
+    }
+
     static DiagnosisContext compatContext(List<AssetSoftware> software, List<CompatRelease> releases,
                                           LocalDate plannedDate) {
         return new DiagnosisContext(1L, List.of(WEB, DB, PG), List.of(), List.of(), List.of(),
