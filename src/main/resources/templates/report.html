@@ -52,27 +52,48 @@
         </div>
     </section>
 
+    <!-- 한 줄 요약 (판정에 따라 자동 생성) -->
+    <p class="summary" th:if="${result.blocked}">
+        현재 구성으로 전환하면 장애 위험이 높습니다. 전환을 막는
+        <b th:text="${blockingCount}">8</b>건의 치명적 항목을 먼저 해소한 뒤 전환을 진행하시기를 권고드립니다.
+    </p>
+    <p class="summary" th:if="${!result.blocked and result.riskLevel.name() != 'LOW'}">
+        전환을 차단할 치명적 항목은 없으나, 전환 전 조치가 필요한 위험
+        <b th:text="${#lists.size(result.findings)}">6</b>건이 확인되었습니다.
+    </p>
+    <p class="summary" th:if="${!result.blocked and result.riskLevel.name() == 'LOW'}">
+        현재 구성에서 전환을 깨뜨릴 주요 위험은 확인되지 않았습니다.
+    </p>
+
     <!-- 위험요인별 위험도 (막대그래프) -->
     <h2>위험요인별 위험도</h2>
-    <table class="factorbars" th:if="${not #lists.isEmpty(factors)}">
-        <tbody>
-        <tr th:each="f : ${factors}">
-            <td class="fb-name" th:text="${f.name}">OS·DBMS 호환성</td>
-            <td class="fb-bar">
-                <div class="bar-track">
-                    <div class="bar"
-                         th:classappend="${f.maxRpn >= 400} ? 'high' : (${f.maxRpn >= 150} ? 'mid' : 'low')"
-                         th:style="'width:' + ${f.maxRpn * 100 / maxFactorRpn} + '%'"></div>
-                </div>
-            </td>
-            <td class="fb-val num" th:text="${f.maxRpn}">504</td>
-            <td class="fb-cnt num" th:text="${f.count} + '건'">7건</td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="fbars" th:if="${not #lists.isEmpty(factors)}">
+        <div class="fbar fbar-head">
+            <span class="fb-name"></span>
+            <span class="fb-lab">최고 위험점수(RPN)</span>
+            <span class="fb-lab">발견 건수</span>
+        </div>
+        <div class="fbar" th:each="f : ${factors}">
+            <span class="fb-name" th:text="${f.name}">OS·DBMS 호환성</span>
+            <span class="fb-group">
+                <span class="bar-track">
+                    <span class="bar"
+                          th:classappend="${f.maxRpn >= 400 ? 'high' : (f.maxRpn >= 150 ? 'mid' : 'low')}"
+                          th:style="'width:' + ${f.maxRpn * 100 / maxFactorRpn} + '%'"></span>
+                </span>
+                <span class="fb-num" th:text="${f.maxRpn}">504</span>
+            </span>
+            <span class="fb-group">
+                <span class="bar-track">
+                    <span class="bar cnt" th:style="'width:' + ${f.count * 100 / maxFactorCount} + '%'"></span>
+                </span>
+                <span class="fb-num" th:text="${f.count} + '건'">7건</span>
+            </span>
+        </div>
+    </div>
     <p class="chart-cap" th:if="${not #lists.isEmpty(factors)}">
-        막대 = 요인별 최고 위험점수(RPN) · 색: <span class="sw high"></span> ≥400
-        <span class="sw mid"></span> ≥150 <span class="sw low"></span> &lt;150
+        RPN 막대 색: <span class="sw high"></span> ≥400 <span class="sw mid"></span> ≥150
+        <span class="sw low"></span> &lt;150 · <span class="sw cnt"></span> 발견 건수
     </p>
 
     <!-- 주요 위험과 권고 -->

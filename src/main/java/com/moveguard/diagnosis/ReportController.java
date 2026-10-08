@@ -31,11 +31,17 @@ public class ReportController {
         var factors = DiagnosisPage.summarize(result.findings());
         int maxFactorRpn = factors.stream()
                 .mapToInt(DiagnosisPage.FactorSummary::maxRpn).max().orElse(1);
+        int maxFactorCount = factors.stream()
+                .mapToInt(DiagnosisPage.FactorSummary::count).max().orElse(1);
+        long blockingCount = result.findings().stream()
+                .filter(DiagnosisResult.Item::blocking).count();
 
         model.addAttribute("project", project);
         model.addAttribute("result", result);
         model.addAttribute("factors", factors);
         model.addAttribute("maxFactorRpn", maxFactorRpn);
+        model.addAttribute("maxFactorCount", maxFactorCount);
+        model.addAttribute("blockingCount", blockingCount);
         model.addAttribute("reportDate", LocalDate.now());
         return "report";
     }
