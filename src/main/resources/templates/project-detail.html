@@ -20,6 +20,10 @@
         <span th:text="'전환 예정 ' + ${project.plannedDate}">전환 예정</span> ·
         <span th:text="${project.status}">PLAN</span>
     </p>
+    <p class="hint muted-note">
+        아래 자산의 <strong>이전 전/이전 후 구성</strong>을 입력하면, 공인IP·네트워크 · 호환성 · 보안 · DNS · 백업
+        <strong>5개 영역(규칙 22개)</strong>으로 전환 위험을 점검합니다.
+    </p>
 
     <div class="actions">
         <form th:action="@{'/projects/' + ${project.projectId} + '/diagnose'}" method="post">
