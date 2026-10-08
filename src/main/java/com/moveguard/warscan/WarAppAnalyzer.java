@@ -109,7 +109,7 @@ public class WarAppAnalyzer {
         }
 
         List<WarLib> libraries = new ArrayList<>();
-        libs.forEach((n, v) -> libraries.add(new WarLib(n, v)));
+        libs.forEach((n, v) -> libraries.add(new WarLib(n, v, JdbcDrivers.canonical(n))));
         return new WarAppReport(classCount, maxMajor, WarAppReport.javaFromMajor(maxMajor),
                 usesJavax, usesJakarta, servletSpec, libraries);
     }

@@ -10,6 +10,7 @@ import com.moveguard.asset.Dependency;
 import com.moveguard.asset.DnsRecord;
 import com.moveguard.asset.Phase;
 import com.moveguard.compat.CompatRelease;
+import com.moveguard.compat.DriverRequirement;
 import com.moveguard.diagnosis.DiagnosisContext;
 import java.time.LocalDate;
 import java.util.List;
@@ -84,6 +85,17 @@ final class Fixtures {
                                           LocalDate plannedDate) {
         return new DiagnosisContext(1L, List.of(WEB, DB, PG), List.of(), List.of(), List.of(),
                 List.of(), plannedDate, software, releases);
+    }
+
+    static DriverRequirement driverReq(String dbProduct, String dbReleaseLine,
+                                       String driverProduct, String minVersion) {
+        return new DriverRequirement(null, dbProduct, dbReleaseLine, driverProduct, minVersion, null, true);
+    }
+
+    static DiagnosisContext driverContext(List<AssetSoftware> software,
+                                          List<DriverRequirement> requirements) {
+        return new DiagnosisContext(1L, List.of(WEB, DB, PG), List.of(), List.of(), List.of(),
+                List.of(), PLANNED_DATE, software, List.of(), List.of(), requirements);
     }
 
     static BackupPlan backup(Asset asset, LocalDate lastBackupAt, boolean restoreTested,

@@ -48,7 +48,14 @@ VALUES
  '이전 후 버전이 연장 지원(유상) 구간임',
  5, 5, 3, 0,
  '{asset}의 이전 후 {product} {version}은(는) 활성(일반) 지원이 종료되어 {extSupport}까지 연장 지원 구간입니다. 기술 지원은 가능하나 추가 비용·제약이 따릅니다.',
- '지원 기간이 더 긴 상위 버전으로 목표를 조정하거나, 연장 지원 계약 비용을 전환 계획에 반영하십시오.');
+ '지원 기간이 더 긴 상위 버전으로 목표를 조정하거나, 연장 지원 계약 비용을 전환 계획에 반영하십시오.'),
+
+('CMP-07',
+ (SELECT factor_id FROM risk_factor WHERE code = 'COMPAT'),
+ '이전 후 JDBC 드라이버 버전이 목표 DB 요구치 미달',
+ 8, 5, 5, 1,
+ '{asset}의 이전 후 {driver} {version}은(는) 목표 DB({db})가 요구하는 최소 드라이버 버전({required})보다 낮습니다. 전환 후 DB 접속이 실패할 수 있습니다.',
+ '드라이버를 목표 DB가 요구하는 최소 버전 이상으로 올린 뒤 전환하십시오.');
 
 -- 2. 동기화 대상 제품
 INSERT INTO compat_product (product, label, category, version_command, source_url, fetch_status) VALUES
@@ -82,6 +89,17 @@ INSERT INTO compat_release
 ('mysql',  '5.7',  '5.7',       0, 1, '2023-10-31', NULL, 0, NULL),
 ('oracle-database', '19',   '19c (LTR)',     1, 0, '2029-12-31', '2032-12-31', 1, NULL),
 ('oracle-database', '12.2', '12c Release 2', 0, 1, '2022-03-31', NULL,         0, NULL);
+
+-- 3b. JDBC 드라이버 호환 매트릭스 (endoflife.date 미제공 → 수동 관리, is_manual=1)
+INSERT INTO driver_requirement (db_product, db_release_line, driver_product, min_version, note) VALUES
+('mysql',           '8.4',  'mysql-connector-j',    '8.4.0',  'MySQL 8.4 LTS는 Connector/J 8.4 이상 권장'),
+('mysql',           '8.0',  'mysql-connector-j',    '8.0.11', 'MySQL 8.0은 Connector/J 8.0.11 이상'),
+('mysql',           '9.6',  'mysql-connector-j',    '9.0.0',  'MySQL 9.x(이노베이션)는 Connector/J 9.x'),
+('mysql',           NULL,   'mariadb-java-client',  '2.7.0',  'MariaDB 드라이버로 MySQL 접속 시'),
+('oracle-database', '19',   'ojdbc8',               '19.3',   'Oracle 19c + JDK 8'),
+('oracle-database', '19',   'ojdbc10',              '19.3',   'Oracle 19c + JDK 10/11'),
+('oracle-database', '21',   'ojdbc11',              '21.1',   'Oracle 21c + JDK 11'),
+('postgresql',      NULL,   'postgresql',           '42.2.0', 'PostgreSQL JDBC 42.2 이상 권장');
 
 -- 4. 더미 이전사업에 소프트웨어 정보 추가
 --    기대 결과: CMP-01(mysql 9.6 EOL), CMP-02(Tomcat 11은 Java 17 필요), CMP-03(9.0→11.0), CMP-05(5.7→9.6)

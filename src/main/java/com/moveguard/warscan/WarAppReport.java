@@ -39,6 +39,7 @@ public class WarAppReport {
     @AllArgsConstructor
     public static class WarLib {
         private String name;
-        private String version;  // 파일명에서 뽑은 버전 (없으면 null)
+        private String version;        // 파일명에서 뽑은 버전 (없으면 null)
+        private String driverProduct;  // 알려진 JDBC 드라이버면 정규화 제품명, 아니면 null
     }
 }

@@ -10,6 +10,7 @@ import com.moveguard.asset.Dependency;
 import com.moveguard.asset.DnsRecord;
 import com.moveguard.asset.Phase;
 import com.moveguard.compat.CompatRelease;
+import com.moveguard.compat.DriverRequirement;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -35,6 +36,7 @@ public class DiagnosisContext {
     private final List<AssetSoftware> software;
     private final Map<String, CompatRelease> releaseIndex;
     private final List<BackupPlan> backups;
+    private final List<DriverRequirement> driverRequirements;
 
     public DiagnosisContext(Long projectId, List<Asset> assets, List<AssetIp> ips,
                             List<Dependency> dependencies, List<DnsRecord> dnsRecords,
@@ -56,6 +58,15 @@ public class DiagnosisContext {
                             List<Certificate> certificates, LocalDate plannedDate,
                             List<AssetSoftware> software, List<CompatRelease> releases,
                             List<BackupPlan> backups) {
+        this(projectId, assets, ips, dependencies, dnsRecords, certificates, plannedDate,
+                software, releases, backups, List.of());
+    }
+
+    public DiagnosisContext(Long projectId, List<Asset> assets, List<AssetIp> ips,
+                            List<Dependency> dependencies, List<DnsRecord> dnsRecords,
+                            List<Certificate> certificates, LocalDate plannedDate,
+                            List<AssetSoftware> software, List<CompatRelease> releases,
+                            List<BackupPlan> backups, List<DriverRequirement> driverRequirements) {
         this.projectId = projectId;
         this.assets = assets.stream()
                 .collect(Collectors.toMap(Asset::getAssetId, Function.identity()));
@@ -69,6 +80,7 @@ public class DiagnosisContext {
                 r -> releaseKey(r.getProduct(), r.getVersion()), Function.identity(),
                 (a, b) -> a));
         this.backups = List.copyOf(backups);
+        this.driverRequirements = List.copyOf(driverRequirements);
     }
 
     private static String releaseKey(String product, String releaseLine) {
@@ -182,6 +194,11 @@ public class DiagnosisContext {
     /** 제품·릴리스 라인에 해당하는 호환성 기준 릴리스 */
     public Optional<CompatRelease> release(String product, String releaseLine) {
         return Optional.ofNullable(releaseIndex.get(releaseKey(product, releaseLine)));
+    }
+
+    /** JDBC 드라이버 호환 매트릭스 */
+    public List<DriverRequirement> driverRequirements() {
+        return driverRequirements;
     }
 
     /** 특정 단계의 백업 계획 */
