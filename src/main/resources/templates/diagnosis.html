@@ -188,14 +188,29 @@
         </table>
     </details>
 
-    <!-- 위험요인별 -->
+    <!-- 위험요인별 (핵심 / 확장) -->
     <h2>위험요인별</h2>
-    <div class="factors">
-        <div class="factor" th:each="f : ${factors}">
-            <div class="factor-name" th:text="${f.name}">공인IP·네트워크 변경</div>
-            <div class="factor-meta">
-                <span th:text="${f.count} + '건'">5건</span> ·
-                <span th:text="'최고 RPN ' + ${f.maxRpn}">최고 RPN 504</span>
+    <div th:if="${not #lists.isEmpty(coreFactors)}">
+        <div class="group-label core">핵심 점검 · 전환이 직접 중단되는 위험</div>
+        <div class="factors">
+            <div class="factor" th:each="f : ${coreFactors}">
+                <div class="factor-name" th:text="${f.name}">공인IP·네트워크 변경</div>
+                <div class="factor-meta">
+                    <span th:text="${f.count} + '건'">5건</span> ·
+                    <span th:text="'최고 RPN ' + ${f.maxRpn}">최고 RPN 504</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:if="${not #lists.isEmpty(extFactors)}">
+        <div class="group-label ext">확장 점검 · 보안·운영 안정성</div>
+        <div class="factors">
+            <div class="factor" th:each="f : ${extFactors}">
+                <div class="factor-name" th:text="${f.name}">보안·접근통제</div>
+                <div class="factor-meta">
+                    <span th:text="${f.count} + '건'">2건</span> ·
+                    <span th:text="'최고 RPN ' + ${f.maxRpn}">최고 RPN 240</span>
+                </div>
             </div>
         </div>
     </div>

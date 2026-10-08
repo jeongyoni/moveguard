@@ -39,6 +39,10 @@ public class ReportController {
         model.addAttribute("project", project);
         model.addAttribute("result", result);
         model.addAttribute("factors", factors);
+        model.addAttribute("coreFactors", factors.stream()
+                .filter(f -> DiagnosisPage.isCore(f.code())).toList());
+        model.addAttribute("extFactors", factors.stream()
+                .filter(f -> !DiagnosisPage.isCore(f.code())).toList());
         model.addAttribute("maxFactorRpn", maxFactorRpn);
         model.addAttribute("maxFactorCount", maxFactorCount);
         model.addAttribute("blockingCount", blockingCount);

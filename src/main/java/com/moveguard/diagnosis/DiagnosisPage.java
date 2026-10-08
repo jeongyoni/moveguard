@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
@@ -17,6 +18,13 @@ import org.springframework.ui.Model;
 @Component
 @RequiredArgsConstructor
 public class DiagnosisPage {
+
+    /** 핵심 점검(전환이 직접 중단되는 위험). 나머지는 확장 점검(보안·운영 안정성). */
+    public static final Set<String> CORE_FACTORS = Set.of("NETWORK_IP", "COMPAT");
+
+    public static boolean isCore(String factorCode) {
+        return CORE_FACTORS.contains(factorCode);
+    }
 
     private final ProjectService projectService;
     private final DiagnosisService diagnosisService;
@@ -33,9 +41,12 @@ public class DiagnosisPage {
             return "redirect:/";
         }
 
+        List<FactorSummary> factors = summarize(result.findings());
         model.addAttribute("project", project);
         model.addAttribute("result", result);
-        model.addAttribute("factors", summarize(result.findings()));
+        model.addAttribute("factors", factors);
+        model.addAttribute("coreFactors", factors.stream().filter(f -> isCore(f.code())).toList());
+        model.addAttribute("extFactors", factors.stream().filter(f -> !isCore(f.code())).toList());
         model.addAttribute("input", DiagnosisInput.of(contextLoader.load(projectId)));
         return "diagnosis";
     }
