@@ -531,3 +531,26 @@ form.inline { margin: 0; }
 
 /* 외부 기관 등록 표시(IP-04 판정 근거) — 눈에 띄게 */
 .ext-yes { color: var(--amber); font-weight: 700; }
+
+/* 재진단 비교 배너 */
+.compare {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-left: 6px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 24px;
+    margin-bottom: 16px;
+}
+.compare.improved { border-left-color: var(--green); }
+.compare.worse { border-left-color: var(--red); }
+.compare-label { color: var(--muted); font-size: 13px; font-weight: 700; }
+.compare-items { display: flex; gap: 40px; margin-left: auto; }
+.compare-item { text-align: center; font-size: 18px; color: var(--muted); }
+.compare-item .arrow { margin: 0 6px; color: var(--muted); }
+.compare-item strong { font-size: 22px; font-weight: 800; color: var(--text); }
+.compare.improved .compare-item strong { color: var(--green); }
+.compare.worse .compare-item strong { color: var(--red); }
+.compare-cap { font-size: 12px; color: var(--muted); margin-top: 2px; }

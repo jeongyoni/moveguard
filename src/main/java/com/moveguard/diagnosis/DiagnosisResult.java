@@ -12,7 +12,8 @@ public record DiagnosisResult(
         RiskLevel riskLevel,
         boolean blocked,
         int maxRpn,
-        List<Item> findings) {
+        List<Item> findings,
+        RunSummary previous) {
 
     public record Item(String ruleCode, String factorCode, String factorName,
                        String title, int rpn, boolean blocking,
@@ -20,7 +21,7 @@ public record DiagnosisResult(
     }
 
     static DiagnosisResult of(Long runId, Long projectId, RiskScore score,
-                              List<EvaluatedFinding> findings) {
+                              List<EvaluatedFinding> findings, RunSummary previous) {
         List<Item> items = findings.stream()
                 .map(f -> new Item(
                         f.rule().getRuleCode(),
@@ -33,6 +34,6 @@ public record DiagnosisResult(
                         f.rule().renderMitigation(f.finding().params())))
                 .toList();
         return new DiagnosisResult(runId, projectId, score.totalScore(), score.level(),
-                score.blocked(), score.maxRpn(), items);
+                score.blocked(), score.maxRpn(), items, previous);
     }
 }

@@ -19,6 +19,33 @@
         <span th:text="'전환 예정 ' + ${project.plannedDate}">전환 예정</span>
     </p>
 
+    <!-- 재진단 비교 (직전 진단이 있을 때만) -->
+    <section class="compare" th:if="${result.previous != null}"
+             th:classappend="${result.maxRpn &lt; result.previous.maxRpn} ? 'improved'
+                             : (${result.maxRpn &gt; result.previous.maxRpn} ? 'worse' : '')">
+        <div class="compare-label">직전 진단 대비</div>
+        <div class="compare-items">
+            <div class="compare-item">
+                <span th:text="${result.previous.riskLevel}">HIGH</span>
+                <span class="arrow">→</span>
+                <strong th:text="${result.riskLevel}">MEDIUM</strong>
+                <div class="compare-cap">위험 등급</div>
+            </div>
+            <div class="compare-item">
+                <span th:text="${result.previous.findingCount}">16</span>
+                <span class="arrow">→</span>
+                <strong th:text="${#lists.size(result.findings)}">6</strong>
+                <div class="compare-cap">발견 건수</div>
+            </div>
+            <div class="compare-item">
+                <span th:text="${result.previous.maxRpn}">504</span>
+                <span class="arrow">→</span>
+                <strong th:text="${result.maxRpn}">240</strong>
+                <div class="compare-cap">최고 RPN</div>
+            </div>
+        </div>
+    </section>
+
     <!-- 판정 -->
     <section class="verdict" th:classappend="${result.riskLevel}">
         <div>
