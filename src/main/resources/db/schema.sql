@@ -30,7 +30,7 @@ CREATE TABLE migration_project
     name          VARCHAR(100) NOT NULL,
     customer_name VARCHAR(100) NOT NULL,
     source_env    VARCHAR(100) COMMENT '기존 환경 (예: IDC-A)',
-    target_env    VARCHAR(100) COMMENT '신규 환경 (예: AWS ap-northeast-2)',
+    target_env    VARCHAR(100) COMMENT '운영 환경 (예: IDC · CentOS 7)',
     status        VARCHAR(20)  NOT NULL DEFAULT 'PLAN',
     planned_date  DATE,
     created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -24,12 +24,13 @@ class DiagnosisServiceIntegrationTest {
         assertThat(result.runId()).isNotNull();
         assertThat(result.riskLevel()).isEqualTo(RiskLevel.HIGH);
         assertThat(result.blocked()).isTrue();
-        assertThat(result.maxRpn()).isEqualTo(420);   // EOL 버전 운영 = 치명적
+        assertThat(result.maxRpn()).isEqualTo(420);   // EOL 버전(리눅스 OS·DB) 운영 = 치명적
         assertThat(result.totalScore()).isEqualByComparingTo("15.15");
         // 운영 헬스체크 세트(SECURITY·BACKUP·COMPAT 일부) 활성, 전환 전용(NETWORK_IP·DNS·CMP-03/05) 비활성.
+        // CentOS 7(서버 OS) EOL이 web01·db01 두 서버에서 각각 CMP-01로 잡혀 mysql 9.6 EOL과 함께 최상위에 온다.
         assertThat(result.findings())
                 .extracting(DiagnosisResult.Item::ruleCode)
-                .containsExactly("CMP-01", "CMP-02", "PORT-01", "BAK-02", "CMP-07", "CERT-01", "BAK-03");
+                .containsExactly("CMP-01", "CMP-01", "CMP-01", "CMP-02", "PORT-01", "BAK-02", "CMP-07", "CERT-01", "BAK-03");
         assertThat(result.findings())
                 .extracting(DiagnosisResult.Item::message)
                 .noneMatch(message -> message.contains("{"));
