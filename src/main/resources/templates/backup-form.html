@@ -5,13 +5,11 @@
     <title>백업 수정 — MoveGuard</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body>
-<header class="top">
-    <div class="brand">MoveGuard</div>
-    <div class="tagline">백업 수정</div>
-</header>
-
-<main>
+<body class="app">
+<aside th:replace="~{fragments/shell :: sidebar('dashboard')}"></aside>
+<div class="app-main">
+    <header th:replace="~{fragments/shell :: topbar('백업 수정')}"></header>
+    <main class="content">
     <p><a th:href="@{'/projects/' + ${projectId}}">← 사업 상세</a></p>
     <h1>백업 수정</h1>
 
@@ -40,5 +38,6 @@
         <p><button class="btn" type="submit">저장</button></p>
     </form>
 </main>
+</div>
 </body>
 </html>

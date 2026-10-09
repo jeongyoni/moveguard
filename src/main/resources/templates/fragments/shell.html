@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- 좌측 사이드바 -->
+<aside class="sidebar" th:fragment="sidebar(active)">
+    <a class="brand" th:href="@{/}">
+        <span class="logo">M</span>
+        <span>MoveGuard
+            <small>시스원 MSP</small>
+        </span>
+    </a>
+    <div class="nav-label">운영 진단</div>
+    <nav>
+        <a th:href="@{/}" th:classappend="${active == 'dashboard'} ? 'active'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>
+            대시보드
+        </a>
+        <a th:href="@{/projects/new}" th:classappend="${active == 'new'} ? 'active'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            새 환경 등록
+        </a>
+        <a th:href="@{/projects/import}" th:classappend="${active == 'import'} ? 'active'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 5 17 10"></polyline>
+                <line x1="12" y1="5" x2="12" y2="16"></line></svg>
+            엑셀로 등록
+        </a>
+    </nav>
+    <div class="nav-label">진단 기준</div>
+    <nav>
+        <a th:href="@{/api/compat/products}" target="_blank">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"></path></svg>
+            지원종료(EOL) 기준
+        </a>
+    </nav>
+    <div class="side-note">규칙 + ML + 사내 LLM<br>외부 AI 미사용 · 데이터 미유출</div>
+</aside>
+
+<!-- 상단바 -->
+<header class="topbar" th:fragment="topbar(title)">
+    <div class="page-title" th:text="${title}">운영 환경 진단</div>
+    <div class="spacer"></div>
+    <div class="top-meta">MSP 운영 환경 헬스체크</div>
+    <div class="user"><span class="ava">S</span><span>시스원 MSP</span></div>
+</header>
+
+</body>
+</html>

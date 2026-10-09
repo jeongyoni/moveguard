@@ -5,13 +5,11 @@
     <title th:text="'진단 결과 — ' + ${project.name}">진단 결과</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body>
-<header class="top">
-    <div class="brand">MoveGuard</div>
-    <div class="tagline" th:text="${project.name}">사업명</div>
-</header>
-
-<main>
+<body class="app">
+<aside th:replace="~{fragments/shell :: sidebar('dashboard')}"></aside>
+<div class="app-main">
+    <header th:replace="~{fragments/shell :: topbar('운영 환경 진단 결과')}"></header>
+    <main class="content">
     <h1>운영 환경 진단 결과</h1>
     <p class="hint">
         <span th:text="${project.customerName}">고객사</span> ·
@@ -239,5 +237,6 @@
         </form>
     </div>
 </main>
+</div>
 </body>
 </html>
