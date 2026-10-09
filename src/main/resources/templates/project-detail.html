@@ -10,25 +10,43 @@
 <div class="app-main">
     <header th:replace="~{fragments/shell :: topbar('환경 상세')}"></header>
     <main class="content">
-    <p><a th:href="@{/}">← 사업 목록</a></p>
-    <h1 th:text="${project.name}">사업명</h1>
-    <p class="hint">
-        <span th:text="${project.customerName}">고객사</span> ·
-        <span th:text="${project.sourceEnv} + ' → ' + ${project.targetEnv}">IDC-A → AWS</span> ·
-        <span th:text="'점검 기준일 ' + ${project.plannedDate}">점검 기준일</span> ·
-        <span th:text="${project.status}">PLAN</span>
-    </p>
-    <p class="hint muted-note">
-        아래 자산의 <strong>운영 구성</strong>을 입력하면, 버전·호환성(EOL) · 보안 · 백업·DR
-        <strong>3개 영역(규칙 13개)</strong>으로 운영 리스크를 점검합니다. 발견 리스크 = MSP 서비스 수주 품목.
-    </p>
+    <p class="crumb"><a th:href="@{/}">대시보드</a> · 환경 상세</p>
+    <div class="detail-head">
+        <div>
+            <h1 th:text="${project.name}">환경명</h1>
+            <p class="hint">
+                <span th:text="${project.customerName}">고객사</span> ·
+                <span th:text="${project.targetEnv}">AWS 서울</span> ·
+                <span th:text="'점검 기준일 ' + ${project.plannedDate}">점검 기준일</span> ·
+                <span th:text="${project.status}">PLAN</span>
+            </p>
+        </div>
+        <div class="actions" style="margin:0">
+            <form th:action="@{'/projects/' + ${project.projectId} + '/diagnose'}" method="post">
+                <button class="btn" type="submit">진단 실행</button>
+            </form>
+            <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/war-scan'}">WAR 분석</a>
+            <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/report'}" target="_blank">리포트</a>
+        </div>
+    </div>
 
-    <div class="actions">
-        <form th:action="@{'/projects/' + ${project.projectId} + '/diagnose'}" method="post">
-            <button class="btn" type="submit">다시 진단</button>
-        </form>
-        <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/war-scan'}">WAR 하드코딩 IP 분석</a>
-        <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/report'}" target="_blank">제안서용 리포트</a>
+    <div class="stats stats-4">
+        <div class="statcard blue">
+            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line></svg></span>
+            <div><div class="num" th:text="${#lists.size(assets)}">2</div><div class="lab">자산</div></div>
+        </div>
+        <div class="statcard green">
+            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></span>
+            <div><div class="num" th:text="${#lists.size(software)}">5</div><div class="lab">소프트웨어(버전)</div></div>
+        </div>
+        <div class="statcard amber">
+            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></span>
+            <div><div class="num" th:text="${#lists.size(ips)}">4</div><div class="lab">IP</div></div>
+        </div>
+        <div class="statcard red">
+            <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg></span>
+            <div><div class="num" th:text="${#lists.size(backups)}">3</div><div class="lab">백업</div></div>
+        </div>
     </div>
 
     <div class="errors" th:if="${errors}">
@@ -38,7 +56,7 @@
         </ul>
     </div>
 
-    <!-- 자산 편집 -->
+    <section class="panel section">
     <h2>자산</h2>
     <table class="input-table wide" th:if="${!#lists.isEmpty(assets)}">
         <thead>
@@ -81,7 +99,9 @@
         <button class="btn" type="submit">추가</button>
     </form>
 
-    <!-- 소프트웨어 편집 (자산의 OS 외 제품·버전: CMP-02/03/07 판정 근거) -->
+    </section>
+
+    <section class="panel section">
     <h2>소프트웨어 (제품·버전)</h2>
     <table class="input-table wide" th:if="${!#lists.isEmpty(software)}">
         <thead>
@@ -121,7 +141,9 @@
     </form>
     <p class="empty" th:if="${#lists.isEmpty(assets)}">소프트웨어를 추가하려면 먼저 자산을 등록하세요.</p>
 
-    <!-- IP 편집 -->
+    </section>
+
+    <section class="panel section">
     <h2>IP</h2>
     <table class="input-table wide" th:if="${!#lists.isEmpty(ips)}">
         <thead>
@@ -165,7 +187,9 @@
     <p class="hint" th:if="${!#lists.isEmpty(assets)}">종류(공인/사설)는 주소를 보고 자동으로 판별됩니다.</p>
     <p class="empty" th:if="${#lists.isEmpty(assets)}">IP를 추가하려면 먼저 자산을 등록하세요.</p>
 
-    <!-- DNS 편집 -->
+    </section>
+
+    <section class="panel section">
     <h2>DNS</h2>
     <table class="input-table wide" th:if="${!#lists.isEmpty(dnsRecords)}">
         <thead>
@@ -201,7 +225,9 @@
         <button class="btn" type="submit">추가</button>
     </form>
 
-    <!-- 인증서 편집 -->
+    </section>
+
+    <section class="panel section">
     <h2>인증서</h2>
     <table class="input-table wide" th:if="${!#lists.isEmpty(certs)}">
         <thead>
@@ -233,7 +259,9 @@
         <button class="btn" type="submit">추가</button>
     </form>
 
-    <!-- 백업 편집 -->
+    </section>
+
+    <section class="panel section">
     <h2>백업</h2>
     <table class="input-table wide" th:if="${!#lists.isEmpty(backups)}">
         <thead>
@@ -270,6 +298,8 @@
         <button class="btn" type="submit">추가</button>
     </form>
     <p class="empty" th:if="${#lists.isEmpty(assets)}">백업을 추가하려면 먼저 자산을 등록하세요.</p>
+
+    </section>
 
     <!-- 진단 입력 미리보기 (읽기 전용) -->
     <details class="input-box">
