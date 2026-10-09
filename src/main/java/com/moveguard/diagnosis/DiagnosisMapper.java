@@ -36,6 +36,9 @@ public interface DiagnosisMapper {
     /** 해당 사업의 가장 최근 진단 실행 요약 (없으면 null). 재진단 비교의 baseline. */
     RunSummary findLatestRun(Long projectId);
 
+    /** 해당 사업의 모든 진단 실행을 오래된 순으로 (이력·추이 화면용). */
+    List<RunSummary> findRunsByProject(Long projectId);
+
     void insertRun(DiagnosisRun run);
 
     void insertFindings(@Param("findings") List<FindingRecord> findings);

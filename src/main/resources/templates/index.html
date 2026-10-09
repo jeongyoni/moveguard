@@ -2,93 +2,139 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>MoveGuard — MSP 운영 환경 진단</title>
+    <title>MoveGuard — MSP 운영 환경 모니터링</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/chart.min.js}"></script>
 </head>
 <body class="app">
 <aside th:replace="~{fragments/shell :: sidebar('dashboard')}"></aside>
 <div class="app-main">
-    <header th:replace="~{fragments/shell :: topbar('대시보드')}"></header>
+    <header th:replace="~{fragments/shell :: topbar('운영 환경 모니터링')}"></header>
     <main class="content">
 
-        <h1>진단 대상 환경</h1>
-        <p class="hint">
-            고객이 <strong>운영 중인 환경</strong>을 점검해 손봐야 할 리스크(지원종료·보안·백업 등)를 선제 발견합니다.
-            발견된 리스크는 그대로 <strong>MSP 운영·보안·백업·DR 서비스로 해결</strong>할 항목이 됩니다.
-        </p>
+        <div class="page-head">
+            <div>
+                <h1>운영 환경 모니터링</h1>
+                <p class="hint">고객 운영 환경의 리스크 현황을 한눈에. 발견 리스크는 그대로 <strong>MSP 운영·보안·백업·DR 수주 품목</strong>이 됩니다.</p>
+            </div>
+            <div class="actions">
+                <a class="btn" th:href="@{/projects/new}">새 환경 등록</a>
+                <a class="btn ghost" th:href="@{/projects/import}">엑셀로 등록</a>
+            </div>
+        </div>
 
-        <!-- 요약 통계 -->
-        <div class="stats">
+        <!-- 전체 현황 통계 -->
+        <div class="stats stats-4">
             <div class="statcard blue">
-                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg></span>
-                <div><div class="num" th:text="${#lists.size(projects)}">1</div><div class="lab">진단 대상 환경</div></div>
-            </div>
-            <div class="statcard green">
-                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></span>
-                <div><div class="num">13</div><div class="lab">운영 점검 규칙</div></div>
-            </div>
-            <div class="statcard amber">
-                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"></path></svg></span>
-                <div><div class="num">3</div><div class="lab">점검 영역 (버전·보안·백업)</div></div>
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line></svg></span>
+                <div><div class="num" th:text="${dash.total}">5</div><div class="lab">진단 대상 환경</div></div>
             </div>
             <div class="statcard red">
-                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg></span>
-                <div><div class="num">규칙+AI</div><div class="lab">규칙·ML·사내 LLM</div></div>
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></span>
+                <div><div class="num" th:text="${dash.blocked}">2</div><div class="lab">즉시 조치 필요 환경</div></div>
+            </div>
+            <div class="statcard amber">
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg></span>
+                <div><div class="num" th:text="${dash.totalFindings}">27</div><div class="lab">발견 리스크 합계</div></div>
+            </div>
+            <div class="statcard green">
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15c6-3 10 3 16 0V3C14 6 10 0 4 3z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg></span>
+                <div><div class="num" th:text="${dash.avgMaxRpn}">312</div><div class="lab">평균 최고 위험점수</div></div>
             </div>
         </div>
 
-        <!-- 점검 범위 -->
-        <h2>점검 범위</h2>
-        <section class="scope">
-            <div class="scope-group core">
-                <div class="scope-head">운영 리스크 <span>MSP 서비스에 직결</span></div>
-                <ul>
-                    <li>버전·호환성 (EOL·지원종료·드라이버) <b>5</b></li>
-                    <li>보안·접근통제 (인증서·포트·평문) <b>4</b></li>
-                    <li>백업·복구 (백업·복구테스트·DR) <b>4</b></li>
-                </ul>
-            </div>
-            <div class="scope-group ext">
-                <div class="scope-head">판정 방식 <span>규칙 + AI 하이브리드</span></div>
-                <ul>
-                    <li>규칙(FMEA) — 설명 가능한 판정</li>
-                    <li>ML — 우선순위·예측</li>
-                    <li>사내 LLM — 리포트 자동 작성</li>
-                </ul>
-            </div>
-        </section>
-        <p class="hint muted-note">발견 리스크 = MSP 서비스 수주 품목(패치·보안·백업·DR·운영) · 외부 AI 미사용으로 고객 데이터 미유출.</p>
-
-        <div class="actions" style="margin-top:14px">
-            <a class="btn" th:href="@{/projects/new}">새 환경 등록</a>
-            <a class="btn ghost" th:href="@{/projects/import}">엑셀로 등록</a>
-        </div>
-
-        <!-- 환경 목록 -->
-        <h2>환경 목록</h2>
-        <ul class="projects">
-            <li class="project" th:each="p : ${projects}">
-                <div>
-                    <div class="project-name">
-                        <a th:href="@{'/projects/' + ${p.projectId}}" th:text="${p.name}">환경명</a>
-                    </div>
-                    <div class="project-meta">
-                        <span th:text="${p.customerName}">고객사</span>
-                        <span th:text="${p.targetEnv}">IDC · CentOS 7</span>
-                        <span th:text="'점검 기준일 ' + ${p.plannedDate}">점검 기준일</span>
-                        <span th:text="${p.status}">PLAN</span>
+        <!-- 차트 2단 -->
+        <div class="chart-row">
+            <div class="panel">
+                <div class="panel-head">위험 등급 분포</div>
+                <div class="panel-body">
+                    <div class="chart-box sm"><canvas id="gradeChart"></canvas></div>
+                    <div class="chart-legend">
+                        <span><i class="dot hi"></i>즉시조치 <b th:text="${dash.high}">2</b></span>
+                        <span><i class="dot me"></i>주의 <b th:text="${dash.medium}">2</b></span>
+                        <span><i class="dot lo"></i>양호 <b th:text="${dash.low}">1</b></span>
+                        <span><i class="dot un"></i>미진단 <b th:text="${dash.untested}">0</b></span>
                     </div>
                 </div>
-                <form th:action="@{'/projects/' + ${p.projectId} + '/diagnose'}" method="post">
-                    <button class="btn" type="submit">진단 실행</button>
-                </form>
-            </li>
-        </ul>
-
-        <div class="empty" th:if="${#lists.isEmpty(projects)}">
-            등록된 진단 환경이 없습니다. 시드 데이터를 적용했는지 확인하세요.
+            </div>
+            <div class="panel">
+                <div class="panel-head">환경별 최고 위험점수(RPN)</div>
+                <div class="panel-body">
+                    <div class="chart-box"><canvas id="rpnChart"></canvas></div>
+                </div>
+            </div>
         </div>
+
+        <!-- 환경 목록 테이블 -->
+        <div class="panel">
+            <div class="panel-head">운영 환경 현황
+                <span th:text="${dash.total} + '개'">5개</span>
+            </div>
+            <div class="panel-body" style="padding:0">
+                <table class="grid-table">
+                    <thead>
+                    <tr><th>환경</th><th>고객사</th><th>운영 환경</th><th>등급</th><th>최고 RPN</th><th>리스크</th><th>최근 진단</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="c : ${dash.cards}">
+                        <td><a class="link" th:href="@{'/projects/' + ${c.project.projectId}}" th:text="${c.project.name}">환경명</a></td>
+                        <td th:text="${c.project.customerName}">고객사</td>
+                        <td class="muted-note" th:text="${c.project.targetEnv}">IDC · CentOS 7</td>
+                        <td>
+                            <span class="level-tag"
+                                  th:classappend="${c.level() == 'HIGH'} ? 'hi' : (${c.level() == 'MEDIUM'} ? 'me' : (${c.level() == 'LOW'} ? 'lo' : 'un'))"
+                                  th:text="${c.level() == 'HIGH'} ? '즉시조치' : (${c.level() == 'MEDIUM'} ? '주의' : (${c.level() == 'LOW'} ? '양호' : '미진단'))">등급</span>
+                        </td>
+                        <td><b th:text="${c.hasRun()} ? ${c.latest.maxRpn} : '-'">420</b></td>
+                        <td th:text="${c.hasRun()} ? ${c.latest.findingCount} + '건' : '-'">9건</td>
+                        <td class="muted-note" th:text="${c.hasRun()} ? ${#temporals.format(c.latest.executedAt, 'MM-dd HH:mm')} : '-'">-</td>
+                        <td class="row-actions">
+                            <form th:action="@{'/projects/' + ${c.project.projectId} + '/diagnose'}" method="post">
+                                <button class="btn sm" type="submit">진단</button>
+                            </form>
+                            <a class="btn ghost sm" th:href="@{'/projects/' + ${c.project.projectId} + '/history'}">이력</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="empty" th:if="${#lists.isEmpty(dash.cards)}" style="border:0">
+                    등록된 진단 환경이 없습니다. 시드 데이터를 적용했는지 확인하세요.
+                </div>
+            </div>
+        </div>
+
     </main>
 </div>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+const GRADES = [ /*[[${dash.high}]]*/0, /*[[${dash.medium}]]*/0, /*[[${dash.low}]]*/0, /*[[${dash.untested}]]*/0 ];
+const ROWS = [
+    /*[# th:each="c : ${dash.cards}"]*/
+    { name: /*[[${c.project.name}]]*/ "환경", rpn: /*[[${c.hasRun()} ? ${c.latest.maxRpn} : 0]]*/ 0, level: /*[[${c.level()}]]*/ "미진단" },
+    /*[/]*/
+];
+const C = { hi:'#e4572e', me:'#e39a1c', lo:'#2faa6a', un:'#aab4c0' };
+
+new Chart(document.getElementById('gradeChart'), {
+    type: 'doughnut',
+    data: { labels:['즉시조치','주의','양호','미진단'],
+        datasets:[{ data:GRADES, backgroundColor:[C.hi,C.me,C.lo,C.un], borderWidth:0 }] },
+    options: { cutout:'62%', plugins:{ legend:{ display:false } }, maintainAspectRatio:false }
+});
+
+const withRun = ROWS.filter(r => r.level !== '미진단').sort((a,b)=>b.rpn-a.rpn).slice(0,8);
+new Chart(document.getElementById('rpnChart'), {
+    type: 'bar',
+    data: { labels: withRun.map(r=>r.name),
+        datasets:[{ data: withRun.map(r=>r.rpn),
+            backgroundColor: withRun.map(r=> r.level==='HIGH'?C.hi : r.level==='MEDIUM'?C.me : C.lo),
+            borderRadius:5, barThickness:22 }] },
+    options: { indexAxis:'y', plugins:{ legend:{ display:false } },
+        scales:{ x:{ beginAtZero:true, grid:{ color:'#eef1f4' } }, y:{ grid:{ display:false } } },
+        maintainAspectRatio:false }
+});
+/*]]>*/
+</script>
 </body>
 </html>
