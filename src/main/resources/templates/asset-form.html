@@ -5,13 +5,11 @@
     <title>자산 수정 — MoveGuard</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body>
-<header class="top">
-    <div class="brand">MoveGuard</div>
-    <div class="tagline">자산 수정</div>
-</header>
-
-<main>
+<body class="app">
+<aside th:replace="~{fragments/shell :: sidebar('dashboard')}"></aside>
+<div class="app-main">
+    <header th:replace="~{fragments/shell :: topbar('자산 수정')}"></header>
+    <main class="content">
     <p><a th:href="@{'/projects/' + ${projectId}}">← 사업 상세</a></p>
     <h1>자산 수정</h1>
 
@@ -56,5 +54,6 @@
         <option value="Windows Server"></option>
     </datalist>
 </main>
+</div>
 </body>
 </html>

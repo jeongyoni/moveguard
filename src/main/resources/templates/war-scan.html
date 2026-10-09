@@ -5,13 +5,11 @@
     <title>WAR 하드코딩 IP 분석 — MoveGuard</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body>
-<header class="top">
-    <div class="brand">MoveGuard</div>
-    <div class="tagline">WAR/JAR 하드코딩 IP 분석</div>
-</header>
-
-<main>
+<body class="app">
+<aside th:replace="~{fragments/shell :: sidebar('dashboard')}"></aside>
+<div class="app-main">
+    <header th:replace="~{fragments/shell :: topbar('WAR 분석')}"></header>
+    <main class="content">
     <p><a th:href="@{'/projects/' + ${projectId}}">← 사업 상세</a></p>
     <h1>WAR/JAR 하드코딩 IP 분석</h1>
     <p class="hint">
@@ -148,5 +146,6 @@
         </form>
     </div>
 </main>
+</div>
 </body>
 </html>

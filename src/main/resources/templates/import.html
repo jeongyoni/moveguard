@@ -5,13 +5,11 @@
     <title>엑셀로 사업 등록 — MoveGuard</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body>
-<header class="top">
-    <div class="brand">MoveGuard</div>
-    <div class="tagline">엑셀로 이전사업 등록</div>
-</header>
-
-<main>
+<body class="app">
+<aside th:replace="~{fragments/shell :: sidebar('import')}"></aside>
+<div class="app-main">
+    <header th:replace="~{fragments/shell :: topbar('엑셀로 등록')}"></header>
+    <main class="content">
     <p><a th:href="@{/}">← 사업 목록</a></p>
     <h1>엑셀로 사업 등록</h1>
     <p class="hint">
@@ -39,5 +37,6 @@
         </ul>
     </div>
 </main>
+</div>
 </body>
 </html>

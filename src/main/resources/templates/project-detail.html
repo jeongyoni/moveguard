@@ -5,13 +5,11 @@
     <title th:text="${project.name} + ' — MoveGuard'">사업 상세</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body>
-<header class="top">
-    <div class="brand">MoveGuard</div>
-    <div class="tagline" th:text="${project.name}">사업명</div>
-</header>
-
-<main>
+<body class="app">
+<aside th:replace="~{fragments/shell :: sidebar('dashboard')}"></aside>
+<div class="app-main">
+    <header th:replace="~{fragments/shell :: topbar('환경 상세')}"></header>
+    <main class="content">
     <p><a th:href="@{/}">← 사업 목록</a></p>
     <h1 th:text="${project.name}">사업명</h1>
     <p class="hint">
@@ -390,5 +388,6 @@
         <option value="ojdbc11"></option>
     </datalist>
 </main>
+</div>
 </body>
 </html>
