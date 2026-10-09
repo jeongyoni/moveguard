@@ -127,10 +127,15 @@ VALUES ('maintenance_window', 'STRING', '작업 가능 시간대'),
        ('data_size_gb', 'NUMBER', '이전 데이터 용량(GB)'),
        ('owner_contact', 'STRING', '자산 담당자 연락처');
 
--- 기술영업 지원 범위: 핵심 2영역(공인IP·네트워크 + OS·DBMS 호환성)만 활성.
--- 보안·DNS·백업은 비활성(필요 시 enabled=1로 복구). 전환을 직접 깨뜨리고 기술력이 돋보이는 범위에 집중.
+-- MSP 운영 헬스체크 범위: 운영 중 환경의 리스크(버전·EOL·보안·백업·DR)에 집중.
+-- 발견 리스크 = 시스원 MSP 서비스 품목(패치·보안·백업·DR·운영)으로 연결.
+-- 전환(이전) 전용 규칙(공인IP 변경·DNS 변경·javax→jakarta 전환·메이저 건너뛰기)은 비활성.
+UPDATE risk_rule SET enabled = 1
+WHERE factor_id IN (SELECT factor_id FROM risk_factor WHERE code IN ('SECURITY', 'BACKUP'));
 UPDATE risk_rule SET enabled = 0
-WHERE factor_id IN (SELECT factor_id FROM risk_factor WHERE code IN ('SECURITY', 'DNS', 'BACKUP'));
+WHERE factor_id IN (SELECT factor_id FROM risk_factor WHERE code IN ('NETWORK_IP', 'DNS'));
+UPDATE risk_rule SET enabled = 0 WHERE rule_code IN ('CMP-03', 'CMP-05');
+UPDATE risk_rule SET enabled = 1 WHERE rule_code IN ('CMP-01', 'CMP-02', 'CMP-04', 'CMP-06', 'CMP-07');
 
 -- 더미 이전사업: 쇼핑몰 IDC → AWS 이전
 -- 기대 진단 결과: IP-01, IP-02, IP-03, IP-04, DNS-01 / 전환 차단
