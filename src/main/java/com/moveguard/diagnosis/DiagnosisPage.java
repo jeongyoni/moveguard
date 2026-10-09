@@ -29,6 +29,7 @@ public class DiagnosisPage {
     private final ProjectService projectService;
     private final DiagnosisService diagnosisService;
     private final DiagnosisContextLoader contextLoader;
+    private final ExecutiveSummary executiveSummary;
 
     /** 진단을 실행하고 모델을 채운다. 성공 시 "diagnosis", 실패 시 "redirect:/". */
     public String render(Long projectId, Model model) {
@@ -48,6 +49,7 @@ public class DiagnosisPage {
         model.addAttribute("coreFactors", factors.stream().filter(f -> isCore(f.code())).toList());
         model.addAttribute("extFactors", factors.stream().filter(f -> !isCore(f.code())).toList());
         model.addAttribute("input", DiagnosisInput.of(contextLoader.load(projectId)));
+        model.addAttribute("exec", executiveSummary.generate(project, result, factors));
         return "diagnosis";
     }
 

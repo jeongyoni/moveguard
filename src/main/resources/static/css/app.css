@@ -292,3 +292,48 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1
     .sidebar { display: none; }
     .scope { grid-template-columns: 1fr; }
 }
+
+/* ===== 대시보드 콘솔 / 차트 / 이력 ===== */
+.page-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+.page-head h1 { margin: 0 0 4px; }
+.chart-row { display: grid; grid-template-columns: 1fr 1.45fr; gap: 16px; margin: 16px 0; }
+.chart-box { position: relative; height: 260px; }
+.chart-box.sm { height: 190px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 12px; font-size: 12.5px; color: var(--muted); }
+.chart-legend b { color: var(--ink); margin-left: 2px; }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+.dot.hi { background: var(--red); } .dot.me { background: var(--amber); }
+.dot.lo { background: var(--green); } .dot.un { background: #aab4c0; }
+
+.grid-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.grid-table thead th { text-align: left; padding: 11px 14px; background: #f6f8fb; color: var(--muted);
+    font-weight: 600; font-size: 11.5px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.grid-table tbody td { padding: 11px 14px; border-bottom: 1px solid #eef1f5; vertical-align: middle; }
+.grid-table tbody tr:last-child td { border-bottom: 0; }
+.grid-table tbody tr:hover { background: #f9fbfd; }
+.grid-table .link { color: var(--brand); font-weight: 600; text-decoration: none; }
+.grid-table .link:hover { text-decoration: underline; }
+.row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+.row-actions form { margin: 0; }
+.btn.sm { padding: 5px 11px; font-size: 12px; }
+
+.level-tag { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+.level-tag.hi { background: #fdeae4; color: #c23c17; }
+.level-tag.me { background: #fcf1dc; color: #9a6a0f; }
+.level-tag.lo { background: #e3f5ec; color: #1f8655; }
+.level-tag.un { background: #eef1f4; color: #7a858f; }
+
+.trend-row { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; margin: 16px 0; }
+@media (max-width: 980px) { .chart-row, .trend-row { grid-template-columns: 1fr; } }
+
+/* AI 경영요약 */
+.ai-summary { margin: 16px 0; border-left: 3px solid #5e7e95; }
+.ai-badge { display: inline-block; background: #5e7e95; color: #fff; font-weight: 700; font-size: 11.5px;
+    padding: 3px 10px; border-radius: 999px; margin-right: 10px; }
+.ai-headline { font-size: 15.5px; font-weight: 700; color: var(--ink); margin: 2px 0 10px; line-height: 1.5; }
+.ai-body { margin: 0 0 12px; padding-left: 18px; }
+.ai-body li { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 3px; }
+.ai-actions { background: #f4f7fa; border: 1px solid var(--border); border-radius: 9px; padding: 12px 16px; }
+.ai-actions-h { font-size: 12px; font-weight: 700; color: #456; margin-bottom: 6px; }
+.ai-actions ul { margin: 0; padding-left: 18px; }
+.ai-actions li { font-size: 12.5px; color: var(--ink); line-height: 1.7; }

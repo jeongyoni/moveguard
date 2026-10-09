@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'진단 이력 — ' + ${project.name}">진단 이력</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/chart.min.js}"></script>
+</head>
+<body class="app">
+<aside th:replace="~{fragments/shell :: sidebar('dashboard')}"></aside>
+<div class="app-main">
+    <header th:replace="~{fragments/shell :: topbar('진단 이력 · 추이')}"></header>
+    <main class="content">
+        <p class="crumb"><a th:href="@{/}">대시보드</a> · <a th:href="@{'/projects/' + ${project.projectId}}" th:text="${project.name}">환경</a> · 진단 이력</p>
+        <div class="page-head">
+            <div>
+                <h1 th:text="${project.name} + ' — 진단 추이'">진단 추이</h1>
+                <p class="hint"><span th:text="${project.customerName}">고객사</span> · <span th:text="${project.targetEnv}">IDC · CentOS 7</span>
+                    · 조치할수록 위험점수가 내려가는 것을 <strong>시간축으로</strong> 보여줍니다.</p>
+            </div>
+            <div class="actions">
+                <form th:action="@{'/projects/' + ${project.projectId} + '/diagnose'}" method="post">
+                    <button class="btn" type="submit">다시 진단</button>
+                </form>
+                <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId}}">환경 상세</a>
+            </div>
+        </div>
+
+        <div class="empty" th:if="${#lists.isEmpty(runs)}">아직 진단 이력이 없습니다. "다시 진단"을 실행하세요.</div>
+
+        <div th:unless="${#lists.isEmpty(runs)}">
+            <div class="trend-row">
+                <div class="panel">
+                    <div class="panel-head">최고 위험점수(RPN) 추이</div>
+                    <div class="panel-body"><div class="chart-box"><canvas id="trendChart"></canvas></div></div>
+                </div>
+                <div class="panel">
+                    <div class="panel-head">발견 리스크 건수 추이</div>
+                    <div class="panel-body"><div class="chart-box"><canvas id="cntChart"></canvas></div></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-head">진단 실행 이력</div>
+                <div class="panel-body" style="padding:0">
+                    <table class="grid-table">
+                        <thead><tr><th>일시</th><th>등급</th><th>최고 RPN</th><th>발견</th><th>판정</th></tr></thead>
+                        <tbody>
+                        <tr th:each="r : ${runs}">
+                            <td th:text="${#temporals.format(r.executedAt, 'yyyy-MM-dd HH:mm')}">2026-10-08 09:41</td>
+                            <td><span class="level-tag"
+                                      th:classappend="${r.riskLevel == 'HIGH'} ? 'hi' : (${r.riskLevel == 'MEDIUM'} ? 'me' : 'lo')"
+                                      th:text="${r.riskLevel == 'HIGH'} ? '즉시조치' : (${r.riskLevel == 'MEDIUM'} ? '주의' : '양호')">등급</span></td>
+                            <td><b th:text="${r.maxRpn}">420</b></td>
+                            <td th:text="${r.findingCount} + '건'">9건</td>
+                            <td th:text="${r.blocked} ? '즉시 조치 필요' : '양호'">판정</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+let RUNS = [
+    /*[# th:each="r : ${runs}"]*/
+    { t: /*[[${#temporals.format(r.executedAt, 'MM-dd')}]]*/ "", rpn: /*[[${r.maxRpn}]]*/ 0, n: /*[[${r.findingCount}]]*/ 0, level: /*[[${r.riskLevel}]]*/ "" },
+    /*[/]*/
+];
+RUNS = RUNS.slice(-15);  // 최근 15회만
+const C = { hi:'#e4572e', me:'#e39a1c', lo:'#2faa6a', steel:'#5e7e95' };
+const ptColor = r => r.level==='HIGH'?C.hi : r.level==='MEDIUM'?C.me : C.lo;
+
+if (RUNS.length) {
+    new Chart(document.getElementById('trendChart'), {
+        type:'line',
+        data:{ labels:RUNS.map(r=>r.t), datasets:[{ data:RUNS.map(r=>r.rpn),
+            borderColor:C.steel, backgroundColor:'rgba(94,126,149,.12)', fill:true, tension:.3,
+            pointBackgroundColor:RUNS.map(ptColor), pointRadius:5, pointBorderColor:'#fff', pointBorderWidth:2 }] },
+        options:{ plugins:{ legend:{ display:false } },
+            scales:{ y:{ beginAtZero:true, grid:{ color:'#eef1f4' } }, x:{ grid:{ display:false } } },
+            maintainAspectRatio:false }
+    });
+    new Chart(document.getElementById('cntChart'), {
+        type:'bar',
+        data:{ labels:RUNS.map(r=>r.t), datasets:[{ data:RUNS.map(r=>r.n),
+            backgroundColor:RUNS.map(ptColor), borderRadius:5 }] },
+        options:{ plugins:{ legend:{ display:false } },
+            scales:{ y:{ beginAtZero:true, grid:{ color:'#eef1f4' } }, x:{ grid:{ display:false } } },
+            maintainAspectRatio:false }
+    });
+}
+/*]]>*/
+</script>
+</body>
+</html>

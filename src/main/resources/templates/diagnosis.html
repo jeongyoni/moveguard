@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title th:text="'진단 결과 — ' + ${project.name}">진단 결과</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script th:src="@{/js/chart.min.js}"></script>
 </head>
 <body class="app">
 <aside th:replace="~{fragments/shell :: sidebar('dashboard')}"></aside>
@@ -71,6 +72,23 @@
             </div>
         </section>
 
+        <!-- AI 경영요약 -->
+        <section class="panel ai-summary" th:if="${exec != null}">
+            <div class="panel-head"><span class="ai-badge">AI 경영요약</span><span class="muted-note">사내 LLM 생성 · 외부 AI 미사용 · 데이터 미유출</span></div>
+            <div class="panel-body">
+                <p class="ai-headline" th:text="${exec.headline}">종합 위험 등급 요약</p>
+                <ul class="ai-body">
+                    <li th:each="b : ${exec.body}" th:text="${b}">본문</li>
+                </ul>
+                <div class="ai-actions">
+                    <div class="ai-actions-h">권고 조치 — MSP 서비스 연결</div>
+                    <ul>
+                        <li th:each="a : ${exec.actions}" th:text="${a}">조치</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
         <!-- 결과: 좌(발견 리스크) / 우(요인·조치) -->
         <div class="result-grid">
             <div>
@@ -109,7 +127,8 @@
             <div>
                 <div class="panel">
                     <div class="panel-head">위험요인별</div>
-                    <div class="panel-body" style="padding:6px 16px">
+                    <div class="panel-body" style="padding:12px 16px 6px">
+                        <div class="chart-box sm" style="height:150px" th:if="${not #lists.isEmpty(factors)}"><canvas id="factorChart"></canvas></div>
                         <div class="factor-row" th:each="f : ${factors}">
                             <span th:text="${f.name}">버전·호환성</span>
                             <span><span class="muted-note" th:text="${f.count} + '건 · '">3건 · </span><span class="fr-rpn" th:text="${f.maxRpn}">420</span></span>
@@ -123,6 +142,7 @@
                             <button class="btn block" type="submit">다시 진단</button>
                         </form>
                         <a class="btn ghost block" th:href="@{'/projects/' + ${project.projectId} + '/report'}" target="_blank">제안서용 리포트</a>
+                        <a class="btn ghost block" th:href="@{'/projects/' + ${project.projectId} + '/history'}">진단 이력·추이</a>
                         <a class="btn ghost block" th:href="@{'/projects/' + ${project.projectId}}">환경 상세</a>
                         <a class="btn ghost block" th:href="@{/}">대시보드</a>
                     </div>
@@ -194,5 +214,25 @@
         </details>
     </main>
 </div>
+<script th:inline="javascript">
+/*<![CDATA[*/
+const FACTORS = [
+    /*[# th:each="f : ${factors}"]*/
+    { name: /*[[${f.name}]]*/ "요인", count: /*[[${f.count}]]*/ 0, rpn: /*[[${f.maxRpn}]]*/ 0 },
+    /*[/]*/
+];
+const el = document.getElementById('factorChart');
+if (el && FACTORS.length) {
+    const PAL = ['#5e7e95','#7a9bb0','#9bb3c4','#b9ccd8'];
+    new Chart(el, {
+        type:'doughnut',
+        data:{ labels:FACTORS.map(f=>f.name),
+            datasets:[{ data:FACTORS.map(f=>f.count), backgroundColor:PAL, borderWidth:0 }] },
+        options:{ cutout:'58%', maintainAspectRatio:false,
+            plugins:{ legend:{ position:'right', labels:{ boxWidth:10, font:{ size:11 } } } } }
+    });
+}
+/*]]>*/
+</script>
 </body>
 </html>

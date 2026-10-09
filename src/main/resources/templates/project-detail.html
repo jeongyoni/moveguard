@@ -26,6 +26,7 @@
                 <button class="btn" type="submit">진단 실행</button>
             </form>
             <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/war-scan'}">WAR 분석</a>
+            <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/history'}">진단 이력</a>
             <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/report'}" target="_blank">리포트</a>
         </div>
     </div>

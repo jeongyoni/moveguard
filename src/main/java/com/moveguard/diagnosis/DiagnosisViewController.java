@@ -18,15 +18,29 @@ public class DiagnosisViewController {
 
     private final ProjectService projectService;
     private final DiagnosisPage diagnosisPage;
+    private final DashboardService dashboardService;
+    private final DiagnosisMapper diagnosisMapper;
 
     @GetMapping("/")
     public String projects(Model model) {
-        model.addAttribute("projects", projectService.findProjects());
+        model.addAttribute("dash", dashboardService.build());
         return "index";
     }
 
     @PostMapping("/projects/{projectId}/diagnose")
     public String diagnose(@PathVariable Long projectId, Model model) {
         return diagnosisPage.render(projectId, model);
+    }
+
+    /** 진단 이력·추이 화면 */
+    @GetMapping("/projects/{projectId}/history")
+    public String history(@PathVariable Long projectId, Model model) {
+        var project = projectService.findProject(projectId).orElse(null);
+        if (project == null) {
+            return "redirect:/";
+        }
+        model.addAttribute("project", project);
+        model.addAttribute("runs", diagnosisMapper.findRunsByProject(projectId));
+        return "history";
     }
 }
