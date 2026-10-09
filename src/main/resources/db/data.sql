@@ -74,16 +74,16 @@ VALUES ('PORT-02',
         '평문 프로토콜로 통신',
         6, 5, 6, 0,
         '{asset}에서 {target}(으)로의 통신이 평문 프로토콜({protocol})을 사용합니다.',
-        'TLS 기반 프로토콜로 전환해 전송 구간을 암호화하고, 자격 증명·데이터 노출을 방지하십시오.');
+        'TLS 기반 프로토콜로 변경해 전송 구간을 암호화하고, 자격 증명·데이터 노출을 방지하십시오.');
 
 INSERT INTO risk_rule
 (rule_code, factor_id, title, severity, occurrence, detection, is_blocking, message_template, mitigation)
 VALUES ('CERT-01',
         (SELECT factor_id FROM risk_factor WHERE code = 'SECURITY'),
-        '인증서 만료가 전환 시점과 근접',
+        '인증서 만료 임박',
         8, 6, 4, 1,
-        '{domain} 인증서가 {expiry}에 만료되어 전환 예정일({planned}) 기준 임박했습니다.',
-        '전환 전에 인증서를 갱신하고, 신규 환경에도 유효한 인증서를 배포한 뒤 만료일을 재확인하십시오.');
+        '{domain} 인증서가 {expiry}에 만료되어 기준일({planned}) 기준 임박했습니다.',
+        '만료 전에 인증서를 갱신하고 만료일을 상시 모니터링하십시오.');
 
 INSERT INTO risk_rule
 (rule_code, factor_id, title, severity, occurrence, detection, is_blocking, message_template, mitigation)
@@ -98,16 +98,16 @@ INSERT INTO risk_rule
 (rule_code, factor_id, title, severity, occurrence, detection, is_blocking, message_template, mitigation)
 VALUES ('BAK-01',
         (SELECT factor_id FROM risk_factor WHERE code = 'BACKUP'),
-        '이전 전 최근 백업 없음',
+        '최근 백업 없음',
         9, 4, 3, 1,
-        '{asset}의 이전 전 최근 백업이 없습니다(마지막 백업: {lastBackup}). 전환 실패 시 복구가 불가능합니다.',
-        '전환 직전 전체 백업을 수행하고 복구 가능성을 확인한 뒤 진행하십시오.'),
+        '{asset}의 최근 백업이 없습니다(마지막 백업: {lastBackup}). 장애 시 복구가 불가능합니다.',
+        '정기적으로 전체 백업을 수행하고 복구 가능성을 확인하십시오.'),
        ('BAK-02',
         (SELECT factor_id FROM risk_factor WHERE code = 'BACKUP'),
         '복구 테스트 미수행',
         7, 6, 5, 0,
         '{asset}의 백업이 복구 테스트를 거치지 않아 실제 복구 가능 여부를 보장할 수 없습니다.',
-        '전환 전에 백업으로 실제 복구 테스트를 1회 이상 수행하십시오.'),
+        '정기적으로 백업으로 실제 복구 테스트를 수행하십시오.'),
        ('BAK-03',
         (SELECT factor_id FROM risk_factor WHERE code = 'BACKUP'),
         '백업 체계 미비',
@@ -174,7 +174,7 @@ INSERT INTO dns_record (project_id, domain, record_type, value, ttl, phase)
 VALUES (@p, 'shop.example.com', 'A', '203.0.113.11', 3600, 'BEFORE'),
        (@p, 'shop.example.com', 'A', '198.51.100.21', 300, 'AFTER');
 
--- 이전 전 인증서는 전환 예정일(2026-10-24) 직후 만료 → CERT-01, 갱신 인증서 존재 → CERT-02 미발생
+-- 인증서는 전환 예정일(2026-10-24) 직후 만료 → CERT-01, 갱신 인증서 존재 → CERT-02 미발생
 INSERT INTO certificate (project_id, domain, issuer, not_after, phase)
 VALUES (@p, 'shop.example.com', 'Lets Encrypt R3', '2026-11-10', 'BEFORE'),
        (@p, 'shop.example.com', 'Lets Encrypt R3', '2027-11-10', 'AFTER');
