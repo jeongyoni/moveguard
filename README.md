@@ -9,15 +9,29 @@
 
 ## 주요 기능
 
+**진단 엔진**
 - 운영 환경 단위로 자산·IP·의존관계·DNS·인증서·설치 소프트웨어·백업 데이터를 진단 입력으로 수집
-- **엑셀 업로드**로 환경 등록 (양식 다운로드 → 검증 → 저장 → 진단)
-- **웹 폼**으로 환경 생성 및 자산·IP·DNS·인증서·소프트웨어·백업 항목 추가/수정/삭제 + 화면마다 다시 진단
-- 규칙 기반 위험 진단 (FMEA RPN 점수화) — OS·DBMS 호환성 · 보안 · 백업
-- 위험도 등급 산정 및 **즉시 조치(blocking)** 판정
+- 규칙 기반 위험 진단 (FMEA RPN 점수화) — OS·DBMS 호환성 · 보안 · 백업 (운영 3영역 13개 규칙)
+- 위험도 등급(HIGH/MEDIUM/LOW) 산정 및 **즉시 조치(blocking)** 판정
 - 규칙별 "왜 위험한지 + MSP 서비스로 어떻게 해결하는지" 조치 가이드 제공
 - 리눅스 OS·WAS·DB 버전의 지원 종료(EOL)를 **endoflife.date와 동기화**해 진단 (CentOS 7 등)
-- 가상 환경 **시뮬레이션 → 성패 라벨링 → 규칙 성능 분석 → 학습**(규칙 baseline 비교)
+
+**화면 (어드민 콘솔 UI)**
+- **대시보드 모니터링 콘솔** — 전체 환경의 위험 등급 분포·환경별 최고 RPN 차트 + 현황 테이블
+- **진단 결과** — 통계 카드 + **AI 경영요약** + 발견 리스크(반복 규칙은 묶음) + 위험요인 차트
+- **진단 이력·추이** — 실행별 RPN·발견 건수 추이 그래프 (조치 효과 시각화)
+- **제안서용 리포트** — 통계·AI 요약·권고 조치가 담긴 인쇄/PDF 리포트
+- **지원종료(EOL) 기준** — 제품·버전별 지원 상태 조회 + 동기화
+- **AI 경영요약** — 진단 결과를 고객 보고용 문장으로 **규칙 기반 자동 생성**(외부 AI 미사용 · 데이터 미유출)
+
+**입력**
+- **엑셀 업로드**로 환경 등록 (양식 다운로드 → 검증 → 저장 → 진단)
+- **웹 폼**으로 환경 생성 및 자산·IP·DNS·인증서·소프트웨어·백업 항목 추가/수정/삭제 + 화면마다 다시 진단
+- **WAR/JAR 분석** — 배포 파일에서 하드코딩 IP·컴파일된 Java 버전·서블릿 스펙·라이브러리 자동 추출(메모리에서만 분석)
+
+**이력·검증**
 - 진단 이력(run·finding) 저장 및 **재진단 비교**(직전 대비 등급·건수·RPN 변화)
+- 가상 운영 환경 **시뮬레이션 → 성패 라벨링 → 규칙 성능 분석 → 학습**(규칙 baseline 비교)
 
 ## 기술 스택
 
@@ -28,6 +42,8 @@
 | DB 접근 | MyBatis (mybatis-spring-boot-starter 4.1.0) |
 | DB | MySQL 8.0 |
 | 빌드 | Gradle |
+| 프런트 | Thymeleaf 프래그먼트(공용 셸) · Chart.js(로컬 벤더링) |
+| 분석/학습 | Python (scikit-learn), 전환 시뮬레이션 SimPy, 로컬 LLM 리포트 Ollama |
 | 기타 | Lombok |
 
 ## 진단 모델 (FMEA 기반)
@@ -75,11 +91,13 @@ com.moveguard
 ├─ asset        # 진단 입력 도메인 (Asset, AssetIp, Dependency, DnsRecord, Certificate, AssetSoftware, BackupPlan, Phase)
 ├─ project      # 운영 환경(사업) 조회 API
 ├─ compat       # 호환성 기준 데이터 + endoflife.date 동기화 (CompatSyncService)
-├─ diagnosis    # 진단 파이프라인 (DiagnosisEngine)
+├─ diagnosis    # 진단 파이프라인·화면 (DiagnosisEngine, DashboardService, ExecutiveSummary, DiagnosisViewController)
 │  └─ rule      # 규칙 구현체 (RiskRuleEvaluator)
 └─ sim          # 시뮬레이션·학습 (ScenarioGenerator, OutcomeModel, RuleAnalysis)
 
 ml/            # 성패 예측 학습 스크립트 (Python, scikit-learn)
+report/        # 로컬 LLM(Ollama) 리포트 생성 스크립트 (옵션)
+des/           # 전환 과정 이산사건 시뮬레이션 (SimPy)
 ```
 
 ## 실행 방법
@@ -130,20 +148,20 @@ spring:
 
 ### 5. 운영 환경 등록 (두 가지 방법)
 
-브라우저 `http://localhost:8080/` 에서 시드 없이 사업을 넣을 수 있습니다.
+브라우저 `http://localhost:8080/` 에서 시드 없이 환경을 넣을 수 있습니다.
 
 **방법 A — 엑셀 업로드 (한 번에 통째로)**
-- **"엑셀로 사업 등록"** → 양식 다운로드(.xlsx) → 8개 시트(사업·자산·IP·의존관계·DNS·인증서·소프트웨어·백업) 작성 → 업로드
+- **"엑셀로 등록"** → 양식 다운로드(.xlsx) → 8개 시트(환경·자산·IP·의존관계·DNS·인증서·소프트웨어·백업) 작성 → 업로드
 - 전건 검증 → 하나라도 틀리면 `"자산 시트 3행: ..."`처럼 시트·행·이유를 표시하고 **저장 안 함**
 - 통과하면 저장 후 **바로 진단 결과** 화면
 
 **방법 B — 웹 폼 (항목별로 관리)**
-- **"새 사업 만들기"** → 기본 정보 입력 → 생성되면 **사업 상세** 화면으로 이동
+- **"새 환경 등록"** → 기본 정보 입력 → 생성되면 **환경 상세** 화면으로 이동
 - 상세 화면에서 **자산 · IP · DNS · 인증서 · 소프트웨어 · 백업**을 각각 **추가 / 수정 / 삭제**
   - 자산을 먼저 등록해야 그 자산의 IP·소프트웨어·백업을 추가할 수 있음
   - 각 입력은 즉시 검증(형식·중복 등), 실패 시 저장하지 않고 사유 표시
 - 화면의 **"다시 진단"** 으로 현재 입력 기준 진단을 다시 실행
-- 사업 목록에서 **사업명을 클릭**하면 언제든 상세로 돌아와 편집
+- 대시보드(환경 목록)에서 **환경명을 클릭**하면 언제든 상세로 돌아와 편집
 
 > 저장·검증 로직은 두 방법이 공유합니다(`ProjectImportService`·`ImportValues`).
 
@@ -153,7 +171,7 @@ spring:
 ./gradlew test
 ```
 
-> 통합 테스트(`DiagnosisServiceIntegrationTest`)는 로컬 MySQL에 더미 사업(`project_id = 1`) 시드가 필요합니다.
+> 통합 테스트(`DiagnosisServiceIntegrationTest`)는 로컬 MySQL에 더미 환경(`project_id = 1`) 시드가 필요합니다.
 
 ## 화면
 
@@ -161,15 +179,22 @@ spring:
 
 | 경로 | 설명 |
 | --- | --- |
-| `GET /` | 운영 환경(사업) 목록 — 사업별 **진단 실행** 버튼 |
-| `POST /projects/{projectId}/diagnose` | 진단을 실행하고 결과 화면을 보여줌 |
+| `GET /` | **대시보드** — 전체 환경 위험 현황·차트·현황 테이블 |
+| `POST /projects/{projectId}/diagnose` | 진단 실행 → 결과 화면(통계·AI 요약·발견 리스크) |
+| `GET /projects/{projectId}` | **환경 상세** — 자산·IP·DNS·인증서·소프트웨어·백업 CRUD |
+| `GET /projects/{projectId}/history` | **진단 이력·추이** — RPN·건수 추이 그래프 |
+| `GET /projects/{projectId}/report` | **제안서용 리포트** (인쇄/PDF) |
+| `GET /projects/{projectId}/war-scan` | **WAR/JAR 분석** 업로드·결과 |
+| `GET /eol` | **지원종료(EOL) 기준** 조회·동기화 |
+| `GET /projects/new`, `GET /projects/import` | 웹 폼 / 엑셀 업로드 등록 |
 
-결과 화면에 나오는 것
+진단 결과 화면에 나오는 것
 
-- **판정**: 위험 등급(HIGH/MEDIUM/LOW), 즉시 조치 여부, 최고 RPN, 종합 점수, 발견 건수
-- **진단 입력**(접이식): 무엇을 보고 판단했는지 — 자산별 IP·소프트웨어 버전의 **기준/현재 비교**(바뀐 값 강조), 의존관계·DNS·인증서·백업
-- **위험요인별**: 5개 요인(공인IP·네트워크 / OS·DBMS 호환성 / 보안·접근통제 / DNS / 백업·복구)의 건수와 최고 RPN
-- **발견 목록**: RPN 내림차순으로 규칙 코드·제목·차단 배지와 함께 **무엇이 왜 위험한지(message)** 와 **조치 가이드(mitigation)**
+- **통계 카드**: 위험 등급(HIGH/MEDIUM/LOW), 최고 RPN, 발견 건수, 긴급 건수
+- **AI 경영요약**: 등급·최상위 리스크·영역별 요약·권고 MSP 서비스 (규칙 기반 자동 생성)
+- **발견 목록**: RPN 내림차순, **같은 규칙이 여러 자산에서 걸리면 한 카드로 묶음**(예: EOL), 규칙마다 message·mitigation
+- **위험요인 차트** + **재진단 비교**(직전 대비 등급·건수·RPN)
+- **진단 입력**(접이식): 무엇을 보고 판단했는지 — 자산별 IP·소프트웨어 버전의 기준/현재 비교, 인증서·백업
 
 ## API
 
@@ -179,7 +204,7 @@ spring:
 | GET | `/api/projects/{projectId}` | 운영 환경(사업) 단건 |
 | POST | `/api/projects/{projectId}/diagnoses` | 진단 실행 (결과 반환·저장) |
 | POST | `/api/compat/sync` | 호환성 기준 데이터를 endoflife.date와 동기화 (실패 시 스냅샷 fallback) |
-| GET | `/api/sim/dataset?count=&seed=` | 가상 이전사업 데이터셋(특징+진단결과+성패) CSV |
+| GET | `/api/sim/dataset?count=&seed=` | 가상 운영 환경 데이터셋(특징+진단결과+성패) CSV |
 | GET | `/api/sim/analysis?count=&seed=` | 규칙(차단)의 성패 예측 성능 분석 (혼동행렬·정밀도·재현율·F1) |
 
 진단 실행 예시:
@@ -192,21 +217,23 @@ curl -X POST http://localhost:8080/api/projects/1/diagnoses
 
 ## 시뮬레이션 · 학습
 
-규칙 진단 엔진을 재사용해 가상 이전사업을 대량 생성하고, 학습 데이터를 만든다. 상세 계획은 [`docs/SIMULATION_ROADMAP.md`](docs/SIMULATION_ROADMAP.md).
+규칙 진단 엔진을 재사용해 가상 운영 환경을 대량 생성하고, 학습 데이터를 만든다. 상세 계획은 [`docs/SIMULATION_ROADMAP.md`](docs/SIMULATION_ROADMAP.md).
 
 - **생성·라벨링·분석**: `/api/sim/dataset`(데이터셋), `/api/sim/analysis`(규칙 성능). 모두 인메모리 평가로 DB에 저장하지 않음
 - **학습**: `ml/`의 Python 스크립트로 성패를 예측하고 규칙 baseline과 F1 비교 (`ml/README.md` 참고)
 - 표(tabular) 데이터라 **CPU로 충분** — GPU는 이후 딥러닝·대규모 단계에서만 필요
 
-## 진단 리포트 LLM 생성
+## AI 경영요약 · 리포트
 
-진단 결과(JSON)를 **로컬 LLM**(DGX Spark의 Ollama)이 고객사 보고용 한국어 리포트로 작성한다.
-외부 API 없이 표준 라이브러리로 Ollama HTTP API만 호출한다. 설치·실행은 [`report/README.md`](report/README.md).
+- **앱 내 AI 경영요약(기본)**: 진단 결과를 고객 보고용 문장으로 **규칙 기반 자동 생성**한다(`ExecutiveSummary`).
+  외부 AI를 호출하지 않아 고객 데이터가 회사 밖으로 나가지 않으며, 진단 결과·제안서 리포트 화면에 바로 표시된다.
+- **로컬 LLM 리포트(옵션·오프라인)**: 동일한 진단 결과(JSON)를 **로컬 LLM**(Ollama)로 더 긴 보고서 문장으로 작성하는 별도 스크립트.
+  외부 API 없이 Ollama HTTP API만 호출한다. 설치·실행은 [`report/README.md`](report/README.md). *(앱 통합은 로드맵)*
 
 ```bash
 cd report
 python generate_report.py --dry-run                                   # 프롬프트만 확인(LLM 불필요)
-python generate_report.py --model qwen2.5:14b --out report.md         # DGX에서 실제 생성
+python generate_report.py --model qwen2.5:14b --out report.md         # 로컬 LLM에서 실제 생성
 ```
 
 ## 개발 규칙
@@ -221,7 +248,8 @@ git config core.hooksPath .githooks
 
 ## 범위
 
-- **1차**: 이전사업 입력 → 네트워크·DNS·보안·호환성·백업 진단 → 위험도 산정 _(완료)_
-  - 위험요인 5개 구현(규칙 22개) · 기본 활성은 **운영 헬스체크 3영역**(COMPAT·SECURITY·BACKUP, 규칙 13개). 전환 전용(NETWORK_IP·DNS·CMP-03/05)은 enabled=0 비활성
-- **시뮬레이션·학습**: 가상 데이터 생성 → 성패 라벨 → 규칙 분석 → 학습 _(파이프라인 완료)_
-- **2차**: 전환 실행 · 검증 · 롤백 _(예정)_
+- **진단 엔진** _(완료)_ — 위험요인 5개·규칙 22개 구현, 기본 활성은 **운영 헬스체크 3영역**(COMPAT·SECURITY·BACKUP, 규칙 13개). 전환 전용(NETWORK_IP·DNS·CMP-03/05)은 enabled=0 비활성
+- **웹 UI** _(완료)_ — 대시보드 모니터링 콘솔 · 진단 결과(AI 요약·반복 규칙 묶음·차트) · 진단 이력/추이 · 제안서 리포트(PDF) · EOL 기준 조회 · 환경 상세 CRUD · 엑셀 업로드 · WAR/JAR 분석
+- **입력 간소화** _(완료)_ — 엑셀 업로드 + 웹 폼 + 배포 파일(WAR) 자동 추출
+- **시뮬레이션·학습** _(파이프라인 완료)_ — 가상 운영 환경 생성 → 성패 라벨 → 규칙 분석 → ML 학습(규칙 baseline 비교, 시뮬레이션 기준 F1 측정)
+- **향후** — 실제 운영 데이터로 ML 재학습 · 사내 LLM 리포트 앱 통합 · 전환 실행/검증/롤백 관리
