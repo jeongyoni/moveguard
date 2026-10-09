@@ -331,6 +331,17 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1
 .trend-row { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; margin: 16px 0; }
 @media (max-width: 980px) { .chart-row, .trend-row { grid-template-columns: 1fr; } }
 
+/* WAR 업로드 드롭존 */
+.upload-zone { max-width: 560px; text-align: center; padding: 34px 28px; border: 1.5px dashed var(--border); background: #fafbfd; }
+.upload-zone form { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 0; }
+.dz-ico { width: 52px; height: 52px; border-radius: 50%; background: #eaf0fb; color: var(--brand); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+.dz-ico svg { width: 24px; height: 24px; }
+.dz-title { font-size: 15px; font-weight: 700; color: var(--ink); margin: 0 0 3px; }
+.dz-sub { font-size: 12.5px; color: var(--muted); margin: 0 0 16px; }
+.dz-input { font-size: 13px; max-width: 320px; margin-bottom: 16px; }
+.dz-input::file-selector-button { font: inherit; font-size: 12.5px; padding: 7px 13px; margin-right: 10px; border: 1px solid var(--border); border-radius: 7px; background: #fff; color: var(--ink); cursor: pointer; }
+.dz-input::file-selector-button:hover { background: #f2f5f9; }
+
 /* AI 경영요약 */
 .ai-summary { margin: 16px 0; border-left: 3px solid #5e7e95; }
 .ai-badge { display: inline-block; background: #5e7e95; color: #fff; font-weight: 700; font-size: 11.5px;

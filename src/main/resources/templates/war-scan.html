@@ -10,7 +10,7 @@
 <div class="app-main">
     <header th:replace="~{fragments/shell :: topbar('WAR 분석')}"></header>
     <main class="content">
-    <p><a th:href="@{'/projects/' + ${projectId}}">← 사업 상세</a></p>
+    <p class="crumb"><a th:href="@{'/projects/' + ${projectId}}">← 환경 상세</a></p>
     <h1>WAR/JAR 하드코딩 IP 분석</h1>
     <p class="hint">
         배포 파일(.war/.jar)을 올리면 내부 설정 파일(application.yml·properties, context.xml 등)에서
@@ -18,10 +18,15 @@
         확인 후 자산의 의존성으로 추가하면 <strong>IP-03</strong> 규칙이 진단에 반영합니다.
     </p>
 
-    <section class="panel section" style="max-width:640px">
+    <section class="panel upload-zone">
         <form th:action="@{'/projects/' + ${projectId} + '/war-scan'}" method="post" enctype="multipart/form-data">
-            <p><input type="file" name="file" accept=".war,.jar" required></p>
-            <p style="margin-bottom:0"><button class="btn" type="submit">분석</button></p>
+            <span class="dz-ico">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 5 17 10"></polyline><line x1="12" y1="5" x2="12" y2="16"></line></svg>
+            </span>
+            <p class="dz-title">배포 파일(.war / .jar)을 선택하세요</p>
+            <p class="dz-sub">메모리에서만 분석하고 저장하지 않습니다</p>
+            <input class="dz-input" type="file" name="file" accept=".war,.jar" required>
+            <div><button class="btn" type="submit">분석 시작</button></div>
         </form>
     </section>
 
@@ -32,8 +37,8 @@
         <p th:text="${applyError}">저장 오류</p>
     </div>
 
-    <div th:if="${report != null and report.hasFindings()}">
-        <h2>애플리케이션 분석 — <span th:text="${fileName}">app.war</span></h2>
+    <section class="panel section" th:if="${report != null and report.hasFindings()}">
+        <h2 style="margin-top:0">애플리케이션 분석 — <span th:text="${fileName}">app.war</span></h2>
         <ul>
             <li th:if="${report.requiredJava != null}">
                 컴파일된 Java: <strong th:text="${report.requiredJava}">8</strong>
@@ -104,10 +109,10 @@
                 </tbody>
             </table>
         </details>
-    </div>
+    </section>
 
-    <div th:if="${hits != null}">
-        <h2>하드코딩 IP — <span th:text="${fileName}">app.war</span>
+    <section class="panel section" th:if="${hits != null}">
+        <h2 style="margin-top:0">하드코딩 IP — <span th:text="${fileName}">app.war</span>
             (<span th:text="${#lists.size(hits)}">0</span>건)</h2>
 
         <p th:if="${#lists.isEmpty(hits)}" class="hint">하드코딩된 IP를 찾지 못했습니다.</p>
@@ -143,10 +148,10 @@
                 </tr>
                 </tbody>
             </table>
-            <p class="hint">공인 IP는 기본 선택됩니다. 추가 후 사업 상세에서 "다시 진단"을 실행하세요.</p>
+            <p class="hint">공인 IP는 기본 선택됩니다. 추가 후 환경 상세에서 "다시 진단"을 실행하세요.</p>
             <p><button class="btn" type="submit">선택 항목을 의존성으로 추가</button></p>
         </form>
-    </div>
+    </section>
 </main>
 </div>
 </body>
