@@ -16,6 +16,7 @@ public class ReportController {
 
     private final ProjectService projectService;
     private final DiagnosisService diagnosisService;
+    private final ExecutiveSummary executiveSummary;
 
     @GetMapping("/projects/{projectId}/report")
     public String report(@PathVariable Long projectId, Model model) {
@@ -47,6 +48,7 @@ public class ReportController {
         model.addAttribute("maxFactorCount", maxFactorCount);
         model.addAttribute("blockingCount", blockingCount);
         model.addAttribute("reportDate", LocalDate.now());
+        model.addAttribute("exec", executiveSummary.generate(project, result, factors));
         return "report";
     }
 }
