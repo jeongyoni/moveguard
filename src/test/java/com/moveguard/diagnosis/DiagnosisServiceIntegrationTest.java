@@ -17,19 +17,19 @@ class DiagnosisServiceIntegrationTest {
     private DiagnosisService diagnosisService;
 
     @Test
-    @DisplayName("더미 환경 진단 → 운영 헬스체크 세트(버전·보안·백업)가 RPN 내림차순으로 발견, MEDIUM, 즉시 조치")
+    @DisplayName("더미 환경 진단 → 운영 헬스체크 세트(버전·보안·백업)가 RPN 내림차순으로 발견, HIGH, 즉시 조치")
     void diagnosesSeedProject() {
         DiagnosisResult result = diagnosisService.diagnose(1L).orElseThrow();
 
         assertThat(result.runId()).isNotNull();
-        assertThat(result.riskLevel()).isEqualTo(RiskLevel.MEDIUM);
+        assertThat(result.riskLevel()).isEqualTo(RiskLevel.HIGH);
         assertThat(result.blocked()).isTrue();
-        assertThat(result.maxRpn()).isEqualTo(270);
-        assertThat(result.totalScore()).isEqualByComparingTo("12.15");
+        assertThat(result.maxRpn()).isEqualTo(420);   // EOL 버전 운영 = 치명적
+        assertThat(result.totalScore()).isEqualByComparingTo("15.15");
         // 운영 헬스체크 세트(SECURITY·BACKUP·COMPAT 일부) 활성, 전환 전용(NETWORK_IP·DNS·CMP-03/05) 비활성.
         assertThat(result.findings())
                 .extracting(DiagnosisResult.Item::ruleCode)
-                .containsExactly("CMP-02", "PORT-01", "BAK-02", "CMP-07", "CERT-01", "CMP-01", "BAK-03");
+                .containsExactly("CMP-01", "CMP-02", "PORT-01", "BAK-02", "CMP-07", "CERT-01", "BAK-03");
         assertThat(result.findings())
                 .extracting(DiagnosisResult.Item::message)
                 .noneMatch(message -> message.contains("{"));

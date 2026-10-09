@@ -10,16 +10,16 @@ INSERT INTO risk_rule
 VALUES
 ('CMP-01',
  (SELECT factor_id FROM risk_factor WHERE code = 'COMPAT'),
- '이전 후 버전이 이미 지원 종료(EOL)됨',
- 8, 5, 4, 1,
- '{asset}의 이전 후 {product} {version}은(는) {eol}에 지원이 종료되었습니다. 보안 패치를 받을 수 없습니다.',
- '지원 중인 버전으로 목표 버전을 변경하거나, 연장 지원 계약 여부를 확인한 뒤 전환하십시오.'),
+ '버전이 이미 지원 종료(EOL)됨',
+ 10, 7, 6, 1,
+ '{asset}의 {product} {version}은(는) {eol}에 지원이 종료되었습니다. 보안 패치를 받을 수 없습니다.',
+ '지원 중인 버전으로 목표 버전을 변경하거나, 연장 지원 계약 여부를 확인한 뒤 조치하십시오.'),
 
 ('CMP-02',
  (SELECT factor_id FROM risk_factor WHERE code = 'COMPAT'),
  '목표 WAS가 요구하는 최소 Java 버전 미달',
  9, 6, 5, 1,
- '{asset}의 이전 후 {product} {version}은(는) Java {required} 이상이 필요하지만, 이전 후 Java 버전은 {current}입니다.',
+ '{asset}의 {product} {version}은(는) Java {required} 이상이 필요하지만, Java 버전은 {current}입니다.',
  'Java 런타임을 필요한 버전 이상으로 올리거나, 현재 Java 버전을 지원하는 WAS 버전으로 목표를 조정하십시오.'),
 
 ('CMP-03',
@@ -31,9 +31,9 @@ VALUES
 
 ('CMP-04',
  (SELECT factor_id FROM risk_factor WHERE code = 'COMPAT'),
- '이전 후 버전의 지원 종료가 임박함',
+ '버전의 지원 종료가 임박함',
  6, 6, 4, 0,
- '{asset}의 이전 후 {product} {version}은(는) {eol}에 지원이 종료됩니다. 전환 후 1년 이내에 재업그레이드가 필요합니다.',
+ '{asset}의 {product} {version}은(는) {eol}에 지원이 종료됩니다. 전환 후 1년 이내에 재업그레이드가 필요합니다.',
  '지원 기간이 더 긴 LTS 버전을 목표로 검토하십시오.'),
 
 ('CMP-05',
@@ -45,17 +45,17 @@ VALUES
 
 ('CMP-06',
  (SELECT factor_id FROM risk_factor WHERE code = 'COMPAT'),
- '이전 후 버전이 연장 지원(유상) 구간임',
+ '버전이 연장 지원(유상) 구간임',
  5, 5, 3, 0,
- '{asset}의 이전 후 {product} {version}은(는) 활성(일반) 지원이 종료되어 {extSupport}까지 연장 지원 구간입니다. 기술 지원은 가능하나 추가 비용·제약이 따릅니다.',
- '지원 기간이 더 긴 상위 버전으로 목표를 조정하거나, 연장 지원 계약 비용을 전환 계획에 반영하십시오.'),
+ '{asset}의 {product} {version}은(는) 활성(일반) 지원이 종료되어 {extSupport}까지 연장 지원 구간입니다. 기술 지원은 가능하나 추가 비용·제약이 따릅니다.',
+ '지원 기간이 더 긴 상위 버전으로 목표를 조정하거나, 연장 지원 계약 비용을 운영 계획에 반영하십시오.'),
 
 ('CMP-07',
  (SELECT factor_id FROM risk_factor WHERE code = 'COMPAT'),
- '이전 후 JDBC 드라이버 버전이 목표 DB 요구치 미달',
+ 'JDBC 드라이버 버전이 목표 DB 요구치 미달',
  8, 5, 5, 1,
- '{asset}의 이전 후 {driver} {version}은(는) 목표 DB({db})가 요구하는 최소 드라이버 버전({required})보다 낮습니다. 전환 후 DB 접속이 실패할 수 있습니다.',
- '드라이버를 목표 DB가 요구하는 최소 버전 이상으로 올린 뒤 전환하십시오.');
+ '{asset}의 {driver} {version}은(는) 목표 DB({db})가 요구하는 최소 드라이버 버전({required})보다 낮습니다. 전환 후 DB 접속이 실패할 수 있습니다.',
+ '드라이버를 목표 DB가 요구하는 최소 버전 이상으로 올린 뒤 조치하십시오.');
 
 -- 2. 동기화 대상 제품
 INSERT INTO compat_product (product, label, category, version_command, source_url, fetch_status) VALUES

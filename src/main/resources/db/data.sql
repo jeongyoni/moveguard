@@ -17,9 +17,9 @@ INSERT INTO risk_rule
 (rule_code, factor_id, title, severity, occurrence, detection, is_blocking, message_template, mitigation)
 VALUES ('IP-01',
         (SELECT factor_id FROM risk_factor WHERE code = 'NETWORK_IP'),
-        '공인IP로 접속 중인 대상의 공인IP가 이전 후 변경됨',
+        '공인IP로 접속 중인 대상의 공인IP가 변경됨',
         9, 8, 6, 1,
-        '{asset}이(가) {target}에 공인IP {address}:{port}로 접속하고 있으나, 이전 후 해당 공인IP가 변경됩니다. 설정 위치: {config}',
+        '{asset}이(가) {target}에 공인IP {address}:{port}로 접속하고 있으나, 해당 공인IP가 변경됩니다. 설정 위치: {config}',
         '전환 전 접속 주소를 신규 IP 또는 내부 도메인으로 수정하고, 수정된 설정으로 연결 테스트를 완료하십시오.'),
        ('IP-02',
         (SELECT factor_id FROM risk_factor WHERE code = 'NETWORK_IP'),
@@ -37,13 +37,13 @@ VALUES ('IP-01',
         (SELECT factor_id FROM risk_factor WHERE code = 'NETWORK_IP'),
         '외부 기관 방화벽 허용목록에 등록된 공인IP 변경',
         9, 7, 8, 1,
-        '{asset}의 공인IP {address}가 외부 기관 방화벽 허용목록에 등록되어 있으나 이전 후 변경됩니다.',
+        '{asset}의 공인IP {address}가 외부 기관 방화벽 허용목록에 등록되어 있으나 변경됩니다.',
         '외부 기관에 신규 공인IP 허용 등록을 사전 요청하고, 처리 기간을 전환 일정에 반영하십시오.'),
        ('IP-05',
         (SELECT factor_id FROM risk_factor WHERE code = 'NETWORK_IP'),
-        '이전 후 IP 미확정',
+        'IP 미확정',
         7, 5, 4, 0,
-        '{asset}의 이전 후 IP 정보가 등록되지 않았습니다.',
+        '{asset}의 IP 정보가 등록되지 않았습니다.',
         '신규 환경의 IP 할당 계획을 확정한 뒤 재진단하십시오.'),
        ('DNS-01',
         (SELECT factor_id FROM risk_factor WHERE code = 'DNS'),
@@ -55,8 +55,8 @@ VALUES ('IP-01',
         (SELECT factor_id FROM risk_factor WHERE code = 'DNS'),
         '변경되는 공인IP에 대한 DNS 변경 계획 누락',
         8, 6, 6, 1,
-        '{domain} A 레코드가 변경 예정 IP {address}를 가리키지만 이전 후 레코드가 등록되지 않았습니다.',
-        '이전 후 레코드 값을 확정하고 변경 담당자와 시점을 전환 계획에 포함하십시오.');
+        '{domain} A 레코드가 변경 예정 IP {address}를 가리키지만 레코드가 등록되지 않았습니다.',
+        '레코드 값을 확정하고 변경 담당자와 시점을 운영 계획에 포함하십시오.');
 
 INSERT INTO risk_rule
 (rule_code, factor_id, title, severity, occurrence, detection, is_blocking, message_template, mitigation)
@@ -89,10 +89,10 @@ INSERT INTO risk_rule
 (rule_code, factor_id, title, severity, occurrence, detection, is_blocking, message_template, mitigation)
 VALUES ('CERT-02',
         (SELECT factor_id FROM risk_factor WHERE code = 'SECURITY'),
-        '인증서의 이전 후 갱신·이관 계획 누락',
+        '인증서의 갱신·이관 계획 누락',
         7, 5, 6, 1,
-        '{domain} 인증서의 이전 후 갱신·이관 계획이 등록되지 않았습니다.',
-        '신규 환경에 배포할 인증서를 준비하고 만료 전 교체 일정을 전환 계획에 포함하십시오.');
+        '{domain} 인증서의 갱신·이관 계획이 등록되지 않았습니다.',
+        '신규 환경에 배포할 인증서를 준비하고 만료 전 교체 일정을 운영 계획에 포함하십시오.');
 
 INSERT INTO risk_rule
 (rule_code, factor_id, title, severity, occurrence, detection, is_blocking, message_template, mitigation)
@@ -110,10 +110,10 @@ VALUES ('BAK-01',
         '전환 전에 백업으로 실제 복구 테스트를 1회 이상 수행하십시오.'),
        ('BAK-03',
         (SELECT factor_id FROM risk_factor WHERE code = 'BACKUP'),
-        '이전 후 백업 체계 미비',
+        '백업 체계 미비',
         6, 5, 4, 0,
-        '{asset}의 이전 후 백업 체계가 구성되지 않았습니다.',
-        '신규 환경의 백업 주기·보관 정책을 전환 계획에 포함하십시오.'),
+        '{asset}의 백업 체계가 구성되지 않았습니다.',
+        '신규 환경의 백업 주기·보관 정책을 운영 계획에 포함하십시오.'),
        ('BAK-04',
         (SELECT factor_id FROM risk_factor WHERE code = 'BACKUP'),
         '백업 오프사이트 미보관',
@@ -174,13 +174,13 @@ INSERT INTO dns_record (project_id, domain, record_type, value, ttl, phase)
 VALUES (@p, 'shop.example.com', 'A', '203.0.113.11', 3600, 'BEFORE'),
        (@p, 'shop.example.com', 'A', '198.51.100.21', 300, 'AFTER');
 
--- 이전 전 인증서는 전환 예정일(2026-10-24) 직후 만료 → CERT-01, 이전 후 갱신 인증서 존재 → CERT-02 미발생
+-- 이전 전 인증서는 전환 예정일(2026-10-24) 직후 만료 → CERT-01, 갱신 인증서 존재 → CERT-02 미발생
 INSERT INTO certificate (project_id, domain, issuer, not_after, phase)
 VALUES (@p, 'shop.example.com', 'Lets Encrypt R3', '2026-11-10', 'BEFORE'),
        (@p, 'shop.example.com', 'Lets Encrypt R3', '2027-11-10', 'AFTER');
 
--- web01: 최근·복구테스트·오프사이트 백업 + 이전 후 계획 → BAK 미발생
--- db01: 복구 테스트 미수행(BAK-02), 이전 후 백업 없음(BAK-03). 최근 백업·오프사이트라 BAK-01·04 미발생
+-- web01: 최근·복구테스트·오프사이트 백업 + 계획 → BAK 미발생
+-- db01: 복구 테스트 미수행(BAK-02), 백업 없음(BAK-03). 최근 백업·오프사이트라 BAK-01·04 미발생
 INSERT INTO backup_plan (asset_id, last_backup_at, restore_tested, offsite, phase)
 VALUES (@web, '2026-10-22', 1, 1, 'BEFORE'),
        (@web, '2026-10-26', 1, 1, 'AFTER'),
