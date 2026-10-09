@@ -32,7 +32,7 @@
     </nav>
     <div class="nav-label">진단 기준</div>
     <nav>
-        <a th:href="@{/api/compat/products}" target="_blank">
+        <a th:href="@{/eol}" th:classappend="${active == 'eol'} ? 'active'">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"></path></svg>
             지원종료(EOL) 기준

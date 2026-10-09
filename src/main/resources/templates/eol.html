@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>지원종료(EOL) 기준 — MoveGuard</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="app">
+<aside th:replace="~{fragments/shell :: sidebar('eol')}"></aside>
+<div class="app-main">
+    <header th:replace="~{fragments/shell :: topbar('지원종료(EOL) 기준')}"></header>
+    <main class="content">
+        <div class="page-head">
+            <div>
+                <h1>지원종료(EOL) 기준</h1>
+                <p class="hint">OS·DB·WAS·드라이버의 지원 종료 기준입니다. 외부 공개 데이터(endoflife.date)와 <strong>자동 동기화</strong>해 항상 최신으로 유지하고, 네트워크가 없으면 내장 스냅샷으로 대체합니다.</p>
+            </div>
+            <div class="actions">
+                <button class="btn" id="syncBtn" type="button">기준 동기화</button>
+            </div>
+        </div>
+
+        <div class="stats stats-4">
+            <div class="statcard blue">
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6z"></path></svg></span>
+                <div><div class="num" th:text="${#lists.size(products)}">16</div><div class="lab">추적 제품</div></div>
+            </div>
+            <div class="statcard green">
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path></svg></span>
+                <div><div class="num" th:text="${total}">40</div><div class="lab">등록 버전</div></div>
+            </div>
+            <div class="statcard red">
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg></span>
+                <div><div class="num" th:text="${eolCount}">18</div><div class="lab">지원 종료(EOL) 버전</div></div>
+            </div>
+            <div class="statcard amber">
+                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
+                <div><div class="num" th:text="${#lists.size(drivers)}">8</div><div class="lab">드라이버 기준</div></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">버전별 지원 상태</div>
+            <div class="panel-body" style="padding:0">
+                <table class="grid-table">
+                    <thead>
+                    <tr><th>제품</th><th>버전</th><th>상태</th><th>지원 종료일</th><th>연장지원</th><th>최소 Java</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="r : ${releases}">
+                        <td><b th:text="${r.product}">mysql</b></td>
+                        <td>
+                            <span th:text="${r.version}">9.6</span>
+                            <span class="tag" th:if="${r.lts}" style="margin-left:6px">LTS</span>
+                        </td>
+                        <td>
+                            <span class="level-tag hi" th:if="${r.eol}">지원 종료</span>
+                            <span class="level-tag lo" th:unless="${r.eol}">지원 중</span>
+                        </td>
+                        <td th:text="${r.eolDate} ?: '-'">2026-04-21</td>
+                        <td th:text="${r.extSupportDate} ?: '-'">-</td>
+                        <td th:text="${r.minJavaVersion} ?: '-'">-</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel" th:if="${not #lists.isEmpty(drivers)}">
+            <div class="panel-head">JDBC 드라이버 호환 기준</div>
+            <div class="panel-body" style="padding:0">
+                <table class="grid-table">
+                    <thead>
+                    <tr><th>대상 DB</th><th>라인</th><th>드라이버</th><th>최소 버전</th><th>비고</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="d : ${drivers}">
+                        <td><b th:text="${d.dbProduct}">mysql</b></td>
+                        <td th:text="${d.dbReleaseLine} ?: '전체'">8.4</td>
+                        <td th:text="${d.driverProduct}">mysql-connector-j</td>
+                        <td th:text="${d.minVersion}">8.4.0</td>
+                        <td class="muted-note" th:text="${d.note}">비고</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+<script th:inline="javascript">
+document.getElementById('syncBtn').addEventListener('click', function () {
+    const b = this; b.disabled = true; b.textContent = '동기화 중…';
+    fetch(/*[[@{/api/compat/sync}]]*/ '/api/compat/sync', { method: 'POST' })
+        .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+        .then(() => location.reload())
+        .catch(() => { b.disabled = false; b.textContent = '동기화 실패 — 재시도'; });
+});
+</script>
+</body>
+</html>
