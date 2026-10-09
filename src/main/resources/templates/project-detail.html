@@ -17,12 +17,12 @@
     <p class="hint">
         <span th:text="${project.customerName}">고객사</span> ·
         <span th:text="${project.sourceEnv} + ' → ' + ${project.targetEnv}">IDC-A → AWS</span> ·
-        <span th:text="'전환 예정 ' + ${project.plannedDate}">전환 예정</span> ·
+        <span th:text="'점검 기준일 ' + ${project.plannedDate}">점검 기준일</span> ·
         <span th:text="${project.status}">PLAN</span>
     </p>
     <p class="hint muted-note">
-        아래 자산의 <strong>이전 전/이전 후 구성</strong>을 입력하면, 공인IP·네트워크 · 호환성 · 보안 · DNS · 백업
-        <strong>5개 영역(규칙 22개)</strong>으로 전환 위험을 점검합니다.
+        아래 자산의 <strong>운영 구성</strong>을 입력하면, 버전·호환성(EOL) · 보안 · 백업·DR
+        <strong>3개 영역(규칙 13개)</strong>으로 운영 리스크를 점검합니다. 발견 리스크 = MSP 서비스 수주 품목.
     </p>
 
     <div class="actions">
@@ -275,7 +275,7 @@
 
     <!-- 진단 입력 미리보기 (읽기 전용) -->
     <details class="input-box">
-        <summary>진단 입력 미리보기 (이전 전/후 구성)</summary>
+        <summary>진단 입력 미리보기 (운영 구성)</summary>
 
         <div class="input-asset" th:each="a : ${input.assets}">
             <div class="input-asset-head">
@@ -285,7 +285,7 @@
             <table class="input-table"
                    th:unless="${#lists.isEmpty(a.beforeIps) and #lists.isEmpty(a.afterIps) and #lists.isEmpty(a.software)}">
                 <thead>
-                <tr><th>항목</th><th>이전 전</th><th>이전 후</th></tr>
+                <tr><th>항목</th><th>기준</th><th>현재</th></tr>
                 </thead>
                 <tbody>
                 <tr th:if="${!#lists.isEmpty(a.beforeIps) or !#lists.isEmpty(a.afterIps)}">
