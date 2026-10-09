@@ -137,10 +137,10 @@ WHERE factor_id IN (SELECT factor_id FROM risk_factor WHERE code IN ('NETWORK_IP
 UPDATE risk_rule SET enabled = 0 WHERE rule_code IN ('CMP-03', 'CMP-05');
 UPDATE risk_rule SET enabled = 1 WHERE rule_code IN ('CMP-01', 'CMP-02', 'CMP-04', 'CMP-06', 'CMP-07');
 
--- 더미 이전사업: 쇼핑몰 IDC → AWS 이전
--- 기대 진단 결과: IP-01, IP-02, IP-03, IP-04, DNS-01 / 전환 차단
+-- 더미 운영 환경: 가나다커머스 쇼핑몰 (IDC 리눅스 서버 운영)
+-- 기대 진단 결과: CMP-01(CentOS 7 OS EOL·mysql 9.6 EOL) 외 보안·백업 / 즉시 조치
 INSERT INTO migration_project (name, customer_name, source_env, target_env, status, planned_date)
-VALUES ('쇼핑몰 서비스 클라우드 이전', '가나다커머스', 'IDC-A', 'AWS ap-northeast-2', 'PLAN', '2026-10-24');
+VALUES ('가나다커머스 쇼핑몰 (운영)', '가나다커머스', 'IDC', 'IDC · CentOS 7', 'PLAN', '2026-10-24');
 
 SET
 @p := LAST_INSERT_ID();

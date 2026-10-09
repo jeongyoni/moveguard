@@ -24,8 +24,8 @@
     <form th:action="@{/projects}" method="post" class="form">
         <p><label>사업명 *<br><input type="text" name="name" th:value="${name}" required></label></p>
         <p><label>고객사 *<br><input type="text" name="customerName" th:value="${customerName}"></label></p>
-        <p><label>기존 환경<br><input type="text" name="sourceEnv" th:value="${sourceEnv}" placeholder="IDC-A"></label></p>
-        <p><label>신규 환경<br><input type="text" name="targetEnv" th:value="${targetEnv}" placeholder="AWS ap-northeast-2"></label></p>
+        <p><label>기준 환경<br><input type="text" name="sourceEnv" th:value="${sourceEnv}" placeholder="IDC"></label></p>
+        <p><label>운영 환경<br><input type="text" name="targetEnv" th:value="${targetEnv}" placeholder="IDC · CentOS 7"></label></p>
         <p><label>상태<br>
             <select name="status">
                 <option value="PLAN" th:selected="${status == null or status == 'PLAN'}">PLAN</option>

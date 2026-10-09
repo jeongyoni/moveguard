@@ -66,7 +66,7 @@ INSERT INTO compat_product (product, label, category, version_command, source_ur
 ('oracle-database', 'Oracle Database', 'database',   'SELECT BANNER_FULL FROM V$VERSION;',  'https://endoflife.date/oracle-database', 'PENDING'),
 ('postgresql',      'PostgreSQL',      'database',   'postgres --version',                  'https://endoflife.date/postgresql',      'PENDING'),
 ('nginx',           'nginx',           'server-app', 'nginx -v',                            'https://endoflife.date/nginx',           'PENDING'),
--- OS (IDC → 클라우드 이전에서 지원 종료·업그레이드 경로 진단용)
+-- OS (리눅스 서버 지원 종료·업그레이드 경로 진단용 — MSP 운영 핵심)
 ('rocky-linux',     'Rocky Linux',     'os',         'cat /etc/os-release',                 'https://endoflife.date/rocky-linux',     'PENDING'),
 ('rhel',            'RHEL',            'os',         'cat /etc/redhat-release',             'https://endoflife.date/rhel',            'PENDING'),
 ('centos',          'CentOS',          'os',         'cat /etc/centos-release',             'https://endoflife.date/centos',          'PENDING'),
@@ -88,7 +88,12 @@ INSERT INTO compat_release
 ('mysql',  '8.4',  '8.4 (LTS)', 1, 0, '2032-04-30', NULL, 1, NULL),
 ('mysql',  '5.7',  '5.7',       0, 1, '2023-10-31', NULL, 0, NULL),
 ('oracle-database', '19',   '19c (LTR)',     1, 0, '2029-12-31', '2032-12-31', 1, NULL),
-('oracle-database', '12.2', '12c Release 2', 0, 1, '2022-03-31', NULL,         0, NULL);
+('oracle-database', '12.2', '12c Release 2', 0, 1, '2022-03-31', NULL,         0, NULL),
+-- 리눅스 OS (동기화 전에도 OS EOL 진단이 동작하도록 기준값 — CentOS 7은 2024-06-30 지원 종료)
+('centos', '8', 'CentOS 8', 0, 1, '2021-12-31', NULL, 0, NULL),
+('centos', '7', 'CentOS 7', 0, 1, '2024-06-30', NULL, 0, NULL),
+('rocky-linux', '9', 'Rocky Linux 9', 0, 0, '2032-05-31', NULL, 1, NULL),
+('rocky-linux', '8', 'Rocky Linux 8', 0, 0, '2029-05-31', NULL, 1, NULL);
 
 -- 3b. JDBC 드라이버 호환 매트릭스 (endoflife.date 미제공 → 수동 관리, is_manual=1)
 INSERT INTO driver_requirement (db_product, db_release_line, driver_product, min_version, note) VALUES
@@ -101,9 +106,9 @@ INSERT INTO driver_requirement (db_product, db_release_line, driver_product, min
 ('oracle-database', '21',   'ojdbc11',              '21.1',   'Oracle 21c + JDK 11'),
 ('postgresql',      NULL,   'postgresql',           '42.2.0', 'PostgreSQL JDBC 42.2 이상 권장');
 
--- 4. 더미 이전사업에 소프트웨어 정보 추가
---    기대 결과: CMP-01(mysql 9.6 EOL), CMP-02(Tomcat 11은 Java 17 필요), CMP-03(9.0→11.0),
---             CMP-05(5.7→9.6), CMP-07(mysql 9.6은 connector-j 9.0+ 필요한데 8.0.33 미달)
+-- 4. 더미 운영 환경에 소프트웨어 정보 추가 (리눅스 서버 운영 중심)
+--    기대 결과: CMP-01(CentOS 7 OS EOL ×2, mysql 9.6 EOL), CMP-02(Tomcat 11은 Java 17 필요),
+--             CMP-07(mysql 9.6은 connector-j 9.0+ 필요한데 8.0.33 미달)
 SET @p := (SELECT project_id FROM migration_project ORDER BY project_id LIMIT 1);
 SET @web := (SELECT asset_id FROM asset WHERE project_id = @p AND name = 'web01');
 SET @db  := (SELECT asset_id FROM asset WHERE project_id = @p AND name = 'db01');
@@ -111,14 +116,14 @@ SET @db  := (SELECT asset_id FROM asset WHERE project_id = @p AND name = 'db01')
 INSERT INTO asset_software (asset_id, product, role, version, release_line, phase) VALUES
 (@web, 'tomcat',      'WAS',     '9.0.80',    '9.0',  'BEFORE'),
 (@web, 'java',        'RUNTIME', '1.8.0_382', '8',    'BEFORE'),
-(@web, 'rocky-linux', 'OS',      '8.9',       '8',    'BEFORE'),
+(@web, 'centos',      'OS',      '7.9.2009',  '7',    'BEFORE'),
 (@db,  'mysql',       'DB',      '5.7.44',    '5.7',  'BEFORE'),
-(@db,  'rocky-linux', 'OS',      '8.9',       '8',    'BEFORE');
+(@db,  'centos',      'OS',      '7.9.2009',  '7',    'BEFORE');
 
 INSERT INTO asset_software (asset_id, product, role, version, release_line, phase) VALUES
 (@web, 'tomcat',            'WAS',     '11.0.22',   '11.0', 'AFTER'),
 (@web, 'java',              'RUNTIME', '11.0.24',   '11',   'AFTER'),
 (@web, 'mysql-connector-j', 'DRIVER',  '8.0.33',    '8.0',  'AFTER'),
-(@web, 'rocky-linux',       'OS',      '9.4',       '9',    'AFTER'),
+(@web, 'centos',            'OS',      '7.9.2009',  '7',    'AFTER'),
 (@db,  'mysql',             'DB',      '9.6.1',     '9.6',  'AFTER'),
-(@db,  'rocky-linux',       'OS',      '9.4',       '9',    'AFTER');
+(@db,  'centos',            'OS',      '7.9.2009',  '7',    'AFTER');
