@@ -74,7 +74,7 @@
 
         <!-- AI 경영요약 -->
         <section class="panel ai-summary" th:if="${exec != null}">
-            <div class="panel-head"><span class="ai-badge">AI 경영요약</span><span class="muted-note">사내 LLM 생성 · 외부 AI 미사용 · 데이터 미유출</span></div>
+            <div class="panel-head"><span class="ai-badge">AI 경영요약</span><span class="muted-note">규칙 기반 자동 생성 · 외부 AI 미사용 · 데이터 미유출</span></div>
             <div class="panel-body">
                 <p class="ai-headline" th:text="${exec.headline}">종합 위험 등급 요약</p>
                 <ul class="ai-body">
