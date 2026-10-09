@@ -10,7 +10,7 @@
 <div class="app-main">
     <header th:replace="~{fragments/shell :: topbar('백업 수정')}"></header>
     <main class="content">
-    <p><a th:href="@{'/projects/' + ${projectId}}">← 사업 상세</a></p>
+    <p class="crumb"><a th:href="@{'/projects/' + ${projectId}}">← 환경 상세</a></p>
     <h1>백업 수정</h1>
 
     <div class="errors" th:if="${errors}">
