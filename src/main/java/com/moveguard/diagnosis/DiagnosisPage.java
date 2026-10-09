@@ -50,6 +50,7 @@ public class DiagnosisPage {
         model.addAttribute("extFactors", factors.stream().filter(f -> !isCore(f.code())).toList());
         model.addAttribute("input", DiagnosisInput.of(contextLoader.load(projectId)));
         model.addAttribute("exec", executiveSummary.generate(project, result, factors));
+        model.addAttribute("groups", groupFindings(result.findings()));
         return "diagnosis";
     }
 
@@ -67,5 +68,27 @@ public class DiagnosisPage {
     }
 
     public record FactorSummary(String code, String name, int count, int maxRpn) {
+    }
+
+    /** 같은 규칙이 여러 자산에서 발견되면 하나로 묶는다(예: EOL이 서버 여럿). findings는 RPN 내림차순. */
+    public static List<FindingGroup> groupFindings(List<DiagnosisResult.Item> findings) {
+        Map<String, List<DiagnosisResult.Item>> byKey = new LinkedHashMap<>();
+        for (DiagnosisResult.Item item : findings) {
+            byKey.computeIfAbsent(item.ruleCode() + "|" + item.title(), k -> new ArrayList<>()).add(item);
+        }
+        List<FindingGroup> groups = new ArrayList<>();
+        for (List<DiagnosisResult.Item> items : byKey.values()) {
+            DiagnosisResult.Item first = items.get(0);
+            int maxRpn = items.stream().mapToInt(DiagnosisResult.Item::rpn).max().orElse(first.rpn());
+            groups.add(new FindingGroup(first.ruleCode(), first.factorCode(), first.factorName(),
+                    first.title(), first.mitigation(), first.blocking(), maxRpn, items.size(),
+                    items.stream().map(DiagnosisResult.Item::message).toList()));
+        }
+        return groups;
+    }
+
+    public record FindingGroup(String ruleCode, String factorCode, String factorName, String title,
+                               String mitigation, boolean blocking, int rpn, int count,
+                               List<String> messages) {
     }
 }
