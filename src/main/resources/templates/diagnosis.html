@@ -12,11 +12,11 @@
 </header>
 
 <main>
-    <h1>진단 결과</h1>
+    <h1>운영 환경 진단 결과</h1>
     <p class="hint">
         <span th:text="${project.customerName}">고객사</span> ·
-        <span th:text="${project.sourceEnv} + ' → ' + ${project.targetEnv}">IDC-A → AWS</span> ·
-        <span th:text="'전환 예정 ' + ${project.plannedDate}">전환 예정</span>
+        <span th:text="${project.targetEnv}">AWS 서울</span> ·
+        <span th:text="'점검 기준일 ' + ${project.plannedDate}">점검 기준일</span>
     </p>
 
     <!-- 재진단 비교 (직전 진단이 있을 때만) -->
@@ -50,13 +50,13 @@
     <section class="verdict" th:classappend="${result.riskLevel}">
         <div>
             <div class="level" th:text="${result.riskLevel}">HIGH</div>
-            <div class="level-caption">위험 등급 (최고 RPN 기준)</div>
+            <div class="level-caption">운영 위험 등급 (최고 RPN 기준)</div>
         </div>
         <div>
-            <span class="badge blocked" th:if="${result.blocked}">전환 차단</span>
-            <span class="badge allowed" th:unless="${result.blocked}">전환 가능</span>
-            <div class="level-caption" th:if="${result.blocked}">차단 규칙에 걸려 지금 상태로는 이전할 수 없습니다</div>
-            <div class="level-caption" th:unless="${result.blocked}">전환을 막는 규칙은 없습니다</div>
+            <span class="badge blocked" th:if="${result.blocked}">즉시 조치 필요</span>
+            <span class="badge allowed" th:unless="${result.blocked}">양호</span>
+            <div class="level-caption" th:if="${result.blocked}">바로 손봐야 하는 위험이 있습니다 (MSP 서비스로 해결 가능)</div>
+            <div class="level-caption" th:unless="${result.blocked}">즉시 조치가 필요한 위험은 없습니다</div>
         </div>
         <div class="metrics">
             <div>
@@ -79,8 +79,8 @@
         <summary>진단 입력 — 무엇을 보고 판단했나</summary>
 
         <p class="input-hint">
-            진단은 자산을 스캔하는 것이 아니라, 이전 계획에 적힌 <strong>이전 전 / 이전 후 구성을 비교</strong>해
-            깨질 지점을 찾습니다. 아래가 그 입력입니다.
+            진단은 운영 중 환경에 입력된 <strong>구성 정보(현재 상태)</strong>를 점검해
+            손봐야 할 지점을 찾습니다. 아래가 그 입력입니다.
         </p>
 
         <div class="input-asset" th:each="a : ${input.assets}">
@@ -91,7 +91,7 @@
 
             <p class="input-none"
                th:if="${#lists.isEmpty(a.beforeIps) and #lists.isEmpty(a.afterIps) and #lists.isEmpty(a.software)}">
-                외부 시스템 — 우리가 이전하지 않으므로 구성 정보가 없습니다. 의존관계로만 참조됩니다.
+                외부 시스템 — 우리가 운영하지 않으므로 구성 정보가 없습니다. 의존관계로만 참조됩니다.
             </p>
 
             <table class="input-table"
@@ -99,8 +99,8 @@
                 <thead>
                 <tr>
                     <th>항목</th>
-                    <th>이전 전</th>
-                    <th>이전 후</th>
+                    <th>기준</th>
+                    <th>현재</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -188,29 +188,14 @@
         </table>
     </details>
 
-    <!-- 위험요인별 (핵심 / 확장) -->
+    <!-- 위험요인별 (운영 영역) -->
     <h2>위험요인별</h2>
-    <div th:if="${not #lists.isEmpty(coreFactors)}">
-        <div class="group-label core">핵심 점검 · 전환이 직접 중단되는 위험</div>
-        <div class="factors">
-            <div class="factor" th:each="f : ${coreFactors}">
-                <div class="factor-name" th:text="${f.name}">공인IP·네트워크 변경</div>
-                <div class="factor-meta">
-                    <span th:text="${f.count} + '건'">5건</span> ·
-                    <span th:text="'최고 RPN ' + ${f.maxRpn}">최고 RPN 504</span>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div th:if="${not #lists.isEmpty(extFactors)}">
-        <div class="group-label ext">확장 점검 · 보안·운영 안정성</div>
-        <div class="factors">
-            <div class="factor" th:each="f : ${extFactors}">
-                <div class="factor-name" th:text="${f.name}">보안·접근통제</div>
-                <div class="factor-meta">
-                    <span th:text="${f.count} + '건'">2건</span> ·
-                    <span th:text="'최고 RPN ' + ${f.maxRpn}">최고 RPN 240</span>
-                </div>
+    <div class="factors">
+        <div class="factor" th:each="f : ${factors}">
+            <div class="factor-name" th:text="${f.name}">OS·DBMS 호환성</div>
+            <div class="factor-meta">
+                <span th:text="${f.count} + '건'">3건</span> ·
+                <span th:text="'최고 RPN ' + ${f.maxRpn}">최고 RPN 270</span>
             </div>
         </div>
     </div>
@@ -228,7 +213,7 @@
                 <div class="finding-head">
                     <span class="code" th:text="${item.ruleCode}">IP-04</span>
                     <span th:text="${item.factorName}">공인IP·네트워크 변경</span>
-                    <span class="tag-blocking" th:if="${item.blocking}">전환 차단</span>
+                    <span class="tag-blocking" th:if="${item.blocking}">즉시 조치</span>
                 </div>
                 <div class="finding-title" th:text="${item.title}">규칙 제목</div>
                 <p class="finding-message" th:text="${item.message}">무엇이 왜 위험한지</p>

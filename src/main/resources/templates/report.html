@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="'이전 위험진단 리포트 — ' + ${project.name}">이전 위험진단 리포트</title>
+    <title th:text="'운영 환경 진단 리포트 — ' + ${project.name}">운영 환경 진단 리포트</title>
     <link rel="stylesheet" th:href="@{/css/report.css}">
 </head>
 <body>
@@ -15,7 +15,7 @@
 <div class="page">
     <div class="rpt-head">
         <div class="brand">시스원 · MoveGuard
-            <small>클라우드 이전 사전 위험진단</small>
+            <small>MSP 운영 환경 헬스체크</small>
         </div>
         <div class="rpt-meta">
             <div th:text="'작성일 ' + ${reportDate}">작성일 2026-10-08</div>
@@ -23,27 +23,27 @@
         </div>
     </div>
 
-    <h1 class="rpt-title">클라우드 이전 사전 위험진단 리포트</h1>
-    <p class="sub">전환을 시작하기 전에, 이전을 깨뜨릴 수 있는 위험을 사전에 진단한 결과입니다.</p>
+    <h1 class="rpt-title">운영 환경 진단 리포트</h1>
+    <p class="sub">고객이 운영 중인 환경을 점검해, 손봐야 할 운영 리스크를 정리한 결과입니다.</p>
 
     <div class="meta-grid">
         <div><b>고객</b><span th:text="${project.customerName}">가나다커머스</span></div>
-        <div><b>사업명</b><span th:text="${project.name}">쇼핑몰 이전</span></div>
-        <div><b>이전 구간</b><span th:text="${project.sourceEnv} + ' → ' + ${project.targetEnv}">IDC → AWS 서울</span></div>
-        <div><b>전환 예정</b><span th:text="${project.plannedDate}">2026-10-24</span></div>
+        <div><b>환경명</b><span th:text="${project.name}">쇼핑몰 운영 환경</span></div>
+        <div><b>운영 환경</b><span th:text="${project.targetEnv}">AWS 서울</span></div>
+        <div><b>점검 기준일</b><span th:text="${project.plannedDate}">2026-10-24</span></div>
     </div>
 
     <!-- 판정 요약 -->
     <section class="verdict" th:classappend="${result.riskLevel}">
         <div>
             <div class="v-level" th:text="${result.riskLevel}">HIGH</div>
-            <div class="v-cap">위험 등급 (최고 RPN 기준)</div>
+            <div class="v-cap">운영 위험 등급 (최고 RPN 기준)</div>
         </div>
         <div>
-            <span class="badge block" th:if="${result.blocked}">전환 차단</span>
-            <span class="badge ok" th:unless="${result.blocked}">전환 가능</span>
-            <div class="v-cap" th:if="${result.blocked}">차단 규칙에 걸려 지금 상태로는 이전 권고 불가</div>
-            <div class="v-cap" th:unless="${result.blocked}">전환을 막는 치명적 위험은 없음</div>
+            <span class="badge block" th:if="${result.blocked}">즉시 조치 필요</span>
+            <span class="badge ok" th:unless="${result.blocked}">양호</span>
+            <div class="v-cap" th:if="${result.blocked}">바로 손봐야 하는 위험이 있습니다 (MSP 서비스로 해결)</div>
+            <div class="v-cap" th:unless="${result.blocked}">즉시 조치가 필요한 위험은 없음</div>
         </div>
         <div class="metrics">
             <div class="metric"><b th:text="${result.maxRpn}">504</b><span>최고 RPN</span></div>
@@ -54,13 +54,13 @@
 
     <!-- 한 줄 요약 (판정에 따라 자동 생성) -->
     <p class="summary block" th:if="${result.blocked}">
-        전환을 막는 ‘차단’ 항목 <b th:text="${blockingCount}">8</b>건이 발견되어, 현재 구성으로는 전환이 차단됩니다.
+        지금 바로 손봐야 하는 ‘긴급 조치’ 항목 <b th:text="${blockingCount}">4</b>건이 있어, 운영 리스크가 높습니다.
     </p>
     <p class="summary caution" th:if="${!result.blocked and result.riskLevel.name() != 'LOW'}">
-        전환을 차단할 항목은 없으나, 전환 전 조치가 필요한 위험 <b th:text="${#lists.size(result.findings)}">6</b>건이 확인되었습니다.
+        긴급 항목은 없으나, 조치가 필요한 운영 리스크 <b th:text="${#lists.size(result.findings)}">6</b>건이 확인되었습니다.
     </p>
     <p class="summary ok" th:if="${!result.blocked and result.riskLevel.name() == 'LOW'}">
-        현재 구성에서 전환을 깨뜨릴 주요 위험은 확인되지 않았습니다.
+        현재 운영 환경에서 주요 리스크는 확인되지 않았습니다. 양호합니다.
     </p>
 
     <!-- 위험요인별 위험도 (막대그래프) -->
@@ -72,8 +72,7 @@
             <span class="fb-lab">발견 건수</span>
         </div>
 
-        <div class="fb-grouplabel core" th:if="${not #lists.isEmpty(coreFactors)}">핵심 점검 · 전환이 직접 중단되는 위험</div>
-        <div class="fbar" th:each="f : ${coreFactors}">
+        <div class="fbar" th:each="f : ${factors}">
             <span class="fb-name" th:text="${f.name}">OS·DBMS 호환성</span>
             <span class="fb-group">
                 <span class="bar-track">
@@ -81,32 +80,13 @@
                           th:classappend="${f.maxRpn >= 400 ? 'high' : (f.maxRpn >= 150 ? 'mid' : 'low')}"
                           th:style="'width:' + ${f.maxRpn * 100 / maxFactorRpn} + '%'"></span>
                 </span>
-                <span class="fb-num" th:text="${f.maxRpn}">504</span>
+                <span class="fb-num" th:text="${f.maxRpn}">270</span>
             </span>
             <span class="fb-group">
                 <span class="bar-track">
                     <span class="bar cnt" th:style="'width:' + ${f.count * 100 / maxFactorCount} + '%'"></span>
                 </span>
-                <span class="fb-num" th:text="${f.count} + '건'">7건</span>
-            </span>
-        </div>
-
-        <div class="fb-grouplabel ext" th:if="${not #lists.isEmpty(extFactors)}">확장 점검 · 보안·운영 안정성</div>
-        <div class="fbar" th:each="f : ${extFactors}">
-            <span class="fb-name" th:text="${f.name}">보안·접근통제</span>
-            <span class="fb-group">
-                <span class="bar-track">
-                    <span class="bar"
-                          th:classappend="${f.maxRpn >= 400 ? 'high' : (f.maxRpn >= 150 ? 'mid' : 'low')}"
-                          th:style="'width:' + ${f.maxRpn * 100 / maxFactorRpn} + '%'"></span>
-                </span>
-                <span class="fb-num" th:text="${f.maxRpn}">240</span>
-            </span>
-            <span class="fb-group">
-                <span class="bar-track">
-                    <span class="bar cnt" th:style="'width:' + ${f.count * 100 / maxFactorCount} + '%'"></span>
-                </span>
-                <span class="fb-num" th:text="${f.count} + '건'">2건</span>
+                <span class="fb-num" th:text="${f.count} + '건'">3건</span>
             </span>
         </div>
     </div>
@@ -120,7 +100,7 @@
     <table>
         <thead>
         <tr>
-            <th>구분</th><th>위험 항목</th><th class="num">RPN</th><th class="col-b">차단</th><th>권고 조치</th>
+            <th>구분</th><th>위험 항목</th><th class="num">RPN</th><th class="col-b">긴급</th><th>권고 조치</th>
         </tr>
         </thead>
         <tbody>
@@ -128,20 +108,20 @@
             <td th:text="${it.factorName}">호환성</td>
             <td th:text="${it.title}">이전 후 버전이 이미 지원 종료(EOL)됨</td>
             <td class="num" th:text="${it.rpn}">504</td>
-            <td class="col-b"><span class="tag-b" th:if="${it.blocking}">차단</span></td>
+            <td class="col-b"><span class="tag-b" th:if="${it.blocking}">긴급</span></td>
             <td th:text="${it.mitigation}">지원 중인 버전으로 목표를 조정하십시오.</td>
         </tr>
         </tbody>
     </table>
 
     <p class="sub" th:if="${#lists.isEmpty(result.findings)}" style="margin-top:14px">
-        발견된 위험이 없습니다. 현재 구성 기준으로 전환을 막는 위험은 확인되지 않았습니다.
+        발견된 위험이 없습니다. 현재 운영 환경에서 손봐야 할 위험은 확인되지 않았습니다.
     </p>
 
     <div class="disc">
-        ※ 본 리포트는 입력된 이전 전/후 구성을 기준으로 규칙 22개로 자동 진단한 결과입니다.
-        위험 점수(RPN)는 심각도 × 발생가능성 × 검출난이도(각 1~10)로 산정하며, ‘차단’ 항목이 1건이라도 있으면
-        점수와 무관하게 전환이 차단됩니다. 실제 전환 전 담당 엔지니어의 검토를 권장합니다.
+        ※ 본 리포트는 운영 환경의 구성을 규칙 13개로 자동 진단한 결과입니다.
+        위험 점수(RPN)는 심각도 × 발생가능성 × 검출난이도(각 1~10)로 산정하며, ‘긴급’ 항목은
+        즉시 조치가 권장됩니다. 발견된 리스크는 시스원 MSP 운영·보안·백업·DR 서비스로 해결할 수 있습니다.
     </div>
 
     <div class="rpt-foot">
