@@ -129,6 +129,6 @@ public record DiagnosisInput(
     }
 
     private static String phaseLabel(Phase phase) {
-        return phase == Phase.BEFORE ? "이전 전" : "이전 후";
+        return phase == Phase.BEFORE ? "기준" : "현재";
     }
 }

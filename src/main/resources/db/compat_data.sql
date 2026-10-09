@@ -33,7 +33,7 @@ VALUES
  (SELECT factor_id FROM risk_factor WHERE code = 'COMPAT'),
  '버전의 지원 종료가 임박함',
  6, 6, 4, 0,
- '{asset}의 {product} {version}은(는) {eol}에 지원이 종료됩니다. 전환 후 1년 이내에 재업그레이드가 필요합니다.',
+ '{asset}의 {product} {version}은(는) {eol}에 지원이 종료됩니다. 1년 이내에 업그레이드가 필요합니다.',
  '지원 기간이 더 긴 LTS 버전을 목표로 검토하십시오.'),
 
 ('CMP-05',
@@ -54,7 +54,7 @@ VALUES
  (SELECT factor_id FROM risk_factor WHERE code = 'COMPAT'),
  'JDBC 드라이버 버전이 목표 DB 요구치 미달',
  8, 5, 5, 1,
- '{asset}의 {driver} {version}은(는) 목표 DB({db})가 요구하는 최소 드라이버 버전({required})보다 낮습니다. 전환 후 DB 접속이 실패할 수 있습니다.',
+ '{asset}의 {driver} {version}은(는) 목표 DB({db})가 요구하는 최소 드라이버 버전({required})보다 낮습니다. DB 접속이 실패할 수 있습니다.',
  '드라이버를 목표 DB가 요구하는 최소 버전 이상으로 올린 뒤 조치하십시오.');
 
 -- 2. 동기화 대상 제품
