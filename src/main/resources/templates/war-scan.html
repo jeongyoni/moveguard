@@ -18,10 +18,12 @@
         확인 후 자산의 의존성으로 추가하면 <strong>IP-03</strong> 규칙이 진단에 반영합니다.
     </p>
 
-    <form th:action="@{'/projects/' + ${projectId} + '/war-scan'}" method="post" enctype="multipart/form-data">
-        <p><input type="file" name="file" accept=".war,.jar" required></p>
-        <p><button class="btn" type="submit">분석</button></p>
-    </form>
+    <section class="panel section" style="max-width:640px">
+        <form th:action="@{'/projects/' + ${projectId} + '/war-scan'}" method="post" enctype="multipart/form-data">
+            <p><input type="file" name="file" accept=".war,.jar" required></p>
+            <p style="margin-bottom:0"><button class="btn" type="submit">분석</button></p>
+        </form>
+    </section>
 
     <div class="errors" th:if="${fileError}">
         <p th:text="${fileError}">파일 오류</p>

@@ -17,14 +17,13 @@
         검증을 통과하면 저장 후 바로 진단 결과를 보여줍니다. 하나라도 오류가 있으면 저장하지 않습니다.
     </p>
 
-    <p>
-        <a class="btn" th:href="@{/projects/import/template}">양식 다운로드 (.xlsx)</a>
-    </p>
-
-    <form th:action="@{/projects/import}" method="post" enctype="multipart/form-data">
-        <p><input type="file" name="file" accept=".xlsx" required></p>
-        <p><button class="btn" type="submit">업로드하고 진단</button></p>
-    </form>
+    <section class="panel section" style="max-width:640px">
+        <p><a class="btn ghost" th:href="@{/projects/import/template}">양식 다운로드 (.xlsx)</a></p>
+        <form th:action="@{/projects/import}" method="post" enctype="multipart/form-data" style="margin-top:14px">
+            <p><input type="file" name="file" accept=".xlsx" required></p>
+            <p style="margin-bottom:0"><button class="btn" type="submit">업로드하고 진단</button></p>
+        </form>
+    </section>
 
     <div class="errors" th:if="${fileError}">
         <p th:text="${fileError}">파일 오류</p>
