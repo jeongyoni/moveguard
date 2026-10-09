@@ -94,30 +94,34 @@
             <div>
                 <div class="panel">
                     <div class="panel-head">발견된 리스크
-                        <span th:text="${#lists.size(result.findings)} + '건 · 위험 순'">7건 · 위험 순</span>
+                        <span th:text="${#lists.size(result.findings)} + '건 · ' + ${#lists.size(groups)} + '개 유형 · 위험 순'">9건 · 7개 유형 · 위험 순</span>
                     </div>
                     <div class="findings">
-                        <article class="finding" th:each="item : ${result.findings}"
-                                 th:classappend="${item.blocking} ? 'is-blocking' : ''">
+                        <article class="finding" th:each="g : ${groups}"
+                                 th:classappend="${g.blocking} ? 'is-blocking' : ''">
                             <div class="rpn">
-                                <div class="rpn-value" th:text="${item.rpn}">420</div>
+                                <div class="rpn-value" th:text="${g.rpn}">420</div>
                                 <div class="rpn-label">RPN</div>
                             </div>
-                            <div>
+                            <div class="finding-body">
                                 <div class="finding-head">
-                                    <span class="code" th:text="${item.ruleCode}">CMP-01</span>
-                                    <span th:text="${item.factorName}">버전·호환성</span>
-                                    <span class="tag-blocking" th:if="${item.blocking}">긴급</span>
+                                    <span class="code" th:text="${g.ruleCode}">CMP-01</span>
+                                    <span th:text="${g.factorName}">OS·DBMS 호환성</span>
+                                    <span class="tag-blocking" th:if="${g.blocking}">긴급</span>
+                                    <span class="count-tag" th:if="${g.count > 1}" th:text="${g.count} + '개 자산'">3개 자산</span>
                                 </div>
-                                <div class="finding-title" th:text="${item.title}">규칙 제목</div>
-                                <p class="finding-message" th:text="${item.message}">무엇이 왜 위험한지</p>
+                                <div class="finding-title" th:text="${g.title}">규칙 제목</div>
+                                <p class="finding-message" th:if="${g.count == 1}" th:text="${g.messages[0]}">무엇이 왜 위험한지</p>
+                                <ul class="target-list" th:if="${g.count > 1}">
+                                    <li th:each="m : ${g.messages}" th:text="${m}">영향 대상</li>
+                                </ul>
                                 <div class="mitigation">
                                     <span class="mitigation-label">조치</span>
-                                    <span th:text="${item.mitigation}">조치 가이드</span>
+                                    <span th:text="${g.mitigation}">조치 가이드</span>
                                 </div>
                             </div>
                         </article>
-                        <div class="empty" th:if="${#lists.isEmpty(result.findings)}" style="border:0">
+                        <div class="empty" th:if="${#lists.isEmpty(groups)}" style="border:0">
                             발견된 리스크가 없습니다.
                         </div>
                     </div>

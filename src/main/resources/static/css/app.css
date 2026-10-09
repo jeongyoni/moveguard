@@ -193,9 +193,14 @@ p.muted-note { margin-top: -10px; }
 .finding-head { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; color: var(--muted); font-size: 12.5px; }
 .code { font-weight: 700; color: var(--brand); }
 .finding-title { font-size: 15.5px; font-weight: 700; color: var(--ink); margin: 4px 0 6px; }
+.finding-body { min-width: 0; flex: 1; }
 .finding-message { margin: 0 0 10px; color: var(--text); }
-.mitigation { background: var(--green-bg); border-left: 3px solid var(--green); border-radius: 0 6px 6px 0; padding: 9px 13px; font-size: 13px; }
-.mitigation-label { color: #1d7a4c; font-weight: 700; margin-right: 8px; }
+.count-tag { background: #eef2f8; color: #475a73; font-weight: 700; font-size: 11px; padding: 2px 9px; border-radius: 999px; }
+.target-list { margin: 0 0 10px; padding: 0; list-style: none; display: grid; gap: 4px; }
+.target-list li { position: relative; padding-left: 15px; font-size: 12.8px; color: var(--text); line-height: 1.55; }
+.target-list li::before { content: ""; position: absolute; left: 3px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: var(--amber); }
+.mitigation { display: flex; gap: 8px; align-items: baseline; background: #f4f8f6; border: 1px solid #dceee5; border-radius: 8px; padding: 8px 12px; font-size: 12.8px; color: #37544a; }
+.mitigation-label { flex: none; color: #1d7a4c; font-weight: 700; font-size: 11px; background: #dff0e7; padding: 2px 8px; border-radius: 5px; }
 
 /* ============ 표 ============ */
 table { width: 100%; border-collapse: collapse; font-size: 13px; color: var(--text); }
