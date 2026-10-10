@@ -115,7 +115,7 @@
             <td th:text="${s.role} ?: '-'">WAS</td>
             <td th:text="${s.version}">9.0.80</td>
             <td th:text="${s.releaseLine}">9.0</td>
-            <td th:text="${s.phase}">BEFORE</td>
+            <td th:text="${s.phase == 'BEFORE' ? '기준' : '현재'}">BEFORE</td>
             <td class="row-actions">
                 <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/software/' + ${s.softwareId} + '/edit'}">수정</a>
                 <form th:action="@{'/projects/' + ${project.projectId} + '/software/' + ${s.softwareId} + '/delete'}" method="post" onsubmit="return confirm('이 항목을 삭제할까요? 되돌릴 수 없습니다.');">
@@ -137,7 +137,7 @@
         <input type="text" name="role" placeholder="역할 (WAS)">
         <input type="text" name="version" placeholder="버전 (9.0.80)" required>
         <input type="text" name="releaseLine" placeholder="릴리스라인 (9.0)" required>
-        <select name="phase"><option value="BEFORE">BEFORE</option><option value="AFTER">AFTER</option></select>
+        <select name="phase"><option value="BEFORE">기준</option><option value="AFTER">현재</option></select>
         <button class="btn" type="submit">추가</button>
     </form>
     <p class="empty" th:if="${#lists.isEmpty(assets)}">소프트웨어를 추가하려면 먼저 자산을 등록하세요.</p>
@@ -155,7 +155,7 @@
             <td th:text="${ip.assetName}">web01</td>
             <td th:text="${ip.address}">203.0.113.11</td>
             <td th:text="${ip.ipType}">PUBLIC</td>
-            <td th:text="${ip.phase}">BEFORE</td>
+            <td th:text="${ip.phase == 'BEFORE' ? '기준' : '현재'}">BEFORE</td>
             <td th:text="${ip.extWhitelisted} ? '✓ 등록' : ''"
                 th:classappend="${ip.extWhitelisted} ? 'ext-yes' : ''">✓ 등록</td>
             <td th:text="${ip.note} ?: '-'">-</td>
@@ -178,8 +178,8 @@
         </select>
         <input type="text" name="address" placeholder="IP 주소" required>
         <select name="phase">
-            <option value="BEFORE">BEFORE</option>
-            <option value="AFTER">AFTER</option>
+            <option value="BEFORE">기준</option>
+            <option value="AFTER">현재</option>
         </select>
         <label class="chk"><input type="checkbox" name="extWhitelisted" value="true"> 외부 기관 등록</label>
         <input type="text" name="note" placeholder="비고">
@@ -202,7 +202,7 @@
             <td th:text="${r.recordType}">A</td>
             <td th:text="${r.value}">203.0.113.11</td>
             <td th:text="${r.ttl}">3600</td>
-            <td th:text="${r.phase}">BEFORE</td>
+            <td th:text="${r.phase == 'BEFORE' ? '기준' : '현재'}">BEFORE</td>
             <td class="row-actions">
                 <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/dns/' + ${r.dnsId} + '/edit'}">수정</a>
                 <form th:action="@{'/projects/' + ${project.projectId} + '/dns/' + ${r.dnsId} + '/delete'}" method="post" onsubmit="return confirm('이 항목을 삭제할까요? 되돌릴 수 없습니다.');">
@@ -222,7 +222,7 @@
         </select>
         <input type="text" name="value" placeholder="값" required>
         <input type="number" name="ttl" placeholder="TTL" min="0" value="300">
-        <select name="phase"><option value="BEFORE">BEFORE</option><option value="AFTER">AFTER</option></select>
+        <select name="phase"><option value="BEFORE">기준</option><option value="AFTER">현재</option></select>
         <button class="btn" type="submit">추가</button>
     </form>
 
@@ -239,7 +239,7 @@
             <td th:text="${c.domain}">shop.example.com</td>
             <td th:text="${c.issuer} ?: '-'">Lets Encrypt</td>
             <td th:text="${c.notAfter}">2026-11-10</td>
-            <td th:text="${c.phase}">BEFORE</td>
+            <td th:text="${c.phase == 'BEFORE' ? '기준' : '현재'}">BEFORE</td>
             <td class="row-actions">
                 <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/certs/' + ${c.certId} + '/edit'}">수정</a>
                 <form th:action="@{'/projects/' + ${project.projectId} + '/certs/' + ${c.certId} + '/delete'}" method="post" onsubmit="return confirm('이 항목을 삭제할까요? 되돌릴 수 없습니다.');">
@@ -256,7 +256,7 @@
         <input type="text" name="domain" placeholder="도메인" required>
         <input type="text" name="issuer" placeholder="발급자">
         <input type="date" name="notAfter" required>
-        <select name="phase"><option value="BEFORE">BEFORE</option><option value="AFTER">AFTER</option></select>
+        <select name="phase"><option value="BEFORE">기준</option><option value="AFTER">현재</option></select>
         <button class="btn" type="submit">추가</button>
     </form>
 
@@ -274,7 +274,7 @@
             <td th:text="${b.lastBackupAt} ?: '-'">2026-10-22</td>
             <td th:text="${b.restoreTested} ? '수행' : '미수행'">미수행</td>
             <td th:text="${b.offsite} ? '보관' : '미보관'">보관</td>
-            <td th:text="${b.phase}">BEFORE</td>
+            <td th:text="${b.phase == 'BEFORE' ? '기준' : '현재'}">BEFORE</td>
             <td class="row-actions">
                 <a class="btn ghost" th:href="@{'/projects/' + ${project.projectId} + '/backups/' + ${b.backupId} + '/edit'}">수정</a>
                 <form th:action="@{'/projects/' + ${project.projectId} + '/backups/' + ${b.backupId} + '/delete'}" method="post" onsubmit="return confirm('이 항목을 삭제할까요? 되돌릴 수 없습니다.');">
@@ -295,7 +295,7 @@
         <input type="date" name="lastBackupAt">
         <label class="chk"><input type="checkbox" name="restoreTested" value="true"> 복구 테스트</label>
         <label class="chk"><input type="checkbox" name="offsite" value="true"> 오프사이트</label>
-        <select name="phase"><option value="BEFORE">BEFORE</option><option value="AFTER">AFTER</option></select>
+        <select name="phase"><option value="BEFORE">기준</option><option value="AFTER">현재</option></select>
         <button class="btn" type="submit">추가</button>
     </form>
     <p class="empty" th:if="${#lists.isEmpty(assets)}">백업을 추가하려면 먼저 자산을 등록하세요.</p>
@@ -358,7 +358,7 @@
             <tr th:each="r : ${input.dnsRecords}">
                 <td th:text="${r.domain}">shop.example.com</td>
                 <td th:text="${r.recordType}">A</td>
-                <td th:text="${r.phase}">이전 전</td>
+                <td th:text="${r.phase == 'BEFORE' ? '기준' : '현재'}">이전 전</td>
                 <td th:text="${r.value}">203.0.113.11</td>
                 <td th:text="${r.ttl} + '초'">3600초</td>
             </tr>
@@ -372,7 +372,7 @@
             <tr th:each="c : ${input.certificates}">
                 <td th:text="${c.domain}">shop.example.com</td>
                 <td th:text="${c.issuer}">Lets Encrypt R3</td>
-                <td th:text="${c.phase}">이전 전</td>
+                <td th:text="${c.phase == 'BEFORE' ? '기준' : '현재'}">이전 전</td>
                 <td th:text="${c.notAfter}">2026-11-10</td>
             </tr>
             </tbody>
@@ -384,7 +384,7 @@
             <tbody>
             <tr th:each="b : ${input.backups}">
                 <td th:text="${b.assetName}">db01</td>
-                <td th:text="${b.phase}">이전 전</td>
+                <td th:text="${b.phase == 'BEFORE' ? '기준' : '현재'}">이전 전</td>
                 <td th:text="${b.lastBackupAt} ?: '-'">2026-10-22</td>
                 <td th:text="${b.restoreTested} ? '수행' : '미수행'">미수행</td>
                 <td th:text="${b.offsite} ? '보관' : '미보관'">보관</td>

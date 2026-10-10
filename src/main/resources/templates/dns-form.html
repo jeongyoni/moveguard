@@ -32,8 +32,8 @@
         <p><label>TTL<br><input type="number" name="ttl" th:value="${dns.ttl}" min="0"></label></p>
         <p><label>단계<br>
             <select name="phase">
-                <option value="BEFORE" th:selected="${dns.phase == 'BEFORE'}">BEFORE</option>
-                <option value="AFTER" th:selected="${dns.phase == 'AFTER'}">AFTER</option>
+                <option value="BEFORE" th:selected="${dns.phase == 'BEFORE'}">기준</option>
+                <option value="AFTER" th:selected="${dns.phase == 'AFTER'}">현재</option>
             </select></label></p>
         <p><button class="btn" type="submit">저장</button></p>
     </form>

@@ -30,6 +30,17 @@ public class DashboardService {
                        int blocked, int totalFindings, int avgMaxRpn, List<Card> recent) {
     }
 
+    private static int severityRank(Card c) {
+        if (!c.hasRun()) {
+            return -1;
+        }
+        return switch (c.latest().getRiskLevel()) {
+            case "HIGH" -> 3;
+            case "MEDIUM" -> 2;
+            default -> 1;
+        };
+    }
+
     public View build() {
         List<Project> projects = projectService.findProjects();
         List<Card> cards = new ArrayList<>();
@@ -56,6 +67,9 @@ public class DashboardService {
             rpnN++;
         }
         int avg = rpnN > 0 ? rpnSum / rpnN : 0;
+        // 운영 콘솔답게 위험 높은 순 정렬 (즉시조치 → 주의 → 양호 → 미진단, 동급은 RPN 내림차순)
+        cards.sort(Comparator.comparingInt(DashboardService::severityRank).reversed()
+                .thenComparing(c -> c.hasRun() ? c.latest().getMaxRpn() : 0, Comparator.reverseOrder()));
         List<Card> recent = cards.stream()
                 .filter(Card::hasRun)
                 .sorted(Comparator.comparing((Card c) -> c.latest().getExecutedAt()).reversed())

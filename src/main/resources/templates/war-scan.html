@@ -69,8 +69,8 @@
                 </label>
                 <label>단계
                     <select name="phase">
-                        <option value="BEFORE" selected>BEFORE</option>
-                        <option value="AFTER">AFTER</option>
+                        <option value="BEFORE" selected>기준</option>
+                        <option value="AFTER">현재</option>
                     </select>
                 </label>
                 <button class="btn ghost" type="submit">Java 버전을 소프트웨어로 추가</button>
@@ -98,8 +98,8 @@
                                 <option th:each="a : ${assets}" th:value="${a.assetId}" th:text="${a.name}">web01</option>
                             </select>
                             <select name="phase">
-                                <option value="AFTER" selected>AFTER</option>
-                                <option value="BEFORE">BEFORE</option>
+                                <option value="AFTER" selected>현재</option>
+                                <option value="BEFORE">기준</option>
                             </select>
                             <button class="btn ghost" type="submit"
                                     th:text="${l.driverProduct} + ' 추가'">드라이버 추가</button>

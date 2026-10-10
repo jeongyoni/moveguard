@@ -27,8 +27,8 @@
         <p><label>만료일 *<br><input type="date" name="notAfter" th:value="${cert.notAfter}" required></label></p>
         <p><label>단계<br>
             <select name="phase">
-                <option value="BEFORE" th:selected="${cert.phase == 'BEFORE'}">BEFORE</option>
-                <option value="AFTER" th:selected="${cert.phase == 'AFTER'}">AFTER</option>
+                <option value="BEFORE" th:selected="${cert.phase == 'BEFORE'}">기준</option>
+                <option value="AFTER" th:selected="${cert.phase == 'AFTER'}">현재</option>
             </select></label></p>
         <p><button class="btn" type="submit">저장</button></p>
     </form>
