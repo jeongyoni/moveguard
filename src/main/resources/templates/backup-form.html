@@ -32,8 +32,8 @@
                                      th:checked="${backup.offsite}"> 오프사이트 보관</label></p>
         <p><label>단계<br>
             <select name="phase">
-                <option value="BEFORE" th:selected="${backup.phase == 'BEFORE'}">BEFORE</option>
-                <option value="AFTER" th:selected="${backup.phase == 'AFTER'}">AFTER</option>
+                <option value="BEFORE" th:selected="${backup.phase == 'BEFORE'}">기준</option>
+                <option value="AFTER" th:selected="${backup.phase == 'AFTER'}">현재</option>
             </select></label></p>
         <p><button class="btn" type="submit">저장</button></p>
     </form>

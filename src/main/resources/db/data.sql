@@ -140,14 +140,14 @@ UPDATE risk_rule SET enabled = 1 WHERE rule_code IN ('CMP-01', 'CMP-02', 'CMP-04
 -- 더미 운영 환경: 가나다커머스 쇼핑몰 (IDC 리눅스 서버 운영)
 -- 기대 진단 결과: CMP-01(CentOS 7 OS EOL·mysql 9.6 EOL) 외 보안·백업 / 즉시 조치
 INSERT INTO migration_project (name, customer_name, source_env, target_env, status, planned_date)
-VALUES ('가나다커머스 쇼핑몰 (운영)', '가나다커머스', 'IDC', 'IDC · CentOS 7', 'PLAN', '2026-10-24');
+VALUES ('가나다커머스 쇼핑몰 (운영)', '가나다커머스', 'IDC', 'IDC · CentOS 7', 'PLAN', '2026-10-10');
 
 SET
 @p := LAST_INSERT_ID();
 
 INSERT INTO asset (project_id, name, asset_type, role, os_name, os_version)
-VALUES (@p, 'web01', 'SERVER', 'WEB', 'Rocky Linux', '8.9'),
-       (@p, 'db01', 'SERVER', 'DB', 'Rocky Linux', '8.9'),
+VALUES (@p, 'web01', 'SERVER', 'WEB', 'CentOS', '7.9.2009'),
+       (@p, 'db01', 'SERVER', 'DB', 'CentOS', '7.9.2009'),
        (@p, 'pg-api', 'EXTERNAL', NULL, NULL, NULL);
 
 SET
@@ -174,9 +174,9 @@ INSERT INTO dns_record (project_id, domain, record_type, value, ttl, phase)
 VALUES (@p, 'shop.example.com', 'A', '203.0.113.11', 3600, 'BEFORE'),
        (@p, 'shop.example.com', 'A', '198.51.100.21', 300, 'AFTER');
 
--- 인증서는 전환 예정일(2026-10-24) 직후 만료 → CERT-01, 갱신 인증서 존재 → CERT-02 미발생
+-- 인증서는 점검일(2026-10-10) 기준 30일 내 만료 → CERT-01, 갱신 인증서 존재 → CERT-02 미발생
 INSERT INTO certificate (project_id, domain, issuer, not_after, phase)
-VALUES (@p, 'shop.example.com', 'Lets Encrypt R3', '2026-11-10', 'BEFORE'),
+VALUES (@p, 'shop.example.com', 'Lets Encrypt R3', '2026-11-05', 'BEFORE'),
        (@p, 'shop.example.com', 'Lets Encrypt R3', '2027-11-10', 'AFTER');
 
 -- web01: 최근·복구테스트·오프사이트 백업 + 계획 → BAK 미발생
