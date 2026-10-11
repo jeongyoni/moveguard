@@ -19,3 +19,11 @@ mybatis:
 compat:
   endoflife:
     base-url: https://endoflife.date/api
+
+# AI 경영요약 — 로컬 LLM(Ollama). 미가용/타임아웃 시 규칙 기반으로 자동 폴백.
+moveguard:
+  llm:
+    enabled: true
+    base-url: http://localhost:11434
+    model: qwen2.5:3b
+    timeout-seconds: 25
