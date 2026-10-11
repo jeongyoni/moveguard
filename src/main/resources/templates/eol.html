@@ -40,29 +40,40 @@
         </div>
 
         <div class="panel">
-            <div class="panel-head">버전별 지원 상태</div>
-            <div class="panel-body" style="padding:0">
-                <table class="grid-table">
-                    <thead>
-                    <tr><th>제품</th><th>버전</th><th>상태</th><th>지원 종료일</th><th>연장지원</th><th>최소 Java</th></tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="r : ${releases}">
-                        <td><b th:text="${r.product}">mysql</b></td>
-                        <td>
-                            <span th:text="${r.version}">9.6</span>
-                            <span class="tag" th:if="${r.lts}" style="margin-left:6px">LTS</span>
-                        </td>
-                        <td>
-                            <span class="level-tag hi" th:if="${r.eol}">지원 종료</span>
-                            <span class="level-tag lo" th:unless="${r.eol}">지원 중</span>
-                        </td>
-                        <td th:text="${r.eolDate} ?: '-'">2026-04-21</td>
-                        <td th:text="${r.extSupportDate} ?: '-'">-</td>
-                        <td th:text="${r.minJavaVersion} ?: '-'">-</td>
-                    </tr>
-                    </tbody>
-                </table>
+            <div class="panel-head">제품별 지원 상태
+                <span th:text="${#lists.size(groups)} + '개 제품'">16개 제품</span>
+            </div>
+            <div class="panel-body" style="padding:10px 14px">
+                <details class="eol-group" th:each="g : ${groups}">
+                    <summary>
+                        <span class="eg-name" th:text="${g.label}">MySQL</span>
+                        <span class="eg-cat" th:text="${g.categoryLabel}">데이터베이스</span>
+                        <span class="eg-spacer"></span>
+                        <span class="eg-count" th:text="${g.total} + '개 버전'">4개 버전</span>
+                        <span class="level-tag hi" th:if="${g.eolCount > 0}" th:text="'EOL ' + ${g.eolCount}">EOL 2</span>
+                        <span class="level-tag lo" th:if="${g.eolCount == 0}">전부 지원 중</span>
+                    </summary>
+                    <table class="grid-table">
+                        <thead>
+                        <tr><th>버전</th><th>상태</th><th>지원 종료일</th><th>연장지원</th><th>최소 Java</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="r : ${g.releases}">
+                            <td>
+                                <b th:text="${r.version}">9.6</b>
+                                <span class="tag" th:if="${r.lts}" style="margin-left:6px">LTS</span>
+                            </td>
+                            <td>
+                                <span class="level-tag hi" th:if="${r.eol}">지원 종료</span>
+                                <span class="level-tag lo" th:unless="${r.eol}">지원 중</span>
+                            </td>
+                            <td th:text="${r.eolDate} ?: '-'">2026-04-21</td>
+                            <td th:text="${r.extSupportDate} ?: '-'">-</td>
+                            <td th:text="${r.minJavaVersion} ?: '-'">-</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </details>
             </div>
         </div>
 

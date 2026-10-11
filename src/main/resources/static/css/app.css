@@ -331,6 +331,22 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1
 .trend-row { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; margin: 16px 0; }
 @media (max-width: 980px) { .chart-row, .trend-row { grid-template-columns: 1fr; } }
 
+/* EOL 제품별 아코디언 */
+.eol-group { border-bottom: 1px solid var(--line); }
+.eol-group:last-child { border-bottom: 0; }
+.eol-group > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px;
+    padding: 13px 6px; font-size: 13.5px; }
+.eol-group > summary::-webkit-details-marker { display: none; }
+.eol-group > summary::before { content: "▸"; color: var(--muted); font-size: 11px; transition: transform .15s; }
+.eol-group[open] > summary::before { transform: rotate(90deg); }
+.eol-group > summary:hover { background: #f9fbfd; }
+.eg-name { font-weight: 700; color: var(--ink); min-width: 160px; }
+.eg-cat { font-size: 11.5px; color: var(--muted); background: #eef2f7; padding: 2px 9px; border-radius: 999px; }
+.eg-spacer { flex: 1; }
+.eg-count { font-size: 12px; color: var(--muted); }
+.eol-group .grid-table { margin: 0 0 12px; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+.eol-group .grid-table thead th { background: #f3f6fa; }
+
 /* WAR 업로드 드롭존 */
 .upload-zone { max-width: 560px; text-align: center; padding: 34px 28px; border: 1.5px dashed var(--border); background: #fafbfd; }
 .upload-zone form { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 0; }
