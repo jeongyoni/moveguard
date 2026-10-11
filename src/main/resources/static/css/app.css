@@ -39,7 +39,8 @@ a { color: var(--brand); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 /* ============ 앱 셸: 사이드바 + 메인 ============ */
-body.app { display: flex; min-height: 100vh; }
+/* 임원(이사진) 대상·발표/영상 가독성: 전체 UI를 15% 확대 */
+body.app { display: flex; min-height: 100vh; zoom: 1.15; }
 
 .sidebar {
     width: 230px; flex-shrink: 0;
