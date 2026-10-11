@@ -15,6 +15,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class RiskScorer {
 
+    // 등급 임계값 (RPN = 심각도 × 발생 × 검출, 각 1~10 → 1~1000).
+    // HIGH(치명적) 400: 심각도 최상위(8~10)이면서 발생·검출이 중상인 조합에서만 도달
+    //   (예: EOL = 10×7×6=420). 보안 패치 끊김/즉시 장애 직결 수준.
+    // MEDIUM(주의) 150: 중간 조합(예: 6×5×5=150). 계획적 조치가 필요한 수준.
     static final int HIGH_RPN = 400;
     static final int MEDIUM_RPN = 150;
 
