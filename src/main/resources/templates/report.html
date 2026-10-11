@@ -99,12 +99,26 @@
         <span class="sw low"></span> &lt;150 · <span class="sw cnt"></span> 발견 건수
     </p>
 
+    <!-- 위험 점수 읽는 법 -->
+    <h2>위험 점수(RPN) 읽는 법</h2>
+    <table class="rpn-legend">
+        <thead>
+        <tr><th>위험 점수</th><th>심각도</th><th>의미 · 권장 대응</th></tr>
+        </thead>
+        <tbody>
+        <tr><td><b>400 이상</b></td><td><span class="sev crit">치명적</span></td><td>즉시 조치 — 보안 사고·서비스 장애로 직결될 수 있는 수준</td></tr>
+        <tr><td><b>150 ~ 399</b></td><td><span class="sev warn">주의</span></td><td>계획적 조치 권고 — 방치 시 위험이 커짐</td></tr>
+        <tr><td><b>149 이하</b></td><td><span class="sev minor">경미</span></td><td>모니터링 권고 — 당장의 위험은 낮음</td></tr>
+        </tbody>
+    </table>
+    <p class="sub" style="margin-top:8px">위험 점수(RPN) = 심각도 × 발생가능성 × 검출난이도 (최대 1,000). 숫자가 클수록 더 시급합니다.</p>
+
     <!-- 주요 위험과 권고 -->
     <h2>주요 위험과 권고 조치 (위험도 순)</h2>
     <table>
         <thead>
         <tr>
-            <th>영역</th><th>위험 항목</th><th class="num">RPN</th><th class="col-b">긴급</th><th>권고 조치</th>
+            <th>영역</th><th>위험 항목</th><th class="num">RPN</th><th class="col-s">심각도</th><th>권고 조치</th>
         </tr>
         </thead>
         <tbody>
@@ -112,7 +126,11 @@
             <td th:text="${it.factorName}">OS·DBMS 호환성</td>
             <td><span class="code" th:text="${it.ruleCode} + ' '">CMP-01</span><span th:text="${it.title}">버전이 이미 지원 종료(EOL)됨</span></td>
             <td class="num" th:text="${it.rpn}">420</td>
-            <td class="col-b"><span class="tag-b" th:if="${it.blocking}">긴급</span></td>
+            <td class="col-s">
+                <span class="sev" th:classappend="${it.rpn >= 400 ? 'crit' : (it.rpn >= 150 ? 'warn' : 'minor')}"
+                      th:text="${it.rpn >= 400 ? '치명적' : (it.rpn >= 150 ? '주의' : '경미')}">치명적</span>
+                <span class="tag-b" th:if="${it.blocking}">긴급</span>
+            </td>
             <td th:text="${it.mitigation}">지원 중인 버전으로 업그레이드하십시오.</td>
         </tr>
         </tbody>

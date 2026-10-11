@@ -80,11 +80,21 @@ th.col-b, td.col-b { text-align: center; white-space: nowrap; width: 46px; }
 .code { font-size: 11px; color: var(--muted); font-weight: 700; }
 .tag-b { display: inline-block; white-space: nowrap; background: #fdeae4; color: #c23c17; border-radius: 5px; padding: 2px 8px; font-size: 10.5px; font-weight: 700; }
 
+/* 심각도 배지 + RPN 해석표 */
+.sev { display: inline-block; white-space: nowrap; border-radius: 5px; padding: 2px 9px; font-size: 10.5px; font-weight: 700; }
+.sev.crit { background: #fdeae4; color: #c23c17; }
+.sev.warn { background: #fcf1dc; color: #9a6a0f; }
+.sev.minor { background: #e3f5ec; color: #1f8655; }
+th.col-s, td.col-s { white-space: nowrap; }
+.rpn-legend { margin-bottom: 4px; }
+.rpn-legend td:first-child, .rpn-legend th:first-child { white-space: nowrap; width: 90px; }
+.rpn-legend td:nth-child(2), .rpn-legend th:nth-child(2) { white-space: nowrap; width: 70px; text-align: center; }
+
 .disc { margin-top: 22px; font-size: 11.5px; color: var(--muted); background: var(--line); border-radius: 8px; padding: 12px 15px; }
 .rpt-foot { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 11px; font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; }
 
 /* 인쇄에서도 색 유지 */
-.bar, .sw, .tag-b, .rcard, .ai, .ai-badge, .ai-act { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.bar, .sw, .tag-b, .sev, .rcard, .ai, .ai-badge, .ai-act { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
 @media print {
     body { background: #fff; }
