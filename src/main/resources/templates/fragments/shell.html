@@ -47,6 +47,27 @@
     <div class="spacer"></div>
     <div class="top-meta">MSP 운영 환경 헬스체크</div>
     <div class="user"><span class="ava">S</span><span>시스원 MSP</span></div>
+
+    <!-- 진단/업로드 제출 시 로딩 오버레이 (LLM 요약 생성 대기) -->
+    <div id="mg-loading" class="mg-loading">
+        <div class="mg-spin"></div>
+        <div class="mg-load-title">진단을 실행하고 있습니다</div>
+        <div class="mg-load-sub">사내 LLM이 고객 보고용 요약을 작성 중입니다…</div>
+    </div>
+    <script>
+        document.addEventListener('submit', function (e) {
+            var f = e.target;
+            if (f && f.action && (f.action.indexOf('/diagnose') > -1 || f.action.indexOf('/projects/import') > -1)) {
+                var el = document.getElementById('mg-loading');
+                if (el) el.classList.add('show');
+            }
+        }, true);
+        // 뒤로가기(bfcache)로 돌아오면 오버레이 숨김
+        window.addEventListener('pageshow', function () {
+            var el = document.getElementById('mg-loading');
+            if (el) el.classList.remove('show');
+        });
+    </script>
 </header>
 
 </body>
