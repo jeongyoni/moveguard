@@ -68,6 +68,26 @@
         </div>
     </section>
 
+    <!-- 먼저 해결할 우선 조치 3가지 -->
+    <div th:if="${not #lists.isEmpty(groups)}">
+        <h2>먼저 해결할 우선 조치 3가지</h2>
+        <div class="prio">
+            <div class="prio-item" th:each="g,st : ${groups}" th:if="${st.index < 3}">
+                <div class="prio-no" th:text="${st.index + 1}">1</div>
+                <div class="prio-body">
+                    <div class="prio-head">
+                        <span class="prio-title" th:text="${g.title}">버전이 이미 지원 종료(EOL)됨</span>
+                        <span class="sev" th:classappend="${g.rpn >= 400 ? 'crit' : (g.rpn >= 150 ? 'warn' : 'minor')}"
+                              th:text="${g.rpn >= 400 ? '치명적' : (g.rpn >= 150 ? '주의' : '경미')}">치명적</span>
+                        <span class="prio-meta" th:text="'RPN ' + ${g.rpn} + (${g.count > 1} ? ' · ' + ${g.count} + '개 자산' : '')">RPN 420</span>
+                    </div>
+                    <div class="prio-action"><b>조치</b> <span th:text="${g.mitigation}">지원 버전으로 업그레이드하십시오.</span></div>
+                </div>
+            </div>
+        </div>
+        <p class="sub" style="margin-top:8px">위 조치는 시스원 MSP의 운영·보안·백업·DR 서비스로 대행·해결할 수 있습니다.</p>
+    </div>
+
     <!-- 위험요인별 위험도 -->
     <h2>위험요인별 위험도</h2>
     <div class="fbars" th:if="${not #lists.isEmpty(factors)}">

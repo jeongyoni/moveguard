@@ -49,6 +49,7 @@ public class ReportController {
         model.addAttribute("blockingCount", blockingCount);
         model.addAttribute("reportDate", LocalDate.now());
         model.addAttribute("exec", executiveSummary.generate(project, result, factors));
+        model.addAttribute("groups", DiagnosisPage.groupFindings(result.findings()));
         return "report";
     }
 }
