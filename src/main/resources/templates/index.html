@@ -65,6 +65,57 @@
             </div>
         </div>
 
+        <!-- 3단 위젯: 긴급 조치 / 점검 영역 / 최근 진단 -->
+        <div class="widgets-3">
+            <div class="panel widget">
+                <div class="panel-head">긴급 조치 필요 <span class="hd-chip" th:text="${dash.blocked} + '개 환경'">2개 환경</span></div>
+                <div class="panel-body wlist">
+                    <a class="witem" th:each="c : ${dash.cards}" th:if="${c.hasRun() and c.level() == 'HIGH'}"
+                       th:href="@{'/projects/' + ${c.project.projectId}}">
+                        <span class="wdot hi"></span>
+                        <span class="wmain"><b th:text="${c.project.name}">환경</b>
+                            <span class="wsub" th:text="${c.project.customerName} + ' · ' + ${c.project.targetEnv}">고객</span></span>
+                        <span class="wval" th:text="'RPN ' + ${c.latest.maxRpn}">RPN 420</span>
+                    </a>
+                    <div class="wempty" th:if="${dash.blocked == 0}">긴급 조치가 필요한 환경이 없습니다 👍</div>
+                </div>
+            </div>
+
+            <div class="panel widget">
+                <div class="panel-head">점검 영역 <span class="hd-chip">규칙 13개</span></div>
+                <div class="panel-body arealist">
+                    <div class="arow">
+                        <span class="aico os"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg></span>
+                        <span class="amain"><b>OS·DBMS 호환성</b><small>지원종료(EOL) · 드라이버 · 최소 Java</small></span>
+                        <span class="acount">5</span>
+                    </div>
+                    <div class="arow">
+                        <span class="aico sec"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></span>
+                        <span class="amain"><b>보안·접근통제</b><small>인증서 · 포트 · 평문 프로토콜</small></span>
+                        <span class="acount">4</span>
+                    </div>
+                    <div class="arow">
+                        <span class="aico bak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"></path><path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3"></path></svg></span>
+                        <span class="amain"><b>백업·복구</b><small>백업 · 복구 테스트 · DR 구성</small></span>
+                        <span class="acount">4</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel widget">
+                <div class="panel-head">최근 진단 현황</div>
+                <div class="panel-body wlist">
+                    <div class="witem" th:each="c, st : ${dash.cards}" th:if="${c.hasRun() and st.index < 5}">
+                        <span class="wdot" th:classappend="${c.level()=='HIGH'} ? 'hi' : (${c.level()=='MEDIUM'} ? 'me' : 'lo')"></span>
+                        <span class="wmain"><b th:text="${c.project.name}">환경</b>
+                            <span class="wsub" th:text="${#temporals.format(c.latest.executedAt, 'MM-dd HH:mm')} + ' · ' + ${c.latest.findingCount} + '건'">시각</span></span>
+                        <span class="wtag" th:classappend="${c.level()=='HIGH'} ? 'hi' : (${c.level()=='MEDIUM'} ? 'me' : 'lo')"
+                              th:text="${c.level()=='HIGH'} ? '즉시조치' : (${c.level()=='MEDIUM'} ? '주의' : '양호')">등급</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 환경 목록 테이블 -->
         <div class="panel">
             <div class="panel-head">운영 환경 현황
@@ -114,13 +165,28 @@ const ROWS = [
     { name: /*[[${c.project.name}]]*/ "환경", rpn: /*[[${c.hasRun()} ? ${c.latest.maxRpn} : 0]]*/ 0, level: /*[[${c.level()}]]*/ "미진단" },
     /*[/]*/
 ];
-const C = { hi:'#e4572e', me:'#e39a1c', lo:'#2faa6a', un:'#aab4c0' };
+const C = { hi:'#f5576c', me:'#f7a23b', lo:'#22bd8a', un:'#c3cbd9' };
 
+const centerText = {
+    id:'centerText',
+    afterDraw(chart){
+        const {ctx, chartArea:{left,right,top,bottom}} = chart;
+        const total = chart.data.datasets[0].data.reduce((a,b)=>a+(+b||0),0);
+        const cx=(left+right)/2, cy=(top+bottom)/2;
+        ctx.save(); ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillStyle='#1f2a44'; ctx.font='800 28px Pretendard, "Noto Sans KR", sans-serif';
+        ctx.fillText(total, cx, cy-7);
+        ctx.fillStyle='#98a0b4'; ctx.font='600 11.5px Pretendard, "Noto Sans KR", sans-serif';
+        ctx.fillText('총 환경', cx, cy+15);
+        ctx.restore();
+    }
+};
 new Chart(document.getElementById('gradeChart'), {
     type: 'doughnut',
     data: { labels:['즉시조치','주의','양호','미진단'],
         datasets:[{ data:GRADES, backgroundColor:[C.hi,C.me,C.lo,C.un], borderWidth:0 }] },
-    options: { cutout:'62%', plugins:{ legend:{ display:false } }, maintainAspectRatio:false }
+    options: { cutout:'70%', plugins:{ legend:{ display:false } }, maintainAspectRatio:false },
+    plugins:[centerText]
 });
 
 const withRun = ROWS.filter(r => r.level !== '미진단').sort((a,b)=>b.rpn-a.rpn).slice(0,8);

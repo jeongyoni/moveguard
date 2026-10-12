@@ -9,9 +9,9 @@
     --ink-2: #43506312;
     --text: #596178;
     --muted: #98a0b4;
-    --brand: #4361ee;        /* modern indigo */
-    --brand-d: #3a53d0;
-    --brand-bg: #eef1fe;
+    --brand: #3b6fe0;        /* Altrix bright blue */
+    --brand-d: #2f5ecb;
+    --brand-bg: #eaf2fe;
     --topbar: #ffffff;       /* light top bar */
     --topbar-2: #263142;
     --red: #f5576c;
@@ -72,8 +72,9 @@ body.app { display: flex; min-height: 100vh; }
     color: var(--text); font-size: 13.5px; font-weight: 500;
 }
 .sidebar nav a:hover { background: var(--bg); text-decoration: none; }
-.sidebar nav a.active { background: var(--brand-bg); color: var(--brand); font-weight: 700; }
+.sidebar nav a.active { background: var(--brand); color: #fff; font-weight: 700; box-shadow: 0 6px 16px rgba(59,111,224,.32); }
 .sidebar nav a svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.85; }
+.sidebar nav a.active svg { opacity: 1; color: #fff; }
 .sidebar .side-note { margin-top: auto; padding: 14px 18px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--border); }
 
 .app-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
@@ -341,6 +342,37 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1
 
 .trend-row { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; margin: 16px 0; }
 @media (max-width: 980px) { .chart-row, .trend-row { grid-template-columns: 1fr; } }
+
+/* ===== 대시보드 3단 위젯 ===== */
+.widgets-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 16px 0; }
+.widget .panel-body { padding: 8px 10px; }
+.hd-chip { float: right; font-size: 11px; font-weight: 600; color: var(--muted); background: var(--bg); padding: 2px 10px; border-radius: 999px; }
+.wlist { display: flex; flex-direction: column; min-height: 150px; }
+.witem { display: flex; align-items: center; gap: 11px; padding: 10px; border-radius: 10px; text-decoration: none; color: inherit; }
+.witem:hover { background: var(--bg); text-decoration: none; }
+.wdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.wdot.hi { background: var(--red); } .wdot.me { background: var(--amber); } .wdot.lo { background: var(--green); }
+.wmain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.wmain b { font-size: 13.5px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wsub { font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wval { font-size: 13px; font-weight: 800; color: var(--red); flex-shrink: 0; }
+.wtag { font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px; flex-shrink: 0; }
+.wtag.hi { background: var(--red-bg); color: #c0391a; } .wtag.me { background: var(--amber-bg); color: #9a6a0f; } .wtag.lo { background: var(--green-bg); color: #1f8655; }
+.wempty { padding: 40px 10px; color: var(--muted); font-size: 12.5px; text-align: center; }
+.arealist { display: flex; flex-direction: column; gap: 2px; }
+.arow { display: flex; align-items: center; gap: 12px; padding: 11px 10px; border-radius: 10px; }
+.arow:hover { background: var(--bg); }
+.aico { width: 40px; height: 40px; border-radius: 11px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.aico svg { width: 20px; height: 20px; }
+.aico.os { background: var(--sky-bg); color: var(--sky); }
+.aico.sec { background: #eceeff; color: #5b6ef5; }
+.aico.bak { background: var(--green-bg); color: var(--green); }
+.amain { flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.amain b { font-size: 13.5px; font-weight: 700; color: var(--ink); }
+.amain small { font-size: 11px; color: var(--muted); }
+.acount { font-size: 19px; font-weight: 800; color: var(--ink); flex-shrink: 0; }
+.acount::after { content: '규칙'; font-size: 10px; font-weight: 500; color: var(--muted); margin-left: 3px; }
+@media (max-width: 1100px) { .widgets-3 { grid-template-columns: 1fr; } }
 
 /* 진단 실행 로딩 오버레이 */
 .mg-loading { position: fixed; inset: 0; z-index: 9999; display: none;
