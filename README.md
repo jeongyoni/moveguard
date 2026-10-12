@@ -138,6 +138,10 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 ```
 
+> **AI 경영요약(로컬 LLM) 설정** — 기본값은 `application.yml`에 있습니다(`moveguard.llm`: Ollama `http://localhost:11434`, 모델 `qwen2.5:3b`).
+> Ollama가 없으면 `moveguard.llm.enabled: false`로 두거나 그냥 두면 되며, 이 경우 AI 요약은 **규칙 기반으로 자동 폴백**합니다(앱 동작엔 지장 없음).
+> 로컬에서 LLM을 쓰려면 `ollama pull qwen2.5:3b` 후 Ollama를 실행하세요.
+
 ### 4. 애플리케이션 실행
 
 ```bash
